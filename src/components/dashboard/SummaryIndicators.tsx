@@ -21,69 +21,70 @@ export function SummaryIndicators({
       id: 'open',
       label: 'Open Incidents',
       count: openIncidents,
-      desc: 'Active operational response',
-      icon: <FolderOpen className="w-5 h-5 text-blue-400" />,
-      border: 'border-blue-900/40 hover:border-blue-700/60',
-      bg: 'bg-slate-900/80',
-      countColor: 'text-blue-100',
+      desc: 'Active operational triage',
+      icon: <FolderOpen className="w-4 h-4 text-blue-400" strokeWidth={1.5} />,
+      border: 'hover:border-blue-500/40',
+      countColor: 'text-blue-400',
+      stagger: 'stagger-1',
     },
     {
       id: 'critical',
-      label: 'Critical / High Attention',
+      label: 'Critical Priority',
       count: criticalHigh,
       desc: 'Score ≥ 45 or safety floor active',
-      icon: <AlertCircle className="w-5 h-5 text-rose-400" />,
-      border: 'border-rose-900/40 hover:border-rose-700/60',
-      bg: 'bg-slate-900/80',
-      countColor: 'text-rose-200',
+      icon: <AlertCircle className="w-4 h-4 text-rose-500" strokeWidth={1.5} />,
+      border: 'hover:border-rose-500/40',
+      countColor: 'text-rose-500',
+      stagger: 'stagger-2',
     },
     {
       id: 'uncertainty',
-      label: 'Unresolved Uncertainty',
+      label: 'Data Uncertainty',
       count: unresolvedUncertainty,
-      desc: 'Missing coords, conflicting, single source',
-      icon: <AlertTriangle className="w-5 h-5 text-amber-400" />,
-      border: 'border-amber-900/40 hover:border-amber-700/60',
-      bg: 'bg-slate-900/80',
-      countColor: 'text-amber-200',
+      desc: 'Missing coords or single source',
+      icon: <AlertTriangle className="w-4 h-4 text-amber-500" strokeWidth={1.5} />,
+      border: 'hover:border-amber-500/40',
+      countColor: 'text-amber-500',
+      stagger: 'stagger-3',
     },
     {
       id: 'duplicates',
-      label: 'Duplicate Suggestions',
+      label: 'Duplicate Reviews',
       count: pendingDuplicates,
-      desc: 'Awaiting coordinator confirmation',
-      icon: <CopyCheck className="w-5 h-5 text-purple-400" />,
-      border: 'border-purple-900/40 hover:border-purple-700/60',
-      bg: 'bg-slate-900/80',
-      countColor: 'text-purple-200',
+      desc: 'Awaiting coordinator decision',
+      icon: <CopyCheck className="w-4 h-4 text-[var(--text-secondary)]" strokeWidth={1.5} />,
+      border: 'hover:border-[var(--border-strong)]',
+      countColor: 'text-[var(--text-primary)]',
+      stagger: 'stagger-4',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
       {indicators.map((ind) => (
-        <div
+        <button
           key={ind.id}
+          type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`p-4 rounded-xl border ${ind.border} ${ind.bg} transition-all duration-150 cursor-pointer shadow-sm relative overflow-hidden group`}
+          className={`text-left p-3.5 md:p-4 surface-z1 ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200 transition-colors">
+            <span className="text-xs font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
               {ind.label}
             </span>
-            <div className="p-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
+            <div className="p-1 rounded-md bg-[var(--border-subtle)] border border-[var(--border-subtle)]">
               {ind.icon}
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl md:text-3xl font-bold font-heading ${ind.countColor}`}>
+            <span className={`text-2xl md:text-3xl font-bold font-heading tabular-nums ${ind.countColor}`}>
               {ind.count}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 truncate">
+          <p className="text-[11px] text-[var(--text-muted)] mt-1 truncate">
             {ind.desc}
           </p>
-        </div>
+        </button>
       ))}
     </div>
   );

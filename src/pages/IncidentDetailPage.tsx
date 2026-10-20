@@ -312,49 +312,49 @@ export function IncidentDetailPage() {
       )}
 
       {/* Score Explanation & Factor Breakdown Card (Section 4.5 & 15.1) */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+      <div className="surface-z1 p-4 md:p-5 shadow-sm animate-spatial-enter">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[var(--border-subtle)] gap-2">
           <div>
-            <h2 className="text-base font-semibold text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-base font-semibold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
               Explainable Priority Score Breakdown
-              <span className="font-mono text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+              <span className="font-mono text-xs font-normal text-[var(--text-muted)] bg-[var(--border-subtle)] px-2 py-0.5 rounded">
                 Ruleset v{breakdown?.ruleset_version || '1.0.0'}
               </span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
               Deterministic, transparent calculation derived from underlying evidence.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 font-mono">
+          <div className="flex items-center gap-4 font-mono tabular-nums">
             <div>
-              <span className="text-[10px] uppercase text-slate-400 block">Computed</span>
-              <span className="text-lg font-bold text-slate-200">
+              <span className="text-[10px] uppercase text-[var(--text-muted)] block">Computed</span>
+              <span className="text-lg font-bold text-[var(--text-primary)]">
                 {incident.computed_score}
-                <span className="text-xs text-slate-400">/100</span>
+                <span className="text-xs text-[var(--text-muted)]">/100</span>
               </span>
             </div>
             {breakdown?.floor_applied && (
               <div>
-                <span className="text-[10px] uppercase text-amber-400 block">Safety Floor</span>
-                <span className="text-lg font-bold text-amber-300">
+                <span className="text-[10px] uppercase text-amber-500 block">Safety Floor</span>
+                <span className="text-lg font-bold text-amber-400">
                   {breakdown.floor_score}
-                  <span className="text-xs text-amber-400/80">/100</span>
+                  <span className="text-xs text-amber-500/80">/100</span>
                 </span>
               </div>
             )}
             {incident.score_override !== null && (
               <div>
-                <span className="text-[10px] uppercase text-purple-400 block">Manual Override</span>
-                <span className="text-lg font-bold text-purple-300">
+                <span className="text-[10px] uppercase text-rose-400 block">Manual Override</span>
+                <span className="text-lg font-bold text-rose-300">
                   {incident.score_override}
-                  <span className="text-xs text-purple-400/80">/100</span>
+                  <span className="text-xs text-rose-400/80">/100</span>
                 </span>
               </div>
             )}
-            <div className="pl-2 border-l border-slate-800">
-              <span className="text-[10px] uppercase text-rose-400 block">Effective Score</span>
-              <span className="text-2xl font-bold text-white">
+            <div className="pl-2 border-l border-[var(--border-subtle)]">
+              <span className="text-[10px] uppercase text-rose-500 block">Effective Score</span>
+              <span className="text-2xl font-bold text-[var(--text-primary)]">
                 {incident.effective_score}
               </span>
             </div>

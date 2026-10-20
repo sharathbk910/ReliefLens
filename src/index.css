@@ -2,9 +2,71 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Theme: Dark (Default) */
+    --canvas: #090d16;
+    --canvas-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(30, 41, 59, 0.35) 0%, rgba(9, 13, 22, 1) 100%);
+    --surface-1: rgba(18, 25, 41, 0.78);
+    --surface-1-solid: #121929;
+    --surface-2: rgba(26, 36, 58, 0.88);
+    --surface-2-solid: #1a243a;
+    --surface-edge: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --surface-edge-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    --shadow-1: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-2: 0 12px 36px -4px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+
+    --accent: #e11d48;
+    --accent-hover: #f43f5e;
+    --accent-subtle: rgba(225, 29, 72, 0.15);
+    
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    --focus-ring: #10b981;
+  }
+
+  :root.light {
+    /* Theme: Light */
+    --canvas: #f6f8fa;
+    --canvas-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(226, 232, 240, 0.6) 0%, rgba(246, 248, 250, 1) 100%);
+    --surface-1: rgba(255, 255, 255, 0.82);
+    --surface-1-solid: #ffffff;
+    --surface-2: rgba(255, 255, 255, 0.94);
+    --surface-2-solid: #ffffff;
+    --surface-edge: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    --surface-edge-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+    --shadow-1: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+    --shadow-2: 0 16px 36px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-subtle: rgba(15, 23, 42, 0.08);
+    --border-strong: rgba(15, 23, 42, 0.16);
+
+    --accent: #e11d48;
+    --accent-hover: #be123c;
+    --accent-subtle: rgba(225, 29, 72, 0.08);
+
+    --success: #059669;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --info: #2563eb;
+
+    --focus-ring: #059669;
   }
 
   *, *::before, *::after {
@@ -18,9 +80,14 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #0b0f19;
-    color: #f1f5f9;
+    background-color: var(--canvas);
+    background-image: var(--canvas-gradient);
+    color: var(--text-primary);
     min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   img, video, canvas, iframe {
@@ -34,61 +101,149 @@
     word-break: break-word;
   }
 
-  /* Accessible focus indicators */
+  /* Accessible focus indicators with WCAG compliance */
   :focus-visible {
-    outline: 2px solid #10b981;
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  /* Tabular figures for coordinates, scores, counts, and timers */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
+/* -------------------------------------------------------------------------
+   SPATIAL LAYERS & MATERIAL SURFACES (Section A & B)
+   1. Canvas (z-0): Base ambient background
+   2. Surface (z-1): Cards, panels, table containers (translucent + highlight + shadow)
+   3. Floating (z-2): Nav rail/dock, dialogs, bottom sheets, toasts
+   ------------------------------------------------------------------------- */
+
+/* Layer 1: Physical Surfaces */
+.surface-z1 {
+  background-color: var(--surface-1-solid);
+  box-shadow: var(--shadow-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.875rem;
+  position: relative;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .surface-z1 {
+    background-color: var(--surface-1);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: var(--shadow-1), var(--surface-edge);
   }
-  to {
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .surface-z1 {
+    background-color: var(--surface-1-solid) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Layer 2: Floating Surfaces (Nav, Modals, Sheets, Command Bars) */
+.surface-z2 {
+  background-color: var(--surface-2-solid);
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 1rem;
+  position: relative;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .surface-z2 {
+    background-color: var(--surface-2);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    box-shadow: var(--shadow-2), var(--surface-edge);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .surface-z2 {
+    background-color: var(--surface-2-solid) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Map Scrim for Text Overlay */
+.map-scrim {
+  background: linear-gradient(180deg, rgba(9, 13, 22, 0.75) 0%, rgba(9, 13, 22, 0.3) 50%, rgba(9, 13, 22, 0.85) 100%);
+  pointer-events: none;
+}
+
+:root.light .map-scrim {
+  background: linear-gradient(180deg, rgba(246, 248, 250, 0.85) 0%, rgba(246, 248, 250, 0.4) 50%, rgba(246, 248, 250, 0.9) 100%);
+}
+
+/* -------------------------------------------------------------------------
+   SPATIAL MOTION & TRANSITIONS (Section E)
+   - Entrance: cubic-bezier(0.2, 0.8, 0.2, 1), 180-300ms
+   - Exit: cubic-bezier(0.4, 0, 1, 1), 150-200ms
+   - Animate ONLY transform & opacity
+   ------------------------------------------------------------------------- */
+@keyframes spatialEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pageTransition {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulseGlow {
+@keyframes subtlePulse {
   0%, 100% {
-    opacity: 0.8;
+    opacity: 1;
   }
   50% {
     opacity: 0.4;
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-spatial-enter {
+  animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-.animate-slide-down {
-  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-page-enter {
+  animation: pageTransition 220ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 2s ease-in-out infinite;
+.animate-subtle-pulse {
+  animation: subtlePulse 1.8s ease-in-out infinite;
 }
+
+/* Staggered Entrance for first 6 items */
+.stagger-1 { animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) 0ms both; }
+.stagger-2 { animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) 30ms both; }
+.stagger-3 { animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) 60ms both; }
+.stagger-4 { animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) 90ms both; }
+.stagger-5 { animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both; }
+.stagger-6 { animation: spatialEntrance 240ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms both; }
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
@@ -96,42 +251,56 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 3px;
+  background: var(--border-strong);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: var(--text-muted);
 }
 
 /* Map specific styling */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #0f172a !important;
-  border-radius: 0.75rem;
+  background: var(--canvas) !important;
+  border-radius: 0.875rem;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #1e293b !important;
-  color: #f8fafc !important;
-  border: 1px solid #334155 !important;
-  border-radius: 0.5rem !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  background: var(--surface-2-solid) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: var(--shadow-2) !important;
 }
 
 .leaflet-popup-tip {
-  background: #1e293b !important;
+  background: var(--surface-2-solid) !important;
 }
 
-/* Reduced motion preference */
+/* Table scroll cue */
+.table-scroll-container {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reduced motion preference (Section E) */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+    transform: none !important;
+  }
+
+  .animate-subtle-pulse {
+    animation: none !important;
+    opacity: 1 !important;
   }
 }

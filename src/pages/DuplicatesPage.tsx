@@ -139,16 +139,16 @@ export function DuplicatesPage() {
             return (
               <div
                 key={cand.id}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4 hover:border-slate-700/80 transition-colors"
+                className="surface-z1 p-4 md:p-5 space-y-4 hover:border-[var(--border-strong)] transition-colors animate-spatial-enter"
               >
                 {/* Top Match Metric & Reasons Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border-subtle)]">
                   <div className="flex items-center gap-3">
-                    <div className="px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-purple-200 text-xs font-mono font-bold flex items-center gap-1.5">
-                      <span>Similarity:</span>
-                      <span className="text-sm">{Math.round(cand.similarity_score * 100)}%</span>
+                    <div className="px-2.5 py-1 rounded-md bg-[var(--border-subtle)] border border-[var(--border-strong)] text-[var(--text-primary)] text-xs font-mono font-bold flex items-center gap-1.5 tabular-nums">
+                      <span className="text-[var(--text-muted)]">Similarity:</span>
+                      <span className="text-sm text-rose-500">{Math.round(cand.similarity_score * 100)}%</span>
                     </div>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-[var(--text-secondary)]">
                       Evaluated via Jaccard text + Haversine spatial + temporal decay
                     </span>
                   </div>

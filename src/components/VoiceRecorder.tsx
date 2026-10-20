@@ -312,79 +312,66 @@ export function VoiceRecorder({
         </div>
       ) : recorderState === 'ready' || recorderState === 'requesting_permission' ? (
         <div className="text-center py-6 px-4">
+          {/* Spatial Focal Object: Single Large Circular Button with Static Outer Ring */}
           <div className="relative inline-flex items-center justify-center mb-4">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer shadow-lg shadow-emerald-500/10">
-              <Mic className="w-9 h-9 text-emerald-400" />
-            </div>
-          </div>
-
-          <h4 className="text-sm font-semibold text-slate-200">Ready to Record Emergency</h4>
-          <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-            Click the button below to start. Describe the emergency naturally: location, what happened, who is at risk,
-            and immediate dangers.
-          </p>
-
-          <div className="flex items-center justify-center gap-3 mt-5">
-            <Button
-              variant="primary"
+            <button
+              type="button"
               onClick={startRecording}
               disabled={recorderState === 'requesting_permission'}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-md shadow-emerald-900/30"
+              aria-label="Start Voice Recording"
+              className="w-24 h-24 rounded-full p-1.5 border-2 border-[var(--border-strong)] hover:border-rose-500/60 transition-colors focus-visible:ring-2 flex items-center justify-center group cursor-pointer"
             >
-              {recorderState === 'requesting_permission' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Requesting Mic Access...
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4" />
-                  Start Recording
-                </>
-              )}
-            </Button>
+              <div className="w-full h-full rounded-full bg-[var(--surface-1-solid)] group-hover:bg-rose-500/10 border border-[var(--border-subtle)] flex items-center justify-center transition-all duration-200 shadow-sm">
+                {recorderState === 'requesting_permission' ? (
+                  <Loader2 className="w-8 h-8 text-rose-500 animate-spin" strokeWidth={1.5} />
+                ) : (
+                  <Mic className="w-8 h-8 text-rose-500 group-hover:scale-105 transition-transform" strokeWidth={1.5} />
+                )}
+              </div>
+            </button>
+          </div>
 
-            {onSwitchToManual && (
-              <Button variant="ghost" size="sm" onClick={onSwitchToManual} className="text-slate-400 hover:text-slate-200">
+          <h4 className="text-sm font-semibold text-[var(--text-primary)]">Ready to Record</h4>
+          <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-sm mx-auto">
+            Click the circular microphone to begin. Speak naturally in any language.
+          </p>
+
+          {onSwitchToManual && (
+            <div className="mt-4">
+              <Button variant="ghost" size="sm" onClick={onSwitchToManual} className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]">
                 Type Manually Instead
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       ) : recorderState === 'recording' ? (
         <div className="text-center py-6 px-4">
-          {/* Audio Pulsing Visualizer Indicator */}
-          <div className="flex items-center justify-center gap-1.5 h-16 mb-4">
-            {[40, 70, 95, 60, 85, 100, 75, 45, 90, 65, 80, 50].map((h, i) => (
-              <span
-                key={i}
-                className="w-1.5 bg-rose-500 rounded-full transition-all duration-150 animate-pulse"
-                style={{
-                  height: `${h}%`,
-                  animationDelay: `${(i * 0.08).toFixed(2)}s`,
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="text-2xl font-mono font-bold text-white mb-1">
-            {formatTime(elapsedSeconds)}
-          </div>
-          <p className="text-xs text-slate-400">
-            Speaking now... Max duration {MAX_RECORDING_SECONDS}s. Press Stop when finished.
-          </p>
-
-          <div className="mt-5 flex items-center justify-center gap-3">
-            <Button
-              variant="danger"
-              size="lg"
+          {/* Spatial Focal Object: Active Recording Ring with Tabular Timer */}
+          <div className="relative inline-flex items-center justify-center mb-4">
+            <button
+              type="button"
               onClick={stopRecording}
-              className="gap-2 font-medium shadow-lg shadow-rose-950/50"
+              aria-label="Stop Voice Recording"
+              className="w-28 h-28 rounded-full p-2 border-2 border-rose-500 transition-colors focus-visible:ring-2 flex items-center justify-center group cursor-pointer relative"
             >
-              <Square className="w-4 h-4 fill-current" />
-              Stop Recording
-            </Button>
+              {/* Single Subtle Animated Indicator (Disabled under reduced motion) */}
+              <div className="absolute top-1 right-1 w-3 h-3 rounded-full bg-rose-500 animate-subtle-pulse" />
+
+              <div className="w-full h-full rounded-full bg-rose-500/15 border border-rose-500/40 flex flex-col items-center justify-center shadow-inner">
+                <Square className="w-5 h-5 fill-rose-500 text-rose-500 mb-1" strokeWidth={1.5} />
+                <span className="text-xs font-mono font-bold text-rose-400 tabular-nums">
+                  {formatTime(elapsedSeconds)}
+                </span>
+              </div>
+            </button>
           </div>
+
+          <div className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">
+            Recording in Progress
+          </div>
+          <p className="text-xs text-[var(--text-muted)] tabular-nums">
+            {formatTime(elapsedSeconds)} / {formatTime(MAX_RECORDING_SECONDS)} • Tap circle to stop
+          </p>
         </div>
       ) : recorderState === 'recording_stopped' ? (
         <div className="py-4 px-2">

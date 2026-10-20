@@ -4,6 +4,7 @@ import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx
 import { IncidentFilters } from '../components/dashboard/IncidentFilters.tsx';
 import { IncidentTable } from '../components/dashboard/IncidentTable.tsx';
 import { ScoringExplainer } from '../components/dashboard/ScoringExplainer.tsx';
+import { DashboardMapPreview } from '../components/dashboard/DashboardMapPreview.tsx';
 import { dataService } from '../lib/dataService.ts';
 import type {
   Incident,
@@ -121,20 +122,20 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2">
+    <div className="space-y-4 animate-spatial-enter">
+      {/* Operational Header - Immediate Live Data, No Marketing Hero */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold font-heading text-white tracking-tight">
+          <h1 className="text-xl md:text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight">
             Incident Coordination Dashboard
           </h1>
-          <p className="text-xs text-slate-400">
-            Real-time disaster reports consolidated with explainable priority ranking.
+          <p className="text-xs text-[var(--text-secondary)]">
+            Continuous triage with deterministic multi-factor scoring and spatial cross-referencing.
           </p>
         </div>
       </div>
 
-      {/* 4 Compact Summary Indicators (Section 4.1) */}
+      {/* 4 Summary Indicators (Surface-Z1) */}
       <SummaryIndicators
         openIncidents={summary.openIncidents}
         criticalHigh={summary.criticalHigh}
@@ -146,7 +147,7 @@ export function DashboardPage() {
       {/* Scoring Explainer Panel */}
       <ScoringExplainer />
 
-      {/* Compact Incident Filter Toolbar */}
+      {/* Filter Toolbar */}
       <IncidentFilters
         filters={filters}
         onChange={handleFilterChange}
@@ -154,15 +155,22 @@ export function DashboardPage() {
         districts={districts}
       />
 
-      {/* Incidents Table */}
-      <IncidentTable
-        incidents={incidents}
-        isLoading={isLoading}
-        page={page}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={(p) => setPage(p)}
-      />
+      {/* Incidents Table + Spatial Map Preview (Beside on desktop, stacked on mobile) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <div className="lg:col-span-8 space-y-4 min-w-0">
+          <IncidentTable
+            incidents={incidents}
+            isLoading={isLoading}
+            page={page}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={(p) => setPage(p)}
+          />
+        </div>
+        <div className="lg:col-span-4 min-w-0 sticky top-4">
+          <DashboardMapPreview incidents={incidents} />
+        </div>
+      </div>
     </div>
   );
 }

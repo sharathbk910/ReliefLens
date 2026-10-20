@@ -28,5 +28,9 @@ pnpm-debug.log*
 *.suo
 *.ntvs*
 *.njsproj
+
+# Test & verification artifacts
+.edge_profile/
+.temp_edge_*
 *.sln
 *.sw?

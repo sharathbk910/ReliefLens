@@ -150,11 +150,11 @@ export function AuditPage() {
       </div>
 
       {/* Audit Log Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="surface-z1 overflow-hidden shadow-sm animate-spatial-enter">
+        <div className="table-scroll-container">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-medium">
+              <tr className="bg-[var(--border-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium">
                 <th className="py-3 px-4">Timestamp</th>
                 <th className="py-3 px-4">Actor</th>
                 <th className="py-3 px-4">Action</th>
@@ -163,7 +163,7 @@ export function AuditPage() {
                 <th className="py-3 px-4 text-right">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-200 font-mono text-[11px]">
+            <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-primary)] font-mono text-[11px] tabular-nums">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-slate-400 font-sans">

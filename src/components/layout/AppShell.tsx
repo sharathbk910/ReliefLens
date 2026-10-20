@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   CopyCheck,
   MapPin,
   ShieldAlert,
-  PlusCircle,
-  Menu,
-  X,
-  AlertOctagon,
+  Plus,
+  AlertTriangle,
   UserCheck,
-  LogOut,
   ChevronDown,
   RefreshCw,
+  Sun,
+  Moon,
+  Radio,
+  Lock,
+  User,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { dataService } from '../../lib/dataService.ts';
 import { Button } from '../ui/Button.tsx';
@@ -20,18 +23,40 @@ import { useToast } from '../ui/Toast.tsx';
 import type { UserRole } from '../../shared/types.ts';
 
 export function AppShell() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const currentUser = dataService.getCurrentUser();
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
 
+  // Initialize theme from system or saved preference
+  useEffect(() => {
+    const saved = localStorage.getItem('relieflens-theme');
+    if (saved === 'light' || (!saved && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      setTheme('light');
+      document.documentElement.classList.add('light');
+    } else {
+      setTheme('dark');
+      document.documentElement.classList.remove('light');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('relieflens-theme', next);
+    if (next === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  };
+
   const handleRoleChange = (role: UserRole) => {
     const updated = dataService.setCurrentUserRole(role);
     setUserDropdownOpen(false);
     toast.info(`Switched Active Role`, `Now acting as ${updated.display_name} (${role.toUpperCase()})`);
-    // If on /audit and switched to non-admin, redirect to /dashboard
     if (location.pathname === '/audit' && role !== 'admin') {
       navigate('/dashboard');
     }
@@ -49,150 +74,173 @@ export function AppShell() {
     {
       to: '/dashboard',
       label: 'Dashboard',
-      icon: <LayoutDashboard className="w-4 h-4" />,
+      icon: <LayoutDashboard className="w-5 h-5 shrink-0" strokeWidth={1.5} />,
     },
     {
       to: '/duplicates',
       label: 'Duplicate Review',
-      icon: <CopyCheck className="w-4 h-4" />,
+      icon: <CopyCheck className="w-5 h-5 shrink-0" strokeWidth={1.5} />,
     },
     {
       to: '/map',
       label: 'Geographic Map',
-      icon: <MapPin className="w-4 h-4" />,
+      icon: <MapPin className="w-5 h-5 shrink-0" strokeWidth={1.5} />,
     },
     ...(currentUser.role === 'admin'
       ? [
           {
             to: '/audit',
             label: 'Audit Log',
-            icon: <ShieldAlert className="w-4 h-4" />,
+            icon: <ShieldAlert className="w-5 h-5 shrink-0" strokeWidth={1.5} />,
           },
         ]
       : []),
   ];
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col font-sans">
-      {/* 1. Mandatory Safety Disclaimer Banner (Section 18) */}
-      <div className="bg-amber-950/40 border-b border-amber-500/20 px-4 py-1.5 text-xs text-amber-200/90 flex items-center justify-between z-40 backdrop-blur-sm">
-        <div className="flex items-center gap-2 max-w-5xl mx-auto w-full">
-          <AlertOctagon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-          <span className="leading-tight">
-            <strong>Prototype:</strong> ReliefLens supports emergency coordination decisions but is not an official emergency-service system. Do not use it as the sole source for emergency triage.
+    <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
+      {/* 1. Mandatory Safety Disclaimer Banner (Spatial Topbar) */}
+      <header className="z-40 px-3 md:px-6 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--surface-1)] backdrop-blur-md text-xs flex items-center justify-between">
+        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full">
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" strokeWidth={1.5} />
+          <span className="leading-tight text-[var(--text-secondary)] text-[11px] md:text-xs">
+            <strong className="text-[var(--text-primary)] font-semibold">Operational Prototype:</strong> ReliefLens provides decision support for emergency coordination. Not an official 911 dispatch replacement.
           </span>
+          <div className="ml-auto flex items-center gap-2 shrink-0">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-3.5 h-3.5" strokeWidth={1.5} />
+              ) : (
+                <Moon className="w-3.5 h-3.5" strokeWidth={1.5} />
+              )}
+            </button>
+            <button
+              onClick={handleResetData}
+              title="Reset simulated scenario data"
+              className="hidden sm:flex items-center gap-1 text-[11px] text-amber-500 hover:text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/10 transition-colors"
+            >
+              <RefreshCw className="w-3 h-3" strokeWidth={1.5} />
+              <span>Reset Data</span>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={handleResetData}
-          title="Reset simulated data"
-          className="hidden md:flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-200 px-2 py-0.5 rounded bg-amber-900/30 border border-amber-600/30"
-        >
-          <RefreshCw className="w-3 h-3" />
-          <span>Reset Seed Data</span>
-        </button>
-      </div>
+      </header>
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* 2. Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 bg-slate-950/70 border-r border-slate-800 shrink-0">
-          {/* Logo / Header */}
-          <div className="p-4 border-b border-slate-800/80 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-600/20 border border-rose-500/40 flex items-center justify-center text-rose-500 shadow-sm">
-              <span className="text-lg">🎯</span>
+      {/* Main Spatial Body */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) */}
+        <aside
+          aria-label="Primary Navigation"
+          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none"
+        >
+          {/* Logo & Operational Status */}
+          <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0 shadow-sm">
+              <Radio className="w-4 h-4" strokeWidth={1.5} />
             </div>
-            <div>
-              <div className="font-bold text-white text-base tracking-tight font-heading flex items-center gap-1.5">
-                ReliefLens
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+            <div className="hidden lg:block min-w-0">
+              <div className="font-bold text-[var(--text-primary)] text-sm tracking-tight font-heading flex items-center gap-1.5">
+                <span>ReliefLens</span>
+                <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   v1.0
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">Emergency Coordination</p>
+              <p className="text-[10px] text-[var(--text-muted)] truncate">Crisis Coordination</p>
             </div>
           </div>
 
-          {/* Primary Action: New Report */}
-          <div className="p-4 pb-2">
+          {/* New Report Primary Action */}
+          <div className="p-2.5">
             {currentUser.role !== 'viewer' ? (
               <Button
                 variant="primary"
                 size="md"
-                className="w-full justify-start shadow-md shadow-rose-950/20"
-                leftIcon={<PlusCircle className="w-4 h-4" />}
+                className="w-full justify-center lg:justify-start shadow-md shadow-rose-950/20 px-2.5"
+                leftIcon={<Plus className="w-4 h-4 shrink-0" strokeWidth={1.5} />}
                 onClick={() => navigate('/reports/new')}
+                title="Create New Emergency Report"
               >
-                New Incident Report
+                <span className="hidden lg:inline text-xs font-semibold">New Report</span>
               </Button>
             ) : (
               <div
                 title="Viewers have read-only access and cannot submit reports."
-                className="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center"
+                className="p-2 rounded-lg bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] text-center flex items-center justify-center"
               >
-                🔒 Read-Only Viewer Mode
+                <Lock className="w-4 h-4" strokeWidth={1.5} />
+                <span className="hidden lg:inline ml-1.5 text-[11px]">Read-Only</span>
               </div>
             )}
           </div>
 
-          {/* Navigation Items (Section 6) */}
-          <nav className="flex-1 p-3 space-y-1">
+          {/* Navigation Links with Spatial Transform Highlight */}
+          <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
+                title={item.label}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-sm font-semibold'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                   }`
                 }
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span className="hidden lg:inline truncate">{item.label}</span>
               </NavLink>
             ))}
           </nav>
 
-          {/* User Account / Role Switcher Menu */}
-          <div className="p-3 border-t border-slate-800/80 relative">
-            <div
+          {/* User Account / Role Switcher Popover */}
+          <div className="p-2.5 border-t border-[var(--border-subtle)] relative">
+            <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className="flex items-center justify-between p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800/80 border border-slate-800 cursor-pointer transition-colors"
+              aria-label="User Account and Persona Menu"
+              className="w-full flex items-center justify-between p-1.5 lg:p-2 rounded-lg hover:bg-[var(--border-subtle)] transition-colors border border-transparent hover:border-[var(--border-subtle)]"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-semibold text-rose-400 shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[var(--border-subtle)] border border-[var(--border-strong)] flex items-center justify-center text-xs font-semibold text-rose-400 shrink-0">
                   {currentUser.display_name.charAt(0)}
                 </div>
-                <div className="truncate">
-                  <p className="text-xs font-semibold text-white truncate">
+                <div className="hidden lg:block text-left truncate min-w-0">
+                  <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
                     {currentUser.display_name}
                   </p>
-                  <p className="text-[10px] uppercase font-mono text-slate-400">
-                    Role: {currentUser.role}
+                  <p className="text-[10px] uppercase font-mono text-[var(--text-muted)]">
+                    {currentUser.role}
                   </p>
                 </div>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            </div>
+              <ChevronDown className="hidden lg:block w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" strokeWidth={1.5} />
+            </button>
 
-            {/* Role Switcher Popover */}
+            {/* Role Switcher Menu */}
             {userDropdownOpen && (
-              <div className="absolute bottom-16 left-3 right-3 bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-2 z-50 animate-slide-down">
-                <p className="text-[10px] uppercase font-mono text-slate-400 px-2 py-1">
-                  Switch Role Persona:
+              <div className="absolute bottom-16 left-2 right-2 lg:w-56 surface-z2 p-2 z-50 animate-spatial-enter">
+                <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] px-2 py-1">
+                  Active Persona:
                 </p>
-                {(['admin', 'coordinator', 'viewer'] as UserRole[]).map((r) => (
+                {(['admin', 'coordinator', 'reporter', 'viewer'] as UserRole[]).map((r) => (
                   <button
                     key={r}
                     onClick={() => handleRoleChange(r)}
-                    className={`w-full text-left px-2 py-1.5 rounded text-xs flex items-center justify-between transition-colors ${
+                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs flex items-center justify-between transition-colors ${
                       currentUser.role === r
-                        ? 'bg-rose-950/60 text-rose-200 font-semibold'
-                        : 'text-slate-300 hover:bg-slate-800'
+                        ? 'bg-rose-500/15 text-rose-400 font-semibold border border-rose-500/30'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                     }`}
                   >
                     <span className="capitalize">{r}</span>
-                    {currentUser.role === r && <UserCheck className="w-3 h-3 text-rose-400" />}
+                    {currentUser.role === r && <UserCheck className="w-3.5 h-3.5 text-rose-400" strokeWidth={1.5} />}
                   </button>
                 ))}
               </div>
@@ -200,71 +248,79 @@ export function AppShell() {
           </div>
         </aside>
 
-        {/* 3. Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          {/* Mobile Topbar */}
-          <header className="md:hidden flex items-center justify-between p-3 bg-slate-950 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🎯</span>
-              <span className="font-bold text-white text-sm font-heading">ReliefLens</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {currentUser.role !== 'viewer' && (
-                <Button
-                  size="sm"
-                  variant="primary"
-                  onClick={() => navigate('/reports/new')}
-                >
-                  New Report
-                </Button>
-              )}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900 border border-slate-800"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-            </div>
-          </header>
-
-          {/* Mobile Navigation Drawer */}
-          {mobileMenuOpen && (
-            <div className="md:hidden bg-slate-950 border-b border-slate-800 p-4 space-y-2 z-30 animate-slide-down">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium ${
-                      isActive
-                        ? 'bg-slate-800 text-white'
-                        : 'text-slate-400 hover:text-slate-200'
-                    }`
-                  }
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span>Active Role: <strong className="text-white capitalize">{currentUser.role}</strong></span>
-                <button
-                  onClick={() => handleRoleChange(currentUser.role === 'coordinator' ? 'admin' : currentUser.role === 'admin' ? 'viewer' : 'coordinator')}
-                  className="text-xs text-rose-400 underline"
-                >
-                  Toggle Role
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Route Outlet */}
-          <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+        {/* 3. Main Content Canvas */}
+        <main
+          id="main-content"
+          className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 md:pb-6"
+        >
+          <div className="flex-1 p-3 md:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-page-enter">
             <Outlet />
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
+
+      {/* 4. Mobile Floating Bottom Dock (Section D - 4 or fewer items, safe area padding) */}
+      <nav
+        aria-label="Mobile Navigation Dock"
+        className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl"
+        style={{ paddingBottom: 'calc(0.375rem + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
+              isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+            }`
+          }
+        >
+          <LayoutDashboard className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+          <span>Dashboard</span>
+        </NavLink>
+
+        <NavLink
+          to="/duplicates"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
+              isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+            }`
+          }
+        >
+          <CopyCheck className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+          <span>Duplicates</span>
+        </NavLink>
+
+        <NavLink
+          to="/map"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
+              isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+            }`
+          }
+        >
+          <MapPin className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+          <span>Map</span>
+        </NavLink>
+
+        {currentUser.role !== 'viewer' ? (
+          <button
+            onClick={() => navigate('/reports/new')}
+            className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-rose-500 font-semibold"
+          >
+            <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mb-0.5">
+              <Plus className="w-4 h-4 text-rose-400" strokeWidth={1.5} />
+            </div>
+            <span>Report</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+            className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-[var(--text-muted)]"
+          >
+            <User className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+            <span>Role</span>
+          </button>
+        )}
+      </nav>
     </div>
   );
 }

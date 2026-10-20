@@ -12,6 +12,7 @@ import {
   AlertCircle,
   CheckCircle2,
   HelpCircle,
+  Radio,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.ts';
@@ -153,29 +154,29 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center p-4 font-sans text-slate-100 selection:bg-rose-500/30">
-      <div className="max-w-md w-full space-y-6">
+    <div className="min-h-screen bg-[var(--canvas)] flex items-center justify-center p-4 font-sans text-[var(--text-primary)] selection:bg-rose-500/30">
+      <div className="max-w-md w-full space-y-5 animate-spatial-enter">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-rose-600/20 border border-rose-500/40 flex items-center justify-center mx-auto text-2xl shadow-lg shadow-rose-950/40">
-            🎯
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-500 shadow-lg shadow-rose-950/20">
+            <Radio className="w-6 h-6" strokeWidth={1.5} />
           </div>
-          <h1 className="text-2xl font-bold font-heading text-white tracking-tight">
+          <h1 className="text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight">
             ReliefLens
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[var(--text-secondary)]">
             Transparent Emergency Response Coordination & Incident Prioritization
           </p>
         </div>
 
         {/* Quick Demo Personas (Section 11 Role Model) */}
-        <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-3">
-          <div className="border-b border-slate-800 pb-2 flex items-center justify-between">
+        <div className="p-4 md:p-5 surface-z2 rounded-2xl shadow-xl space-y-3">
+          <div className="border-b border-[var(--border-subtle)] pb-2 flex items-center justify-between">
             <h2 className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5 font-mono">
-              <UserCheck className="w-4 h-4" />
+              <UserCheck className="w-4 h-4" strokeWidth={1.5} />
               Quick Demo Personas
             </h2>
-            <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
+            <Badge variant="outline" className="text-[10px] text-[var(--text-muted)] border-[var(--border-strong)]">
               Instant Switch
             </Badge>
           </div>
@@ -260,12 +261,12 @@ export function LoginPage() {
         </div>
 
         {/* Live Supabase Auth & Google OAuth Form */}
-        <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-4">
-          <div className="border-b border-slate-800 pb-2 flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-slate-200">
+        <div className="p-4 md:p-5 surface-z2 rounded-2xl shadow-xl space-y-4">
+          <div className="border-b border-[var(--border-subtle)] pb-2 flex items-center justify-between">
+            <h3 className="text-xs font-semibold text-[var(--text-primary)]">
               Supabase Authentication
             </h3>
-            <span className="text-[10px] font-mono text-slate-400">
+            <span className="text-[10px] font-mono text-[var(--text-muted)]">
               {isSupabaseConfigured ? '🟢 Supabase Active' : '⚪ Sandbox Mode'}
             </span>
           </div>
