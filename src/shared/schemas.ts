@@ -48,7 +48,9 @@ export const verificationLevelEnum = z.enum([
   'coordinator_verified',
 ]);
 
-export const userRoleEnum = z.enum(['admin', 'coordinator', 'viewer']);
+export const userRoleEnum = z.enum(['admin', 'coordinator', 'viewer', 'reporter']);
+
+export const locationSourceEnum = z.enum(['gps', 'voice', 'manual']);
 
 /**
  * Report Ingestion Schema with cross-field validation.
@@ -130,6 +132,13 @@ export const reportIngestionSchema = z
       .max(20, { message: 'Contact phone must be under 20 characters.' })
       .nullable()
       .optional(),
+    original_transcript: z.string().nullable().optional(),
+    detected_language: z.string().nullable().optional(),
+    normalized_description: z.string().nullable().optional(),
+    location_source: locationSourceEnum.nullable().optional(),
+    location_accuracy: z.number().nullable().optional(),
+    location_captured_at: z.string().nullable().optional(),
+    user_confirmed_incident_location: z.boolean().default(true),
   })
   .refine(
     (data) => {
@@ -234,3 +243,42 @@ export const updateIncidentStatusSchema = z
   );
 
 export type UpdateIncidentStatusInput = z.infer<typeof updateIncidentStatusSchema>;
+
+/**
+ * Gemini Multilingual Voice Extraction Response Schema (Section 7)
+ */
+export const geminiVoiceExtractionSchema = z
+  .object({
+    transcript: z.string().min(1, 'Transcript must not be empty.'),
+    detectedLanguage: z.string().min(1, 'Detected language identifier must be specified.'),
+    normalizedDescription: z.string().min(1, 'Normalized description must not be empty.'),
+    title: z.string().min(3).max(200),
+    incidentType: incidentTypeEnum,
+    locationText: z.string().max(200).nullable(),
+    district: z.string().max(100).nullable(),
+    latitude: z.number().min(-90).max(90).nullable(),
+    longitude: z.number().min(-180).max(180).nullable(),
+    locationPrecision: locationPrecisionEnum.default('unknown'),
+    peopleAtRiskEstimate: z.number().int().min(0).max(100000).nullable(),
+    immediateDanger: z.boolean().nullable(),
+    vulnerabilityFlags: z.array(vulnerabilityFlagEnum).default([]),
+    reportedAt: z.string().nullable(),
+    missingInformation: z.array(z.string()).default([]),
+    uncertaintyNotes: z.array(z.string()).default([]),
+    fieldEvidence: z.array(z.string()).default([]),
+  })
+  .strict()
+  .refine(
+    (data) => {
+      const hasLat = typeof data.latitude === 'number' && !isNaN(data.latitude);
+      const hasLng = typeof data.longitude === 'number' && !isNaN(data.longitude);
+      return (hasLat && hasLng) || (!hasLat && !hasLng);
+    },
+    {
+      message: 'Latitude and longitude must either both be valid numbers or both be null.',
+      path: ['latitude'],
+    }
+  );
+
+export type GeminiVoiceExtraction = z.infer<typeof geminiVoiceExtractionSchema>;
+

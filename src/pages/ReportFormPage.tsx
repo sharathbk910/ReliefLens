@@ -12,16 +12,29 @@ import {
   Info,
   Clock,
   Phone,
+  Mic,
+  FileText,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { reportIngestionSchema, type ReportIngestionInput } from '../shared/schemas.ts';
 import { dataService } from '../lib/dataService.ts';
 import { Button } from '../components/ui/Button.tsx';
+import { Badge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
-import type { VulnerabilityFlag } from '../shared/types.ts';
+import type { VulnerabilityFlag, VoiceExtractionResult } from '../shared/types.ts';
+import { VoiceRecorder } from '../components/VoiceRecorder.tsx';
+import { EditableExtractionPreview } from '../components/EditableExtractionPreview.tsx';
+import { CurrentLocationControl, type DetectedLocation } from '../components/CurrentLocationControl.tsx';
+import { LiveLocationControl } from '../components/LiveLocationControl.tsx';
 
 export function ReportFormPage() {
   const navigate = useNavigate();
   const toast = useToast();
+
+  const [reportingMode, setReportingMode] = useState<'voice' | 'manual'>('voice');
+  const [voiceExtraction, setVoiceExtraction] = useState<VoiceExtractionResult | null>(null);
+  const [detectedLocation, setDetectedLocation] = useState<DetectedLocation | null>(null);
   const [additionalOpen, setAdditionalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,6 +62,7 @@ export function ReportFormPage() {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<ReportIngestionInput>({
     resolver: zodResolver(reportIngestionSchema),
@@ -62,6 +76,13 @@ export function ReportFormPage() {
       latitude: null,
       longitude: null,
       location_precision: 'approximate',
+      location_source: null,
+      location_accuracy: null,
+      location_captured_at: null,
+      user_confirmed_incident_location: true,
+      original_transcript: null,
+      detected_language: null,
+      normalized_description: null,
       people_at_risk_estimate: null,
       immediate_danger: false,
       vulnerability_flags: [],
@@ -78,6 +99,9 @@ export function ReportFormPage() {
   const watchPeople = watch('people_at_risk_estimate');
   const watchReportedAt = watch('reported_at');
   const watchFlags = watch('vulnerability_flags') || [];
+  const watchOriginalTranscript = watch('original_transcript');
+  const watchDetectedLanguage = watch('detected_language');
+  const watchLocationText = watch('location_text');
 
   const handleToggleFlag = (flag: VulnerabilityFlag) => {
     const current = new Set(watchFlags);
@@ -87,6 +111,71 @@ export function ReportFormPage() {
       current.add(flag);
     }
     setValue('vulnerability_flags', Array.from(current) as any);
+  };
+
+  // Location Handlers
+  const handleLocationDetected = (loc: DetectedLocation) => {
+    setDetectedLocation(loc);
+    setValue('latitude', loc.latitude);
+    setValue('longitude', loc.longitude);
+    setValue('location_accuracy', loc.accuracy);
+    setValue('location_captured_at', loc.capturedAt);
+    setValue('location_source', 'gps');
+    setValue('user_confirmed_incident_location', loc.isConfirmedIncidentLocation);
+    setValue('location_precision', loc.accuracy && loc.accuracy <= 40 ? 'exact' : 'approximate');
+  };
+
+  const handleLocationCleared = () => {
+    setDetectedLocation(null);
+    setValue('latitude', null);
+    setValue('longitude', null);
+    setValue('location_accuracy', null);
+    setValue('location_captured_at', null);
+    setValue('location_source', null);
+    setValue('user_confirmed_incident_location', true);
+  };
+
+  const handleLocationConfirmedChange = (confirmed: boolean) => {
+    if (detectedLocation) {
+      setDetectedLocation({ ...detectedLocation, isConfirmedIncidentLocation: confirmed });
+    }
+    setValue('user_confirmed_incident_location', confirmed);
+  };
+
+  // Voice Extraction Handlers
+  const handleExtractionSuccess = (result: VoiceExtractionResult) => {
+    setVoiceExtraction(result);
+  };
+
+  const handleApplyExtraction = (data: VoiceExtractionResult) => {
+    setValue('description', data.normalizedDescription || data.transcript);
+    setValue('incident_type', data.incidentType);
+    setValue('location_text', data.locationText || '');
+    setValue('district', data.district || '');
+    setValue('people_at_risk_estimate', data.peopleAtRiskEstimate);
+    setValue('immediate_danger', data.immediateDanger === true);
+    setValue('vulnerability_flags', data.vulnerabilityFlags);
+    setValue('original_transcript', data.transcript);
+    setValue('detected_language', data.detectedLanguage);
+    setValue('normalized_description', data.normalizedDescription);
+
+    if (data.latitude && data.longitude) {
+      setValue('latitude', data.latitude);
+      setValue('longitude', data.longitude);
+      setValue('location_precision', data.locationPrecision);
+      setValue('location_source', 'voice');
+    }
+
+    setVoiceExtraction(null);
+    setReportingMode('manual'); // Show filled form for final user review and confirmation
+    toast.success(
+      'AI Extraction Applied',
+      `Language: ${data.detectedLanguage}. Please review all details and confirm location before submitting.`
+    );
+  };
+
+  const handleDiscardExtraction = () => {
+    setVoiceExtraction(null);
   };
 
   // Real-time advisories calculation (Section 9.2)
@@ -129,6 +218,13 @@ export function ReportFormPage() {
     }
   }
 
+  if (watchOriginalTranscript && watchDetectedLanguage) {
+    advisories.push({
+      type: 'info',
+      text: `Voice report captured in ${watchDetectedLanguage}. Original script preserved with editable English normalization.`,
+    });
+  }
+
   const onSubmit = async (data: ReportIngestionInput) => {
     setIsSubmitting(true);
     try {
@@ -155,7 +251,7 @@ export function ReportFormPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in pb-12">
-      {/* Top Breadcrumb */}
+      {/* Top Breadcrumb & Header */}
       <div>
         <Link
           to="/dashboard"
@@ -168,11 +264,57 @@ export function ReportFormPage() {
           New Incident Observation Report
         </h1>
         <p className="text-xs text-slate-400">
-          Enter validated emergency incoming report information. Priority scoring and duplicate detection will execute deterministically upon submission.
+          Submit emergency incident reports via Multilingual Voice or manual entry. Priority scoring and duplicate
+          detection execute deterministically upon submission.
         </p>
       </div>
 
-      {/* Real-time Contextual Advisories (Section 9.2) */}
+      {/* Input Mode Selector: [ Use Voice ] vs [ Type Manually ] */}
+      <div className="flex items-center gap-2 p-1 bg-slate-900 border border-slate-800 rounded-xl w-full sm:w-auto sm:inline-flex">
+        <button
+          type="button"
+          onClick={() => setReportingMode('voice')}
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-semibold transition-all ${
+            reportingMode === 'voice'
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/40'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Mic className="w-3.5 h-3.5" />
+          Use Voice
+        </button>
+        <button
+          type="button"
+          onClick={() => setReportingMode('manual')}
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-semibold transition-all ${
+            reportingMode === 'manual'
+              ? 'bg-slate-800 text-white shadow-md shadow-slate-950/40 border border-slate-700'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <FileText className="w-3.5 h-3.5" />
+          Type Manually
+        </button>
+      </div>
+
+      {/* VOICE REPORTING SECTION */}
+      {reportingMode === 'voice' && !voiceExtraction && (
+        <VoiceRecorder
+          onExtractionSuccess={handleExtractionSuccess}
+          onSwitchToManual={() => setReportingMode('manual')}
+        />
+      )}
+
+      {/* EDITABLE GEMINI EXTRACTION PREVIEW */}
+      {reportingMode === 'voice' && voiceExtraction && (
+        <EditableExtractionPreview
+          extraction={voiceExtraction}
+          onApply={handleApplyExtraction}
+          onDiscard={handleDiscardExtraction}
+        />
+      )}
+
+      {/* Real-time Contextual Advisories */}
       {advisories.length > 0 && (
         <div className="space-y-2">
           {advisories.map((adv, idx) => (
@@ -191,16 +333,37 @@ export function ReportFormPage() {
         </div>
       )}
 
+      {/* Preserved Multilingual Voice Metadata Badge Banner (if populated from voice) */}
+      {watchOriginalTranscript && (
+        <div className="p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/20 text-xs space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Voice Source Attached ({watchDetectedLanguage || 'Detected Language'})
+            </span>
+            <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30">
+              Original Transcript Preserved
+            </Badge>
+          </div>
+          <p className="text-[11px] text-slate-400 font-sans italic bg-slate-950/60 p-2 rounded border border-slate-800">
+            "{watchOriginalTranscript}"
+          </p>
+        </div>
+      )}
+
+      {/* REPORT SUBMISSION FORM (Active for manual entry and reviewing AI drafts) */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* GROUP 1: Incident Information */}
         <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl space-y-4">
-          <div className="border-b border-slate-800 pb-2">
-            <h2 className="text-sm font-semibold text-white tracking-tight">
-              1. Incident & Channel Information
-            </h2>
-            <p className="text-[11px] text-slate-400">
-              Source channel, disaster category, and incoming message text.
-            </p>
+          <div className="border-b border-slate-800 pb-2 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-white tracking-tight">
+                1. Incident & Channel Information
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                Source channel, disaster category, and incoming message text.
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -212,7 +375,7 @@ export function ReportFormPage() {
                 {...register('channel')}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
               >
-                <option value="phone_call">Phone Call (911 / Hotline)</option>
+                <option value="phone_call">Phone Call (Hotline)</option>
                 <option value="sms">SMS Text Message</option>
                 <option value="social_media">Social Media Feed</option>
                 <option value="sensor">Sensor / Automated Monitor</option>
@@ -268,13 +431,13 @@ export function ReportFormPage() {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Description / Observation Text * (10–5,000 characters)
+              Description / Normalized Incident Details * (10–5,000 characters)
             </label>
             <textarea
               rows={4}
               {...register('description')}
               placeholder="Describe the incident, observable hazards, number of stranded victims, building conditions..."
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-rose-500"
+              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
             {errors.description && (
               <p className="text-[10px] text-rose-400 mt-1">{errors.description.message}</p>
@@ -282,18 +445,40 @@ export function ReportFormPage() {
           </div>
         </div>
 
-        {/* GROUP 2: Location and Impact */}
+        {/* GROUP 2: Location and Impact Assessment */}
         <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl space-y-4">
           <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-semibold text-white tracking-tight">
-              2. Location and Impact Assessment
+              2. Location and Geolocation Controls
             </h2>
             <p className="text-[11px] text-slate-400">
-              Geographic coordinates, casualties/risk, immediate danger indicator, and vulnerable populations.
+              Attach device GPS location or enter coordinates manually. Live tracking is optional and opt-in.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Automatic Geolocation Controls */}
+          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <span className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-emerald-400" />
+                Automatic Device Location
+              </span>
+              <LiveLocationControl
+                onLocationUpdate={handleLocationDetected}
+                onLiveSharingStopped={() => {}}
+              />
+            </div>
+
+            <CurrentLocationControl
+              location={detectedLocation}
+              onLocationDetected={handleLocationDetected}
+              onLocationCleared={handleLocationCleared}
+              onLocationConfirmedChange={handleLocationConfirmedChange}
+              spokenLocationText={watchLocationText}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">
                 Location Description / Landmark
@@ -328,7 +513,7 @@ export function ReportFormPage() {
                 type="number"
                 step="any"
                 {...register('latitude', { valueAsNumber: true })}
-                placeholder="e.g. 37.7749"
+                placeholder="e.g. 13.3408"
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
               />
               {errors.latitude && (
@@ -344,7 +529,7 @@ export function ReportFormPage() {
                 type="number"
                 step="any"
                 {...register('longitude', { valueAsNumber: true })}
-                placeholder="e.g. -122.4194"
+                placeholder="e.g. 74.7421"
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
               />
               {errors.longitude && (
@@ -401,7 +586,7 @@ export function ReportFormPage() {
           {/* Vulnerability Flags Multi-Select */}
           <div className="pt-2">
             <label className="block text-xs font-medium text-slate-300 mb-2">
-              Vulnerability Flags (Manual Field Assessment):
+              Vulnerability Flags (Field / AI Assessment):
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
@@ -507,8 +692,10 @@ export function ReportFormPage() {
             type="submit"
             variant="primary"
             isLoading={isSubmitting}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-md shadow-emerald-950/40"
           >
-            Submit Incident Report
+            <CheckCircle2 className="w-4 h-4 mr-1.5" />
+            Confirm & Submit Incident Report
           </Button>
         </div>
       </form>

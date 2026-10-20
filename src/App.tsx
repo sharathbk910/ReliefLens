@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from './components/ui/Toast.tsx';
 import { AppShell } from './components/layout/AppShell.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
+import { AuthCallback } from './pages/AuthCallback.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
 import { IncidentDetailPage } from './pages/IncidentDetailPage.tsx';
 import { ReportFormPage } from './pages/ReportFormPage.tsx';
@@ -27,8 +28,9 @@ export function App() {
       <ToastProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Auth Route */}
+            {/* Public Auth Routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Authenticated Application Shell */}
             <Route element={<AppShell />}>

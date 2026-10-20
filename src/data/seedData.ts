@@ -29,6 +29,12 @@ export const SEED_PROFILES = [
     role: 'viewer' as UserRole,
     created_at: '2026-10-15T08:30:00Z',
   },
+  {
+    id: '44444444-4444-4444-a444-444444444444',
+    display_name: 'Citizen Reporter Priya Rao',
+    role: 'reporter' as UserRole,
+    created_at: '2026-10-15T08:45:00Z',
+  },
 ];
 
 export interface LabeledPair {

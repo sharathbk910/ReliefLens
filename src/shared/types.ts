@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'coordinator' | 'viewer';
+export type UserRole = 'admin' | 'coordinator' | 'viewer' | 'reporter';
 
 export type ReportChannel =
   | 'phone_call'
@@ -126,6 +126,10 @@ export interface Incident {
   ruleset_version: string;
   uncertainty_flags: UncertaintyFlag[];
   merged_into_id: string | null;
+  detected_language?: string | null;
+  location_accuracy?: number | null;
+  location_source?: 'gps' | 'voice' | 'manual' | null;
+  user_confirmed_incident_location?: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -138,6 +142,9 @@ export interface Report {
   incident_type: IncidentType;
   external_reference: string | null;
   description: string;
+  original_transcript?: string | null;
+  detected_language?: string | null;
+  normalized_description?: string | null;
   reported_at: string;
   received_at: string;
   location_text: string | null;
@@ -145,6 +152,10 @@ export interface Report {
   latitude: number | null;
   longitude: number | null;
   location_precision: LocationPrecision;
+  location_source?: 'gps' | 'voice' | 'manual' | null;
+  location_accuracy?: number | null;
+  location_captured_at?: string | null;
+  user_confirmed_incident_location?: boolean;
   people_at_risk_estimate: number | null;
   immediate_danger: boolean;
   vulnerability_flags: VulnerabilityFlag[];
@@ -194,3 +205,24 @@ export interface AuditLogEntry {
   details: Record<string, any>;
   created_at: string;
 }
+
+export interface VoiceExtractionResult {
+  transcript: string;
+  detectedLanguage: string;
+  normalizedDescription: string;
+  title: string;
+  incidentType: IncidentType;
+  locationText: string | null;
+  district: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  locationPrecision: LocationPrecision;
+  peopleAtRiskEstimate: number | null;
+  immediateDanger: boolean | null;
+  vulnerabilityFlags: VulnerabilityFlag[];
+  reportedAt: string | null;
+  missingInformation: string[];
+  uncertaintyNotes: string[];
+  fieldEvidence: string[];
+}
+

@@ -1,5 +1,32 @@
-import React from 'react';
 import type { PriorityTier, IncidentStatus, VerificationLevel, UncertaintyFlag } from '../../shared/types.ts';
+
+export function Badge({
+  children,
+  className = '',
+  variant = 'default',
+}: {
+  children: React.ReactNode;
+  className?: string;
+  variant?: 'default' | 'outline' | 'warning' | 'danger' | 'success';
+}) {
+  const variantStyles = {
+    default: 'bg-slate-800 text-slate-200 border-slate-700',
+    outline: 'bg-transparent text-slate-300 border-slate-700',
+    warning: 'bg-amber-950/60 text-amber-300 border-amber-500/40',
+    danger: 'bg-rose-950/60 text-rose-300 border-rose-500/40',
+    success: 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40',
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${
+        variantStyles[variant] || variantStyles.default
+      } ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
 
 export function PriorityBadge({ tier, score }: { tier: PriorityTier; score?: number }) {
   const styles: Record<PriorityTier, { bg: string; text: string; border: string; label: string }> = {

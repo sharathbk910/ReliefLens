@@ -12,6 +12,7 @@ import type {
   ReportContact,
   UserRole,
   VerificationLevel,
+  VoiceExtractionResult,
 } from '../shared/types.ts';
 import { calculateIncidentScore, getPriorityTier } from '../shared/scoring.ts';
 import {
@@ -242,7 +243,7 @@ export const dataService = {
   // 3. Restricted Report Contacts (coordinators and admins only)
   async getReportContact(reportId: string): Promise<ReportContact | null> {
     const user = this.getCurrentUser();
-    if (user.role === 'viewer') {
+    if (user.role !== 'admin' && user.role !== 'coordinator') {
       return null;
     }
     return localDB.contacts.find((c) => c.report_id === reportId) || null;
@@ -310,6 +311,13 @@ export const dataService = {
       people_at_risk_estimate: input.people_at_risk_estimate ?? null,
       immediate_danger: input.immediate_danger,
       vulnerability_flags: input.vulnerability_flags,
+      original_transcript: input.original_transcript ?? null,
+      detected_language: input.detected_language ?? null,
+      normalized_description: input.normalized_description ?? null,
+      location_source: input.location_source ?? null,
+      location_accuracy: input.location_accuracy ?? null,
+      location_captured_at: input.location_captured_at ?? null,
+      user_confirmed_incident_location: input.user_confirmed_incident_location ?? false,
       created_by: user.id,
       created_at: nowIso,
     };
@@ -332,6 +340,9 @@ export const dataService = {
       latitude: input.latitude ?? null,
       longitude: input.longitude ?? null,
       location_precision: input.location_precision,
+      location_source: input.location_source ?? null,
+      location_accuracy: input.location_accuracy ?? null,
+      user_confirmed_incident_location: input.user_confirmed_incident_location ?? false,
       people_at_risk_estimate: input.people_at_risk_estimate ?? null,
       vulnerability_flags: input.vulnerability_flags,
       first_reported_at: input.reported_at,
@@ -431,8 +442,8 @@ export const dataService = {
     source_incident_id?: string;
   }> {
     const user = this.getCurrentUser();
-    if (user.role === 'viewer') {
-      throw new Error('Forbidden: Viewers cannot review duplicates.');
+    if (user.role !== 'admin' && user.role !== 'coordinator') {
+      throw new Error('Forbidden: Only coordinators and administrators can review duplicates.');
     }
 
     const candidate = localDB.duplicateCandidates.find(
@@ -571,8 +582,8 @@ export const dataService = {
     priority_tier: PriorityTier;
   }> {
     const user = this.getCurrentUser();
-    if (user.role === 'viewer') {
-      throw new Error('Forbidden: Viewers cannot override priority.');
+    if (user.role !== 'admin' && user.role !== 'coordinator') {
+      throw new Error('Forbidden: Only coordinators and administrators can override priority.');
     }
 
     const incident = localDB.incidents.find((i) => i.id === input.incident_id);
@@ -627,8 +638,8 @@ export const dataService = {
   // 8. Update Incident Status & Verification
   async updateIncidentStatus(input: UpdateIncidentStatusInput): Promise<Incident> {
     const user = this.getCurrentUser();
-    if (user.role === 'viewer') {
-      throw new Error('Forbidden: Viewers cannot modify incident status.');
+    if (user.role !== 'admin' && user.role !== 'coordinator') {
+      throw new Error('Forbidden: Only coordinators and administrators can modify incident status.');
     }
 
     const incident = localDB.incidents.find((i) => i.id === input.incident_id);
@@ -785,4 +796,63 @@ export const dataService = {
       pendingDuplicates,
     };
   },
+
+  // 11. Multilingual Voice Report Analysis (Gemini via Supabase Edge Function)
+  async analyzeVoiceReport(audioBlob: Blob): Promise<VoiceExtractionResult> {
+    const user = this.getCurrentUser();
+    if (user.role === 'viewer') {
+      throw new Error('Forbidden: Viewers cannot create or analyze reports.');
+    }
+
+    if (!audioBlob || audioBlob.size === 0) {
+      throw new Error('Cannot analyze empty audio recording.');
+    }
+
+    const MAX_BYTES = 8 * 1024 * 1024; // 8 MB limit
+    if (audioBlob.size > MAX_BYTES) {
+      throw new Error('Audio file exceeds the 8 MB maximum upload limit.');
+    }
+
+    // Convert Blob to base64 in browser
+    const audioBase64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        // Strip data:audio/*;base64, prefix
+        const base64 = result.includes(',') ? result.split(',')[1] : result;
+        resolve(base64);
+      };
+      reader.onerror = () => reject(new Error('Failed to read audio blob'));
+      reader.readAsDataURL(audioBlob);
+    });
+
+    const mimeType = audioBlob.type || 'audio/webm';
+
+    // If Supabase is configured, invoke the secure server-side Edge Function
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase.functions.invoke('analyze-voice-report', {
+        body: { audioBase64, mimeType },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Edge Function error during voice analysis.');
+      }
+
+      if (data?.error) {
+        throw new Error(data.error.message || 'Gemini voice analysis failed.');
+      }
+
+      if (!data?.data) {
+        throw new Error('No structured extraction data returned from Gemini voice analysis.');
+      }
+
+      return data.data as VoiceExtractionResult;
+    }
+
+    // When backend / Edge Function is not configured
+    throw new Error(
+      'Supabase Edge Function is not configured with GEMINI_API_KEY. Please deploy Edge Functions with GEMINI_API_KEY or switch to "Type Manually".'
+    );
+  },
 };
+
