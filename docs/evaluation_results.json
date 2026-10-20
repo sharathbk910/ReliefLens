@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-10-20T11:33:34.595Z",
+  "dataset_size": {
+    "total_reports": 65,
+    "total_incidents": 65,
+    "total_labeled_pairs": 25
+  },
+  "duplicate_detection": {
+    "true_positives": 13,
+    "false_positives": 0,
+    "false_negatives": 2,
+    "true_negatives": 10,
+    "precision": 1,
+    "recall": 0.8667,
+    "f1_score": 0.9286,
+    "fp_details": [],
+    "fn_details": [
+      {
+        "pair": {
+          "reportAIndex": 25,
+          "reportBIndex": 26,
+          "isDuplicate": true,
+          "notes": "East Side Elementary shelter station water shortage"
+        },
+        "score": 0.538,
+        "reasons": [
+          "Same incident type (shelter_request)",
+          "Locations within 48 meters (full match)",
+          "Reports received 20 minutes apart"
+        ]
+      },
+      {
+        "pair": {
+          "reportAIndex": 31,
+          "reportBIndex": 32,
+          "isDuplicate": true,
+          "notes": "South Bay Tidal Gate 3 actuator failure & inflow"
+        },
+        "score": 0.53,
+        "reasons": [
+          "Same incident type (flood)",
+          "Locations within 38 meters (full match)",
+          "Reports received 20 minutes apart"
+        ]
+      }
+    ]
+  },
+  "ranking_consistency": {
+    "spearman_rank_correlation": 0.9567,
+    "target_met": true
+  }
+}
