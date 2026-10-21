@@ -103,8 +103,8 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
-      {/* 1. Tactical Operational Topbar & Emergency Response Strip */}
-      <header className="z-40 px-3 md:px-6 py-2 border-b border-[var(--tactical-border,rgba(244,243,232,0.1))] bg-[#12130f]/95 backdrop-blur-md text-xs flex items-center justify-between select-none">
+      {/* 1. Tactical Operational Topbar & Emergency Response Strip (Sticky / Fixed at top) */}
+      <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-[var(--tactical-border,rgba(244,243,232,0.1))] bg-[#12130f]/95 backdrop-blur-md text-xs select-none shadow-md">
         <div className="flex items-center gap-2.5 max-w-7xl mx-auto w-full">
           <div className="md:hidden shrink-0">
             <AppLogo size="xs" showText={false} />
@@ -140,6 +140,67 @@ export function AppShell() {
                 <span className="hidden sm:inline">Voice SOS</span>
               </button>
             )}
+
+            {/* FIXED LOGGED-IN DETAILS PILL & PERSONA SWITCHER */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] border border-amber-400/40 hover:border-amber-400 transition-all cursor-pointer shadow-sm"
+                title={`Logged in as ${currentUser.display_name} (${currentUser.role}). Tap to switch persona.`}
+              >
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-[10px] sm:text-xs font-bold text-amber-300 shrink-0">
+                  {currentUser.display_name.charAt(0)}
+                </div>
+                <div className="text-left hidden sm:block max-w-[100px] md:max-w-[130px] truncate">
+                  <p className="text-[11px] font-bold text-[var(--text-primary)] truncate leading-tight">
+                    {currentUser.display_name}
+                  </p>
+                  <p className="text-[9px] uppercase font-mono text-amber-400 font-bold leading-none">
+                    {currentUser.role}
+                  </p>
+                </div>
+                <ChevronDown className="w-3 h-3 text-[var(--text-muted)] shrink-0" strokeWidth={1.5} />
+              </button>
+
+              {/* Persona Switcher Dropdown Popover */}
+              {userDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 surface-z2 border border-[var(--border-strong)] rounded-xl p-2 z-50 animate-spatial-enter shadow-2xl bg-[#141611]/98">
+                  <div className="px-2 py-1.5 border-b border-[var(--border-subtle)] mb-1">
+                    <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] font-bold">
+                      CURRENTLY LOGGED IN:
+                    </p>
+                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">
+                      {currentUser.display_name}
+                    </p>
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-amber-400/20 text-amber-300 mt-0.5 border border-amber-400/30">
+                      ROLE: {currentUser.role}
+                    </span>
+                  </div>
+
+                  <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] px-2 py-1">
+                    SWITCH ACTIVE PERSONA:
+                  </p>
+                  {(['admin', 'coordinator', 'reporter', 'viewer'] as UserRole[]).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => handleRoleChange(r)}
+                      className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs flex items-center justify-between transition-colors ${
+                        currentUser.role === r
+                          ? 'bg-amber-400/15 text-amber-300 font-semibold border border-amber-400/30'
+                          : 'text-[var(--text-secondary)] hover:text-white hover:bg-[var(--border-subtle)]'
+                      }`}
+                    >
+                      <span className="capitalize">{r}</span>
+                      {currentUser.role === r && (
+                        <span className="text-[10px] font-mono font-bold text-amber-400">ACTIVE</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Theme Toggle Button */}
             <button
@@ -264,8 +325,8 @@ export function AppShell() {
             </p>
           </div>
 
-          {/* User Account / Role Switcher Popover */}
-          <div className="p-2.5 border-t border-[var(--border-subtle)] relative">
+          {/* User Account / Role Switcher Popover (Pinned to bottom of sidebar) */}
+          <div className="mt-auto sticky bottom-0 bg-[#141611]/98 p-2.5 border-t border-[var(--border-subtle)] relative z-20">
             <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
               aria-label="User Account and Persona Menu"
