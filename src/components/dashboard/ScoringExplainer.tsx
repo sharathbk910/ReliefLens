@@ -23,7 +23,7 @@ export function ScoringExplainer() {
           aria-expanded={open}
           className="self-start sm:self-auto text-xs font-mono text-[var(--text-secondary)] hover:text-white flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] transition-colors border border-[var(--border-subtle)] cursor-pointer"
         >
-          <span>{open ? 'Hide Formula' : 'How It Works'}</span>
+          <span>{open ? 'Hide Formula' : 'Scoring Logic'}</span>
           <ChevronDown
             className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           />

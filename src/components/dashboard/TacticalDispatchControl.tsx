@@ -74,17 +74,17 @@ export function TacticalDispatchControl({
 
   if (!selectedIncident) {
     return (
-      <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-[var(--text-secondary)] select-none">
+      <div className="surface-z1 border border-[var(--border-subtle)] rounded-lg py-2 px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--text-secondary)] select-none">
         <div className="flex items-center gap-2 min-w-0">
           <Truck className="w-4 h-4 text-amber-400 shrink-0" />
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-300 shrink-0">
-            Rescue Team Dispatch:
+          <span className="font-mono text-xs font-semibold text-amber-300 shrink-0">
+            Rescue Dispatch:
           </span>
           <span className="font-mono text-xs text-[var(--text-muted)] truncate">
-            Tap any incident below to deploy rescue units (boats, helicopters, ambulances)
+            Tap any incident below to deploy rescue units
           </span>
         </div>
-        <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--border-subtle)] text-amber-400/80 uppercase shrink-0 self-start sm:self-auto">
+        <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-[var(--border-subtle)] text-amber-400/80 uppercase shrink-0 self-start sm:self-auto">
           Standby Mode
         </span>
       </div>
@@ -92,24 +92,24 @@ export function TacticalDispatchControl({
   }
 
   return (
-    <div className="relative surface-z2 border-2 border-amber-400/40 rounded-xl p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 space-y-2.5 animate-fade-in select-none">
+    <div className="relative surface-z2 border border-amber-400/30 rounded-xl p-2.5 sm:p-3 shadow-md shadow-amber-950/10 space-y-2 animate-fade-in select-none">
       <div className="corner-bracket cross-tl"></div>
       <div className="corner-bracket cross-tr"></div>
       <div className="corner-bracket cross-bl"></div>
       <div className="corner-bracket cross-br"></div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pb-2 border-b border-[var(--border-subtle)]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-1.5 border-b border-[var(--border-subtle)]">
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square"></span>
-            <span className="font-mono text-xs text-amber-300 font-bold uppercase tracking-wide">
+            <span className="font-mono text-xs text-amber-300 font-bold tracking-wide">
               Rescue Mission Failsafe HUD
             </span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-700 font-bold uppercase">
+            <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold uppercase">
               {selectedIncident.priority_tier.toUpperCase()} ({selectedIncident.effective_score}/100)
             </span>
           </div>
-          <h3 className="font-heading font-bold text-sm text-[var(--text-primary)] line-clamp-2 leading-snug">
+          <h3 className="font-heading font-bold text-xs sm:text-sm text-[var(--text-primary)] line-clamp-1 leading-snug">
             {selectedIncident.title}
           </h3>
           <p className="text-xs text-[var(--text-muted)] font-mono truncate">
@@ -140,7 +140,7 @@ export function TacticalDispatchControl({
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer"
+            className="p-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer"
             title={isCollapsed ? 'Expand Dispatch Controls' : 'Minimize HUD to scan incident table'}
           >
             {isCollapsed ? 'Expand HUD' : 'Collapse'}
@@ -150,7 +150,7 @@ export function TacticalDispatchControl({
 
       {/* Slide-to-Confirm Emergency Dispatch Slider (Collapsible to keep data table visible) */}
       {!isCollapsed && (
-        <div className="space-y-1.5 pt-0.5">
+        <div className="space-y-1 pt-0.5">
           <div className="slide-track" title="Slide right to 100% to send rescue team. Prevents accidental clicks.">
             <div className="slide-fill" style={{ width: `${sliderValue}%` }}></div>
             <span className="slide-label flex items-center gap-2 px-2 text-center text-xs">
@@ -184,7 +184,7 @@ export function TacticalDispatchControl({
               aria-label="Slide right to send rescue"
             />
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-mono text-[var(--text-muted)] px-3 pb-1 pt-0.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-mono text-[var(--text-muted)] px-2 pb-0.5">
             <span>Failsafe: Accidental click protection</span>
             <span>Audit trail recorded</span>
           </div>

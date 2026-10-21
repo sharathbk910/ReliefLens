@@ -156,24 +156,24 @@ export function IncidentTable({
       <div className="hidden md:block w-full max-w-full overflow-x-auto table-scroll-container">
         <table className="w-full text-left text-xs border-collapse table-fixed min-w-[1200px]">
           <colgroup>
-            <col style={{ width: '150px' }} className="w-[150px]" />
-            <col style={{ width: '270px' }} className="w-[270px]" />
-            <col style={{ width: '210px' }} className="w-[210px]" />
-            <col style={{ width: '120px' }} className="w-[120px]" />
             <col style={{ width: '140px' }} className="w-[140px]" />
+            <col style={{ width: '260px' }} className="w-[260px]" />
+            <col style={{ width: '180px' }} className="w-[180px]" />
+            <col style={{ width: '140px' }} className="w-[140px]" />
+            <col style={{ width: '180px' }} className="w-[180px]" />
             <col style={{ width: '110px' }} className="w-[110px]" />
-            <col style={{ width: '150px' }} className="w-[150px]" />
+            <col style={{ width: '140px' }} className="w-[140px]" />
             <col style={{ width: '50px' }} className="w-[50px]" />
           </colgroup>
           <thead className="sticky top-0 z-10">
             <tr className="bg-[var(--surface-1-solid)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium select-none shadow-sm">
-              <th style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Priority & Score</th>
-              <th style={{ width: '270px', minWidth: '270px', maxWidth: '270px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Incident Details</th>
-              <th style={{ width: '210px', minWidth: '210px', maxWidth: '210px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">District / Location</th>
-              <th style={{ width: '120px', minWidth: '120px', maxWidth: '120px' }} className="py-3 px-3.5 text-center whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Reports</th>
-              <th style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Verification</th>
+              <th style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Priority & Score</th>
+              <th style={{ width: '260px', minWidth: '260px', maxWidth: '260px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Incident Details</th>
+              <th style={{ width: '180px', minWidth: '180px', maxWidth: '180px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">District / Location</th>
+              <th style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 text-center whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Reports</th>
+              <th style={{ width: '180px', minWidth: '180px', maxWidth: '180px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Verification</th>
               <th style={{ width: '110px', minWidth: '110px', maxWidth: '110px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Status</th>
-              <th style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Uncertainty</th>
+              <th style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Uncertainty</th>
               <th style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} className="py-3 px-2 text-center whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Action</th>
             </tr>
           </thead>
@@ -182,6 +182,12 @@ export function IncidentTable({
               const hasFloorApplied = incident.score_breakdown?.floor_applied;
               const hasOverride = incident.score_override !== null;
               const isSelected = selectedIncidentId === incident.id;
+              const priorityBorder =
+                incident.priority_tier === 'critical'
+                  ? 'border-l-4 border-l-rose-500/70'
+                  : incident.priority_tier === 'high'
+                  ? 'border-l-4 border-l-amber-500/50'
+                  : 'border-l-4 border-l-transparent';
 
               return (
                 <tr
@@ -193,15 +199,15 @@ export function IncidentTable({
                       navigate(`/incidents/${incident.id}`);
                     }
                   }}
-                  className={`transition-colors cursor-pointer group ${
+                  className={`transition-colors cursor-pointer group ${priorityBorder} ${
                     isSelected
                       ? 'bg-[#EBFC72]/10 hover:bg-[#EBFC72]/15 shadow-[inset_3px_0_0_0_#EBFC72]'
                       : 'hover:bg-[var(--surface-2-solid)]'
                   }`}
                 >
                   {/* Priority & Score */}
-                  <td style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
-                    <div className="flex flex-col gap-2 items-start whitespace-nowrap">
+                  <td style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
+                    <div className="flex flex-col gap-1.5 items-start whitespace-nowrap">
                       <PriorityBadge
                         tier={incident.priority_tier}
                         score={incident.effective_score}
@@ -217,7 +223,7 @@ export function IncidentTable({
                         </span>
                       )}
                       {isSelected && (
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#EBFC72] font-bold">
+                        <span className="text-xs font-mono uppercase tracking-wider text-[#EBFC72] font-bold">
                           ● TARGETED IN HUD
                         </span>
                       )}
@@ -225,12 +231,12 @@ export function IncidentTable({
                   </td>
 
                   {/* Title & Type */}
-                  <td style={{ width: '270px', minWidth: '270px', maxWidth: '270px' }} className="py-3 px-3.5 align-top overflow-hidden">
+                  <td style={{ width: '260px', minWidth: '260px', maxWidth: '260px' }} className="py-3 px-3.5 align-top overflow-hidden">
                     <div className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-teal-300 transition-colors line-clamp-2 leading-tight" title={incident.title}>
                       {incident.title}
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-[var(--text-secondary)]">
-                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-[10px] whitespace-nowrap shrink-0">
+                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-xs whitespace-nowrap shrink-0">
                         {incident.incident_type}
                       </span>
                       <span className="flex items-center gap-1 tabular-nums text-[var(--text-muted)] whitespace-nowrap truncate">
@@ -241,7 +247,7 @@ export function IncidentTable({
                   </td>
 
                   {/* Location */}
-                  <td style={{ width: '210px', minWidth: '210px', maxWidth: '210px' }} className="py-3 px-3.5 align-top overflow-hidden">
+                  <td style={{ width: '180px', minWidth: '180px', maxWidth: '180px' }} className="py-3 px-3.5 align-top overflow-hidden">
                     <div className="flex items-start gap-1.5 text-[var(--text-primary)] min-w-0">
                       <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" strokeWidth={1.5} />
                       <div className="w-full min-w-0">
@@ -252,7 +258,7 @@ export function IncidentTable({
                           {incident.location_text || 'No text location'}
                         </p>
                         {getDistanceText(incident.latitude, incident.longitude) && (
-                          <span className="text-[10px] text-teal-400 font-mono font-medium block truncate mt-0.5">
+                          <span className="text-xs text-teal-400 font-mono font-medium block truncate mt-0.5">
                             📍 {getDistanceText(incident.latitude, incident.longitude)}
                           </span>
                         )}
@@ -261,9 +267,9 @@ export function IncidentTable({
                   </td>
 
                   {/* Report Count */}
-                  <td style={{ width: '120px', minWidth: '120px', maxWidth: '120px' }} className="py-3 px-3.5 align-top text-center whitespace-nowrap overflow-hidden">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-medium tabular-nums whitespace-nowrap">
-                      <span>{incident.report_count}</span>
+                  <td style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 align-top text-center whitespace-nowrap overflow-hidden">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono text-xs tabular-nums whitespace-nowrap">
+                      <span className="font-bold">{incident.report_count}</span>
                       <span className="text-xs text-[var(--text-muted)]" title={`${incident.distinct_channel_count} reporting channels`}>
                         ({incident.distinct_channel_count} {incident.distinct_channel_count === 1 ? 'channel' : 'channels'})
                       </span>
@@ -271,7 +277,7 @@ export function IncidentTable({
                   </td>
 
                   {/* Verification Level */}
-                  <td style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
+                  <td style={{ width: '180px', minWidth: '180px', maxWidth: '180px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
                     <VerificationBadge level={incident.verification_level} />
                   </td>
 
@@ -281,7 +287,7 @@ export function IncidentTable({
                   </td>
 
                   {/* Uncertainty Flags */}
-                  <td style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
+                  <td style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
                     <div className="flex flex-wrap gap-1 max-w-[140px]">
                       {incident.uncertainty_flags && incident.uncertainty_flags.length > 0 ? (
                         incident.uncertainty_flags.map((flag) => (

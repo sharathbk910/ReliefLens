@@ -144,11 +144,11 @@ export function AppShell() {
                 <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-xs font-bold text-amber-300 shrink-0">
                   {currentUser.display_name.charAt(0)}
                 </div>
-                <div className="text-left hidden sm:block max-w-[100px] md:max-w-[130px] truncate">
-                  <p className="text-xs font-bold text-[var(--text-primary)] truncate leading-tight">
+                <div className="text-left hidden sm:block max-w-[180px] md:max-w-[220px]">
+                  <p className="text-xs font-bold text-[var(--text-primary)] leading-tight whitespace-nowrap">
                     {currentUser.display_name}
                   </p>
-                  <p className="text-[10px] uppercase font-mono text-amber-400 font-bold leading-none">
+                  <p className="text-xs uppercase font-mono text-amber-400 font-bold leading-none">
                     {currentUser.role}
                   </p>
                 </div>

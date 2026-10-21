@@ -150,7 +150,7 @@ export function DashboardPage() {
       </div>
 
       {/* 3. Live Tactical Response Status Strip */}
-      <div className="surface-z1 px-3 sm:px-3.5 py-2 rounded-xl flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono border border-[var(--border-subtle)] bg-[#12130f]/90">
+      <div className="surface-z1 px-3 sm:px-3.5 py-2 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs font-mono border border-[var(--border-subtle)] bg-[#12130f]/90">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />

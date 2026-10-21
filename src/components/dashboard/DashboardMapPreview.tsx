@@ -385,28 +385,24 @@ export function DashboardMapPreview({
       <div className="corner-bracket cross-bl"></div>
       <div className="corner-bracket cross-br"></div>
 
-      {/* Header */}
-      <div className="p-2.5 sm:p-3.5 border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2 bg-[var(--surface-1)]">
-        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-          <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400 shrink-0" strokeWidth={1.5} />
-          <h3 className="text-xs font-semibold text-[var(--text-primary)] font-mono truncate">
+      {/* Header (Aligned single-row tactical bar) */}
+      <div className="px-3.5 py-2.5 border-b border-[var(--border-subtle)] flex items-center justify-between gap-2 bg-[var(--surface-1-solid)]">
+        <div className="flex items-center gap-2 min-w-0">
+          <MapPin className="w-4 h-4 text-teal-400 shrink-0" strokeWidth={1.5} />
+          <h3 className="text-xs font-semibold text-[var(--text-primary)] font-mono whitespace-nowrap shrink-0">
             Spatial Distribution
           </h3>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums shrink-0">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums truncate">
             {locatedIncidents.length} pinned ({clusteredNodes.length} zones)
           </span>
-          <span className="hidden md:inline-flex items-center gap-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-950/60 text-teal-300 border border-teal-500/30 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping" />
-            LIVE RADAR
-          </span>
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <Link
             to="/map"
-            className="text-xs text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1 transition-colors font-mono px-2 py-0.5 rounded bg-[var(--surface-2-solid)] border border-[var(--border-subtle)]"
+            className="text-xs text-[var(--text-secondary)] hover:text-white font-medium flex items-center gap-1 transition-colors font-mono px-2.5 py-1 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] border border-[var(--border-subtle)] cursor-pointer"
           >
             <span>Full Canvas</span>
-            <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
+            <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} />
           </Link>
         </div>
       </div>

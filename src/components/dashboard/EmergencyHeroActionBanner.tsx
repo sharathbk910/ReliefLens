@@ -22,7 +22,7 @@ export function EmergencyHeroActionBanner({
         {/* Left Side: Human Friendly Emergency Message */}
         <div className="space-y-1.5 max-w-xl">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-xs font-bold uppercase tracking-wide">
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
               Active Disaster Response System
             </span>
@@ -45,7 +45,7 @@ export function EmergencyHeroActionBanner({
           <button
             type="button"
             onClick={() => navigate('/reports/new')}
-            className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-900/40 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            className="flex-1 sm:flex-none px-4 py-2.5 rounded-lg bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-900/40 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
             <ShieldAlert className="w-4 h-4" />
             <span>Report Emergency</span>
@@ -56,7 +56,7 @@ export function EmergencyHeroActionBanner({
           <button
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
-            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/50 text-amber-300 font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/50 text-amber-300 font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
             <Mic className="w-4 h-4 text-[#EBFC72]" />
             <span>VOICE SOS</span>
@@ -65,7 +65,7 @@ export function EmergencyHeroActionBanner({
           {/* Direct 112 Helpline Button */}
           <a
             href="tel:112"
-            className="px-3.5 py-2.5 rounded-xl bg-black/60 hover:bg-black/80 border border-white/20 text-white font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all hover:border-rose-400"
+            className="px-3.5 py-2.5 rounded-lg bg-black/60 hover:bg-black/80 border border-white/20 text-white font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all hover:border-rose-400"
             title="Direct phone call to 112 National Emergency Hotline"
           >
             <Phone className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
