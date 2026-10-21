@@ -100,34 +100,45 @@ export function AppShell() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
+    <div className="min-h-screen flex flex-col font-sans relative bg-[#0c0c0c] text-[#ebebeb] selection:bg-[#ccff00] selection:text-black overflow-x-hidden">
+      {/* Background Grid Pattern & Ambient Glows */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-20 z-0"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      <div className="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#ccff00]/5 blur-[140px] pointer-events-none z-0" />
+      <div className="fixed bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#10b981]/5 blur-[140px] pointer-events-none z-0" />
+
       {/* 1. Mandatory Safety Disclaimer Banner (Spatial Topbar) */}
-      <header className="z-40 px-3 md:px-6 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--surface-1)] backdrop-blur-md text-xs flex items-center justify-between">
+      <header className="z-40 px-3 md:px-6 py-2 border-b border-white/10 bg-[#0c0c0c]/80 backdrop-blur-xl text-xs flex items-center justify-between">
         <div className="flex items-center gap-2 max-w-7xl mx-auto w-full">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" strokeWidth={1.5} />
-          <span className="leading-tight text-[var(--text-secondary)] text-[10px] sm:text-xs truncate sm:whitespace-normal">
-            <strong className="text-[var(--text-primary)] font-semibold">Prototype:</strong> <span className="hidden sm:inline">ReliefLens provides decision support for emergency coordination.</span> Not for 911 dispatch.
+          <AlertTriangle className="w-3.5 h-3.5 text-[#ccff00] shrink-0" strokeWidth={2} />
+          <span className="leading-tight text-white/60 text-[10px] sm:text-xs truncate sm:whitespace-normal font-mono">
+            <strong className="text-[#ccff00] font-bold">PROTOTYPE // 0x01:</strong> <span className="hidden sm:inline">ReliefLens provides decision support for emergency coordination.</span> Not for 911 dispatch.
           </span>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
+              className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? (
-                <Sun className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <Sun className="w-3.5 h-3.5" strokeWidth={1.8} />
               ) : (
-                <Moon className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <Moon className="w-3.5 h-3.5" strokeWidth={1.8} />
               )}
             </button>
             <button
               onClick={handleResetData}
               title="Reset simulated scenario data"
-              className="hidden sm:flex items-center gap-1 text-[11px] text-amber-500 hover:text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/10 transition-colors"
+              className="hidden sm:flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[#ccff00] hover:text-black px-2.5 py-1 rounded-full border border-[#ccff00]/40 hover:bg-[#ccff00] transition-colors"
             >
-              <RefreshCw className="w-3 h-3" strokeWidth={1.5} />
+              <RefreshCw className="w-3 h-3" strokeWidth={2} />
               <span>Reset Data</span>
             </button>
           </div>
@@ -138,11 +149,11 @@ export function AppShell() {
       <OfflineBanner />
 
       {/* Main Spatial Body */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex overflow-hidden relative z-10">
         {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) */}
         <aside
           aria-label="Primary Navigation"
-          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none"
+          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shrink-0 transition-all duration-300 z-30 select-none overflow-hidden"
         >
           {/* Logo & Operational Status */}
           <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center gap-2.5">

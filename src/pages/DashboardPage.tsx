@@ -85,9 +85,9 @@ export function DashboardPage() {
         districts={districts}
       />
 
-      {/* Incidents Table + Spatial Map Preview (Beside on desktop, stacked on mobile) */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
-        <div className="xl:col-span-8 space-y-4 min-w-0">
+      {/* Incidents Table + Spatial Map Preview (Full responsive layout, side-by-side on 2xl+ displays) */}
+      <div className="grid grid-cols-1 2xl:grid-cols-12 gap-6 items-start">
+        <div className="2xl:col-span-8 space-y-4 min-w-0 w-full">
           <IncidentTable
             incidents={incidents}
             isLoading={isLoading}
@@ -97,7 +97,7 @@ export function DashboardPage() {
             onPageChange={(p) => setPage(p)}
           />
         </div>
-        <div className="xl:col-span-4 min-w-0 xl:sticky xl:top-4">
+        <div className="2xl:col-span-4 min-w-0 w-full 2xl:sticky 2xl:top-4">
           <DashboardMapPreview incidents={incidents} />
         </div>
       </div>

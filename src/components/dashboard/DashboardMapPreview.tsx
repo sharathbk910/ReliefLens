@@ -234,24 +234,24 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
       : -122.4194;
 
   return (
-    <div className="surface-z1 rounded-2xl flex flex-col h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm">
+    <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl flex flex-col h-[520px] overflow-hidden border border-white/10 shadow-2xl">
       {/* Header */}
-      <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-1)]">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-teal-400" strokeWidth={1.5} />
-          <h3 className="text-xs font-semibold text-[var(--text-primary)]">
+      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.05]">
+        <div className="flex items-center gap-2.5">
+          <MapPin className="w-4 h-4 text-[#ccff00]" strokeWidth={2} />
+          <h3 className="text-xs font-bold text-white tracking-tight uppercase font-mono">
             Spatial Distribution
           </h3>
-          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums">
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30 font-semibold tabular-nums">
             {locatedIncidents.length} pinned
           </span>
         </div>
         <Link
           to="/map"
-          className="text-[11px] text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1 transition-colors"
+          className="text-[11px] text-[#ccff00] hover:text-white font-mono uppercase tracking-wider flex items-center gap-1 transition-colors"
         >
           <span>Full Canvas</span>
-          <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
+          <ExternalLink className="w-3 h-3 stroke-[2]" />
         </Link>
       </div>
 

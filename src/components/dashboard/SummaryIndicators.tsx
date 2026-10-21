@@ -22,9 +22,10 @@ export function SummaryIndicators({
       label: 'Open Incidents',
       count: openIncidents,
       desc: 'Active operational triage',
-      icon: <FolderOpen className="w-4 h-4 text-blue-400" strokeWidth={1.5} />,
-      border: 'hover:border-blue-500/40',
-      countColor: 'text-blue-400',
+      icon: <FolderOpen className="w-4 h-4 text-[#ccff00]" strokeWidth={2} />,
+      border: 'hover:border-[#ccff00]/50 hover:shadow-[0_0_20px_rgba(204,255,0,0.15)]',
+      countColor: 'text-white',
+      badge: 'LIVE_TRIAGE',
       stagger: 'stagger-1',
     },
     {
@@ -32,9 +33,10 @@ export function SummaryIndicators({
       label: 'Critical Priority',
       count: criticalHigh,
       desc: 'Score ≥ 45 or safety floor active',
-      icon: <AlertCircle className="w-4 h-4 text-rose-500" strokeWidth={1.5} />,
-      border: 'hover:border-rose-500/40',
-      countColor: 'text-rose-500',
+      icon: <AlertCircle className="w-4 h-4 text-[#ccff00]" strokeWidth={2} />,
+      border: 'hover:border-[#ccff00] hover:shadow-[0_0_25px_rgba(204,255,0,0.25)]',
+      countColor: 'text-[#ccff00]',
+      badge: 'TIER_1',
       stagger: 'stagger-2',
     },
     {
@@ -42,9 +44,10 @@ export function SummaryIndicators({
       label: 'Data Uncertainty',
       count: unresolvedUncertainty,
       desc: 'Missing coords or single source',
-      icon: <AlertTriangle className="w-4 h-4 text-amber-500" strokeWidth={1.5} />,
-      border: 'hover:border-amber-500/40',
-      countColor: 'text-amber-500',
+      icon: <AlertTriangle className="w-4 h-4 text-amber-400" strokeWidth={2} />,
+      border: 'hover:border-amber-400/50 hover:shadow-[0_0_20px_rgba(251,191,36,0.15)]',
+      countColor: 'text-amber-400',
+      badge: 'REVIEW_REQ',
       stagger: 'stagger-3',
     },
     {
@@ -52,9 +55,10 @@ export function SummaryIndicators({
       label: 'Duplicate Reviews',
       count: pendingDuplicates,
       desc: 'Awaiting coordinator decision',
-      icon: <CopyCheck className="w-4 h-4 text-[var(--text-secondary)]" strokeWidth={1.5} />,
-      border: 'hover:border-[var(--border-strong)]',
-      countColor: 'text-[var(--text-primary)]',
+      icon: <CopyCheck className="w-4 h-4 text-[#10b981]" strokeWidth={2} />,
+      border: 'hover:border-[#10b981]/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]',
+      countColor: 'text-white',
+      badge: 'CLUSTER_SYNC',
       stagger: 'stagger-4',
     },
   ];
@@ -66,22 +70,25 @@ export function SummaryIndicators({
           key={ind.id}
           type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`text-left p-4 rounded-2xl surface-z1 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm hover:shadow-md hover:-translate-y-0.5`}
+          className={`text-left p-4 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 ${ind.border} ${ind.stagger} transition-all duration-300 cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-xl hover:-translate-y-1 relative`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            <span className="text-xs font-bold text-white/70 group-hover:text-white transition-colors">
               {ind.label}
             </span>
-            <div className="p-1.5 rounded-lg bg-[var(--surface-2-solid)] border border-[var(--border-subtle)] group-hover:border-teal-500/30 transition-colors">
+            <div className="p-2 rounded-xl bg-white/[0.05] border border-white/10 group-hover:border-[#ccff00]/40 transition-colors">
               {ind.icon}
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl md:text-3xl font-extrabold font-heading tabular-nums ${ind.countColor}`}>
+            <span className={`text-3xl md:text-4xl font-extrabold font-heading tabular-nums ${ind.countColor} tracking-tight`}>
               {ind.count}
             </span>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-[#ccff00]/70 font-semibold ml-auto">
+              {ind.badge}
+            </span>
           </div>
-          <p className="text-[11px] text-[var(--text-muted)] mt-1 truncate">
+          <p className="text-[11px] text-white/50 mt-1.5 truncate font-sans">
             {ind.desc}
           </p>
         </button>
