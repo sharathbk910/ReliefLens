@@ -122,7 +122,7 @@ export function AuditPage() {
 
       {/* Filter Toolbar */}
       <div className="flex flex-wrap items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-3">
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -136,7 +136,7 @@ export function AuditPage() {
         <select
           value={actionFilter}
           onChange={(e) => setActionFilter(e.target.value)}
-          className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200"
+          className="w-full sm:w-auto bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200"
         >
           <option value="all">Action: All Types</option>
           <option value="report_ingested">Report Ingested</option>
@@ -150,9 +150,9 @@ export function AuditPage() {
       </div>
 
       {/* Audit Log Table */}
-      <div className="surface-z1 overflow-hidden shadow-sm animate-fade-in">
-        <div className="table-scroll-container">
-          <table className="w-full text-left text-xs border-collapse">
+      <div className="surface-z1 overflow-hidden shadow-sm animate-fade-in rounded-xl border border-[var(--border-subtle)]">
+        <div className="w-full max-w-full overflow-x-auto table-scroll-container">
+          <table className="w-full text-left text-xs border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-[var(--border-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium">
                 <th className="py-3 px-4">Timestamp</th>

@@ -507,3 +507,81 @@
   z-index: 3;
 }
 
+/* Tactical Emergency UI/UX Visual Enhancements */
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes glowPulseRed {
+  0%, 100% { box-shadow: 0 0 8px rgba(241, 102, 77, 0.35); }
+  50% { box-shadow: 0 0 18px rgba(241, 102, 77, 0.75); }
+}
+
+@keyframes glowPulseYellow {
+  0%, 100% { box-shadow: 0 0 8px rgba(235, 252, 114, 0.25); }
+  50% { box-shadow: 0 0 16px rgba(235, 252, 114, 0.6); }
+}
+
+.radar-sweep-needle {
+  transform-origin: center;
+  animation: radarSweep 4s linear infinite;
+}
+
+.emergency-glow-red {
+  animation: glowPulseRed 2.2s ease-in-out infinite;
+}
+
+.emergency-glow-yellow {
+  animation: glowPulseYellow 2.2s ease-in-out infinite;
+}
+
+.tactical-card-interactive {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+.tactical-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(235, 252, 114, 0.12);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Responsive Device Containment & Scroll Management
+   ───────────────────────────────────────────────────────────── */
+.table-scroll-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(235, 252, 114, 0.25) transparent;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(235, 252, 114, 0.3);
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(235, 252, 114, 0.5);
+}
+
+@media (max-width: 640px) {
+  .slide-track {
+    height: 48px;
+  }
+  .slide-range {
+    height: 48px;
+  }
+}
+
+

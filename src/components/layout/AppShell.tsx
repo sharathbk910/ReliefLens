@@ -16,6 +16,7 @@ import {
   Lock,
   User,
   SlidersHorizontal,
+  Mic,
 } from 'lucide-react';
 import { dataService } from '../../lib/dataService.ts';
 import { Button } from '../ui/Button.tsx';
@@ -114,20 +115,31 @@ export function AppShell() {
               ACTIVE DISASTER RESPONSE ZONE
             </span>
           </div>
-          <span className="hidden md:inline text-[var(--tactical-muted,#8e8f86)] text-xs border-l border-[var(--tactical-border,rgba(244,243,232,0.1))] pl-2.5">
-            Clear Explanations · Fair Prioritization · Human Chiefs in Control
-          </span>
 
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {/* Prominent Emergency Action Button (from Inversa sample) */}
             <button
               onClick={() => navigate('/reports/new')}
-              className="px-2.5 sm:px-3 py-1 rounded-md bg-rose-950/80 hover:bg-rose-900 border border-rose-600/80 text-rose-200 hover:text-white font-mono text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-md shadow-rose-950/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="px-2 sm:px-3 py-1 rounded-md bg-rose-950/80 hover:bg-rose-900 border border-rose-600/80 text-rose-200 hover:text-white font-mono text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-md shadow-rose-950/50 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
               title="Report an immediate disaster emergency"
             >
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-              <span>🚨 CALL FOR HELP NOW</span>
+              <span className="hidden sm:inline">🚨 CALL FOR HELP NOW</span>
+              <span className="sm:hidden">🚨 SOS HELP</span>
             </button>
+
+            {/* Quick Multilingual Voice Action Button */}
+            {currentUser.role !== 'viewer' && (
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
+                className="px-2 sm:px-2.5 py-1 rounded-md bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/40 text-amber-300 hover:text-white font-mono text-[11px] font-bold tracking-wide flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                title="Quick Multilingual Voice Emergency Report"
+              >
+                <Mic className="w-3.5 h-3.5 text-[#EBFC72]" />
+                <span className="hidden sm:inline">Voice SOS</span>
+              </button>
+            )}
 
             {/* Theme Toggle Button */}
             <button
@@ -269,7 +281,7 @@ export function AppShell() {
           className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${
             location.pathname === '/reports/new' || location.pathname === '/map'
               ? 'pb-4 md:pb-6'
-              : 'pb-32 md:pb-16'
+              : 'pb-36 md:pb-16'
           }`}
         >
           <div className="flex-1 p-3 md:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-page-enter">
@@ -278,72 +290,88 @@ export function AppShell() {
         </main>
       </div>
 
-      {/* 4. Mobile Floating Bottom Dock (Section D - 4 or fewer items, safe area padding) */}
+      {/* 4. Mobile Floating Bottom Dock with Central Voice SOS (Never overlaps cards or controls) */}
       {location.pathname !== '/reports/new' && (
         <nav
           aria-label="Mobile Navigation Dock"
-          className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl"
+          className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl border border-[var(--border-subtle)] rounded-2xl"
           style={{ paddingBottom: 'calc(0.375rem + env(safe-area-inset-bottom, 0px))' }}
         >
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+              `flex flex-col items-center justify-center py-1 px-2.5 rounded-lg text-[10px] transition-colors ${
+                isActive ? 'text-amber-300 font-bold' : 'text-[var(--text-muted)]'
               }`
             }
           >
-            <LayoutDashboard className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+            <LayoutDashboard className="w-4 h-4 mb-0.5" strokeWidth={1.5} />
             <span>Dashboard</span>
-          </NavLink>
-
-          <NavLink
-            to="/duplicates"
-            className={({ isActive }) =>
-              `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
-              }`
-            }
-          >
-            <CopyCheck className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
-            <span>Duplicates</span>
           </NavLink>
 
           <NavLink
             to="/map"
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+              `flex flex-col items-center justify-center py-1 px-2.5 rounded-lg text-[10px] transition-colors ${
+                isActive ? 'text-amber-300 font-bold' : 'text-[var(--text-muted)]'
               }`
             }
           >
-            <MapPin className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+            <MapPin className="w-4 h-4 mb-0.5" strokeWidth={1.5} />
             <span>Map</span>
+          </NavLink>
+
+          {/* Central Raised Voice SOS Action */}
+          {currentUser.role !== 'viewer' && (
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
+              className="flex flex-col items-center justify-center -mt-5 group focus:outline-none cursor-pointer"
+              title="Speak emergency complaint via voice"
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500 group-hover:from-rose-500 group-hover:to-amber-400 border-2 border-white/20 flex items-center justify-center shadow-xl shadow-rose-950/70 transition-transform active:scale-90 relative">
+                <span className="absolute -inset-1 rounded-full bg-rose-500/35 animate-ping pointer-events-none" />
+                <Mic className="w-5 h-5 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-[10px] font-bold text-amber-300 mt-0.5 font-mono">VOICE SOS</span>
+            </button>
+          )}
+
+          <NavLink
+            to="/duplicates"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1 px-2.5 rounded-lg text-[10px] transition-colors ${
+                isActive ? 'text-amber-300 font-bold' : 'text-[var(--text-muted)]'
+              }`
+            }
+          >
+            <CopyCheck className="w-4 h-4 mb-0.5" strokeWidth={1.5} />
+            <span>Duplicates</span>
           </NavLink>
 
           {currentUser.role !== 'viewer' ? (
             <button
               onClick={() => navigate('/reports/new')}
-              className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-rose-500 font-semibold"
+              className="flex flex-col items-center justify-center py-1 px-2.5 rounded-lg text-[10px] text-teal-400 font-semibold cursor-pointer"
             >
-              <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mb-0.5">
-                <Plus className="w-4 h-4 text-rose-400" strokeWidth={1.5} />
+              <div className="w-5 h-5 rounded-full bg-teal-500/20 border border-teal-500/40 flex items-center justify-center mb-0.5">
+                <Plus className="w-3.5 h-3.5 text-teal-300" strokeWidth={2} />
               </div>
               <span>Report</span>
             </button>
           ) : (
             <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-[var(--text-muted)]"
+              className="flex flex-col items-center justify-center py-1 px-2.5 rounded-lg text-[10px] text-[var(--text-muted)] cursor-pointer"
             >
-              <User className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+              <User className="w-4 h-4 mb-0.5" strokeWidth={1.5} />
               <span>Role</span>
             </button>
           )}
         </nav>
       )}
 
-      {/* 5. Persistent Emergency Quick Voice Action Button */}
+      {/* 5. Persistent Emergency Quick Voice Action Modal */}
       {currentUser.role !== 'viewer' && <EmergencyVoiceFAB />}
     </div>
   );

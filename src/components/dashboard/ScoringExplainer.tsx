@@ -6,39 +6,34 @@ export function ScoringExplainer() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mb-4 corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] rounded-xl overflow-hidden transition-all shadow-sm">
-      <div className="w-full flex flex-col md:flex-row md:items-center justify-between p-3.5 gap-2.5">
+    <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl overflow-hidden transition-all shadow-sm">
+      <div className="w-full flex items-center justify-between px-3.5 py-2 gap-2">
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center justify-between gap-3 text-left group flex-1"
+          className="flex items-center gap-2 text-left group flex-1 cursor-pointer"
         >
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#EBFC72] emergency-pulse-dot" />
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)] group-hover:text-[#EBFC72] transition-colors flex items-center gap-1.5">
-              <Cpu className="w-3.5 h-3.5 text-[#EBFC72]" />
-              Deterministic Incident Scoring Formula (v{RULESET.version})
-            </span>
-            <span className="text-[10px] text-[#EBFC72] font-mono bg-[#EBFC72]/10 border border-[#EBFC72]/30 px-2 py-0.5 rounded-sm">
-              100% EXPLAINABLE & AUDITABLE
-            </span>
+          <Cpu className="w-3.5 h-3.5 text-[#EBFC72] shrink-0" />
+          <span className="text-xs font-mono font-semibold text-[var(--text-secondary)] group-hover:text-white transition-colors">
+            Scoring Formula:
+          </span>
+          <div className="hidden sm:flex items-center gap-1.5 font-mono text-[10px] text-[var(--text-muted)]">
+            <span className="text-rose-400">Danger 30%</span>
+            <span>+</span>
+            <span className="text-amber-400">People 25%</span>
+            <span>+</span>
+            <span className="text-sky-400">Freshness 20%</span>
+            <span>+</span>
+            <span className="text-purple-400">Vulnerability 15%</span>
+            <span>+</span>
+            <span className="text-[#EBFC72]">Confidence 10%</span>
           </div>
-          <ChevronDown
-            className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${open ? 'rotate-180' : ''}`}
-          />
+          <span className="text-[10px] font-mono text-teal-400 ml-auto sm:ml-2 flex items-center gap-1">
+            {open ? 'Hide Formula' : 'How It Works'}
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
+            />
+          </span>
         </button>
-
-        {/* Tactical Quick Formula Banner */}
-        <div className="hidden lg:flex items-center gap-1.5 font-mono text-[10px] text-[var(--text-muted)] bg-black/40 px-2.5 py-1 rounded border border-white/5">
-          <span className="text-rose-400 font-semibold">DANGER 30%</span>
-          <span>+</span>
-          <span className="text-amber-400 font-semibold">PEOPLE 25%</span>
-          <span>+</span>
-          <span className="text-sky-400 font-semibold">FRESHNESS 20%</span>
-          <span>+</span>
-          <span className="text-purple-400 font-semibold">VULNERABILITY 15%</span>
-          <span>+</span>
-          <span className="text-[#EBFC72] font-semibold">CONFIDENCE 10%</span>
-        </div>
       </div>
 
       {open && (

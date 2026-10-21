@@ -1,0 +1,18 @@
+{
+  "short_name": "ReliefLens",
+  "name": "ReliefLens — Emergency Response & Rescue Coordination",
+  "description": "Transparent emergency incident coordination, deterministic priority scoring, and human-in-the-loop disaster response.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0B0F12",
+  "theme_color": "#0B0F12",
+  "display": "standalone",
+  "orientation": "portrait"
+}

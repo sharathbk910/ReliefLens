@@ -40,6 +40,7 @@ export function useIncidents(options: UseIncidentsOptions = {}) {
   } = options;
 
   const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [allIncidents, setAllIncidents] = useState<Incident[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +80,7 @@ export function useIncidents(options: UseIncidentsOptions = {}) {
       ]);
 
       setIncidents(incidentRes.incidents);
+      setAllIncidents(allIncidentsRes.incidents);
       setTotal(incidentRes.total);
       setSummary(summaryRes);
 
@@ -144,6 +146,7 @@ export function useIncidents(options: UseIncidentsOptions = {}) {
 
   return {
     incidents,
+    allIncidents,
     total,
     page,
     setPage,

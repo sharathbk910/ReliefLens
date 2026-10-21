@@ -72,18 +72,25 @@ export function TacticalDispatchControl({
 
   if (!selectedIncident) {
     return (
-      <div className="surface-z1 border border-[var(--tactical-border,rgba(244,243,232,0.1))] rounded-xl p-3 flex items-center justify-between font-mono text-xs text-[var(--text-muted)] select-none">
-        <div className="flex items-center gap-2">
-          <span className="blinker-square"></span>
-          <span>SELECT ANY INCIDENT ROW IN THE TABLE TO ACTIVATE SLIDE-TO-DISPATCH FAILSAFE</span>
+      <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-[var(--text-secondary)] select-none">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="blinker-square shrink-0"></span>
+          <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-amber-300 shrink-0">
+            RESCUE DISPATCH HUD:
+          </span>
+          <span className="font-mono text-[11px] text-[var(--text-muted)] truncate">
+            Standby • Select any incident row in the table below to target and dispatch units
+          </span>
         </div>
-        <span className="text-[10px] uppercase font-bold text-amber-400/80">STANDBY MODE</span>
+        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[var(--border-subtle)] text-amber-400/80 uppercase shrink-0 self-start sm:self-auto">
+          Standby Mode
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="relative surface-z2 border-2 border-amber-400/40 rounded-xl p-3.5 shadow-xl shadow-amber-950/20 space-y-3 animate-fade-in select-none">
+    <div className="relative surface-z2 border-2 border-amber-400/40 rounded-xl p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 space-y-3 animate-fade-in select-none">
       <div className="corner-bracket cross-tl"></div>
       <div className="corner-bracket cross-tr"></div>
       <div className="corner-bracket cross-bl"></div>
@@ -91,7 +98,7 @@ export function TacticalDispatchControl({
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-[var(--border-subtle)]">
         <div className="space-y-0.5 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square"></span>
             <span className="font-mono text-[10px] text-amber-300 font-bold uppercase tracking-wider">
               RESCUE MISSION FAILSAFE HUD
@@ -109,8 +116,8 @@ export function TacticalDispatchControl({
         </div>
 
         {/* Unit Selector */}
-        <div className="flex items-center gap-2 shrink-0">
-          <label htmlFor="unit-select" className="text-[11px] font-mono text-[var(--text-muted)] font-semibold">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 w-full md:w-auto">
+          <label htmlFor="unit-select" className="text-[11px] font-mono text-[var(--text-muted)] font-semibold shrink-0">
             RESOURCE:
           </label>
           <select
@@ -118,7 +125,7 @@ export function TacticalDispatchControl({
             value={selectedUnit}
             onChange={(e) => setSelectedUnit(e.target.value)}
             disabled={isDeploying || deployedSuccess}
-            className="bg-[var(--surface-1-solid)] border border-amber-400/50 rounded-lg px-2.5 py-1.5 text-xs font-mono text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
+            className="w-full sm:w-auto max-w-full bg-[var(--surface-1-solid)] border border-amber-400/50 rounded-lg px-2.5 py-1.5 text-xs font-mono text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
           >
             {units.map((u) => (
               <option key={u.id} value={u.id}>
@@ -133,19 +140,22 @@ export function TacticalDispatchControl({
       <div className="space-y-1">
         <div className="slide-track" title="Slide right to 100% to send rescue team. Prevents accidental clicks.">
           <div className="slide-fill" style={{ width: `${sliderValue}%` }}></div>
-          <span className="slide-label flex items-center gap-2">
+          <span className="slide-label flex items-center gap-2 px-2 text-center text-xs">
             {deployedSuccess ? (
               <span className="text-emerald-400 flex items-center gap-1.5 font-bold animate-pulse">
                 <Check className="w-4 h-4" /> RESCUE UNIT DISPATCHED & LOGGED
               </span>
             ) : isDeploying ? (
-              <span className="text-amber-300 font-bold animate-pulse">
+              <span className="text-amber-300 font-bold animate-pulse text-xs">
                 TRANSMITTING RESCUE DISPATCH ORDER...
               </span>
             ) : sliderValue > 50 ? (
               <span>RELEASE AT END TO DEPLOY [{selectedUnit}] ➔</span>
             ) : (
-              <span>SLIDE RIGHT TO SEND RESCUE TEAM ➔</span>
+              <>
+                <span className="hidden sm:inline">SLIDE RIGHT TO SEND RESCUE TEAM ➔</span>
+                <span className="sm:hidden">SLIDE TO SEND RESCUE ➔</span>
+              </>
             )}
           </span>
           <input
@@ -161,7 +171,7 @@ export function TacticalDispatchControl({
             aria-label="Slide right to send rescue"
           />
         </div>
-        <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] px-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-[var(--text-muted)] px-1">
           <span>FAILSAFE: ACCIDENTAL CLICK PROTECTION</span>
           <span>HUMAN CHIEF AUDIT TRAIL RECORDED</span>
         </div>

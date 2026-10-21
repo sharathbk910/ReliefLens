@@ -155,7 +155,7 @@ export function DuplicatesPage() {
 
                   {/* Actions for Pending */}
                   {cand.decision === 'pending' ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
                       <Button
                         size="sm"
                         variant="secondary"
@@ -163,6 +163,7 @@ export function DuplicatesPage() {
                         disabled={isViewer || isProcessing}
                         isLoading={isProcessing}
                         onClick={() => handleDecision(cand.id, 'rejected')}
+                        className="flex-1 sm:flex-none justify-center"
                       >
                         Reject Duplicate
                       </Button>
@@ -173,6 +174,7 @@ export function DuplicatesPage() {
                         disabled={isViewer || isProcessing}
                         isLoading={isProcessing}
                         onClick={() => handleDecision(cand.id, 'confirmed')}
+                        className="flex-1 sm:flex-none justify-center"
                       >
                         Confirm & Merge Incidents
                       </Button>

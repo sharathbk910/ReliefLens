@@ -39,11 +39,11 @@ export function IncidentFilters({
     (filters.maxDistanceKm !== undefined && filters.maxDistanceKm !== 'all');
 
   return (
-    <div className="surface-z1 border border-[var(--border-subtle)] rounded-2xl p-3.5 mb-4 shadow-sm">
+    <div className="surface-z1 border border-[var(--border-subtle)] rounded-2xl p-3 sm:p-3.5 mb-4 shadow-sm">
       {/* Compact Primary Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
           <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -66,7 +66,7 @@ export function IncidentFilters({
         <select
           value={filters.status}
           onChange={(e) => onChange({ status: e.target.value as any })}
-          className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="flex-1 sm:flex-none min-w-[110px] bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
         >
           <option value="all">Status: All</option>
           <option value="new">New</option>
@@ -81,7 +81,7 @@ export function IncidentFilters({
         <select
           value={filters.priorityTier}
           onChange={(e) => onChange({ priorityTier: e.target.value as any })}
-          className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="flex-1 sm:flex-none min-w-[110px] bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
         >
           <option value="all">Tier: All</option>
           <option value="critical">Critical (70–100)</option>
@@ -94,7 +94,7 @@ export function IncidentFilters({
         <select
           value={filters.incidentType}
           onChange={(e) => onChange({ incidentType: e.target.value as any })}
-          className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="flex-1 sm:flex-none min-w-[110px] bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
         >
           <option value="all">Type: All</option>
           <option value="flood">Flood</option>
@@ -107,7 +107,7 @@ export function IncidentFilters({
         </select>
 
         {/* Proximity / Within Range Filter */}
-        <div className="flex items-center gap-1.5 bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
+        <div className="flex-1 sm:flex-none flex items-center gap-1.5 bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)] min-w-[140px]">
           <Compass className="w-3.5 h-3.5 text-teal-400 shrink-0" />
           <select
             value={filters.maxDistanceKm ?? 'all'}
@@ -117,7 +117,7 @@ export function IncidentFilters({
               })
             }
             aria-label="Filter incidents within range of your current location"
-            className="bg-transparent text-xs text-[var(--text-primary)] focus:outline-none cursor-pointer"
+            className="w-full bg-transparent text-xs text-[var(--text-primary)] focus:outline-none cursor-pointer"
           >
             <option value="all" className="bg-slate-900 text-white">Range: All Distances</option>
             <option value={5} className="bg-slate-900 text-white">Within 5 km of Me</option>
@@ -130,7 +130,7 @@ export function IncidentFilters({
         {/* Toggle Uncertainty Filter */}
         <button
           onClick={() => onChange({ hasUncertainty: !filters.hasUncertainty })}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
             filters.hasUncertainty
               ? 'bg-amber-950/50 border-amber-500/50 text-amber-200'
               : 'bg-[var(--surface-1-solid)] border-[var(--border-strong)] text-[var(--text-muted)] hover:text-white'
@@ -142,7 +142,7 @@ export function IncidentFilters({
         {/* Secondary Popover Toggle */}
         <button
           onClick={() => setPanelOpen(!panelOpen)}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
             panelOpen || filters.district !== 'all'
               ? 'bg-[var(--surface-2-solid)] border-teal-500/40 text-teal-300'
               : 'bg-[var(--surface-1-solid)] border-[var(--border-strong)] text-[var(--text-muted)] hover:text-white'
@@ -157,7 +157,7 @@ export function IncidentFilters({
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 px-2 py-1.5 rounded-lg bg-rose-950/30 border border-rose-800/40"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1 text-xs text-rose-400 hover:text-rose-300 px-2 py-1.5 rounded-lg bg-rose-950/30 border border-rose-800/40 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
             <span>Clear</span>

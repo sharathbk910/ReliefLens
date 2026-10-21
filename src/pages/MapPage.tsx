@@ -19,6 +19,7 @@ import {
   Crosshair,
   Loader2,
   Compass,
+  ArrowLeft,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
 import { calculateHaversineMeters } from '../shared/duplicate.ts';
@@ -102,7 +103,7 @@ function getHeatCircleStyle(tier: PriorityTier) {
   return configs[tier] || configs.low;
 }
 
-// Automatically fits map bounds or centers on user location upon opening
+// Automatically fits map bounds to incident markers upon opening and invalidates container size
 function MapAutoInitializer({
   incidents,
   userLocation,
@@ -111,32 +112,42 @@ function MapAutoInitializer({
   userLocation: { lat: number; lng: number; accuracy: number } | null;
 }) {
   const map = useMap();
-  const prevCountRef = useRef<number>(-1);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   // Invalidate map size so Leaflet renders tiles immediately on open without requiring a click
   useEffect(() => {
+    containerRef.current = map.getContainer();
     map.invalidateSize();
-    const t1 = setTimeout(() => map.invalidateSize(), 80);
-    const t2 = setTimeout(() => map.invalidateSize(), 300);
-    const t3 = setTimeout(() => map.invalidateSize(), 800);
+
+    const raf = requestAnimationFrame(() => map.invalidateSize());
+    const t1 = setTimeout(() => map.invalidateSize(), 50);
+    const t2 = setTimeout(() => map.invalidateSize(), 150);
+    const t3 = setTimeout(() => map.invalidateSize(), 350);
+    const t4 = setTimeout(() => map.invalidateSize(), 700);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      ro = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      ro.observe(containerRef.current);
+    }
 
     const onResize = () => map.invalidateSize();
     window.addEventListener('resize', onResize);
 
     return () => {
+      cancelAnimationFrame(raf);
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
+      if (ro) ro.disconnect();
       window.removeEventListener('resize', onResize);
     };
   }, [map]);
 
   useEffect(() => {
-    if (userLocation) {
-      map.setView([userLocation.lat, userLocation.lng], 14);
-      return;
-    }
-
     const valid = incidents.filter(
       (i) =>
         typeof i.latitude === 'number' &&
@@ -144,19 +155,33 @@ function MapAutoInitializer({
         !isNaN(i.latitude) &&
         !isNaN(i.longitude)
     );
-    if (valid.length === 0) return;
 
-    if (prevCountRef.current !== valid.length) {
-      prevCountRef.current = valid.length;
-      map.invalidateSize();
-      if (valid.length === 1) {
+    map.invalidateSize();
+
+    if (valid.length > 0) {
+      const bounds = L.latLngBounds(
+        valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
+      );
+
+      // Only extend bounds if user location is nearby (< 100km)
+      if (userLocation) {
+        const center = bounds.getCenter();
+        const dist = calculateHaversineMeters(userLocation.lat, userLocation.lng, center.lat, center.lng);
+        if (dist < 100_000) {
+          bounds.extend([userLocation.lat, userLocation.lng]);
+        }
+      }
+
+      if (valid.length === 1 && !userLocation) {
         map.setView([valid[0].latitude!, valid[0].longitude!], 13);
       } else {
-        const bounds = L.latLngBounds(
-          valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
-        );
-        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
       }
+    } else if (userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 13);
+    } else {
+      const defaultCenter = config.map.defaultCenter || [12.9716, 77.5946];
+      map.setView([defaultCenter[0], defaultCenter[1]], 12);
     }
   }, [incidents, userLocation, map]);
 
@@ -292,6 +317,7 @@ export function MapPage() {
   
   // Mobile sheet detents: 'peek' | 'half' | 'full'
   const [mobileDetent, setMobileDetent] = useState<'peek' | 'half' | 'full'>('peek');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const tileUrl = config.map.tileUrl;
 
@@ -329,14 +355,6 @@ export function MapPage() {
     };
   }, []);
 
-  // Automatic geolocation: immediately request and update user's location as soon as page opens
-  useEffect(() => {
-    if (typeof window === 'undefined' || !navigator.geolocation) return;
-
-    // Immediately trigger location detection on page open
-    setLocateRequested((prev) => prev + 1);
-  }, []);
-
   const locatedIncidents = incidents.filter((i) => {
     const hasCoords =
       typeof i.latitude === 'number' &&
@@ -368,19 +386,20 @@ export function MapPage() {
     (i) => i.latitude === null || i.longitude === null
   );
 
+  const defaultLat = config.map.defaultCenter?.[0] ?? 12.9716;
+  const defaultLng = config.map.defaultCenter?.[1] ?? 77.5946;
+
   const centerLat =
-    userLocation?.lat ??
-    (locatedIncidents.length > 0
+    locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.latitude!, 0) /
         locatedIncidents.length
-      : 37.7749);
+      : (userLocation?.lat ?? defaultLat);
 
   const centerLng =
-    userLocation?.lng ??
-    (locatedIncidents.length > 0
+    locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.longitude!, 0) /
         locatedIncidents.length
-      : -122.4194);
+      : (userLocation?.lng ?? defaultLng);
 
   const handleSelectIncident = (inc: Incident) => {
     setSelectedIncident(inc);
@@ -553,9 +572,17 @@ export function MapPage() {
       </div>
 
       {/* 2. Floating Filter & Legend Panel (Desktop Top-Left - Layer 2) */}
-      <div className="absolute top-4 left-4 z-20 surface-z2 p-3 space-y-2.5 max-w-xs shadow-xl animate-spatial-enter">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 surface-z2 p-2.5 sm:p-3 space-y-2.5 max-w-[calc(100vw-24px)] sm:max-w-xs shadow-xl animate-spatial-enter">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
+            <Link
+              to="/dashboard"
+              className="p-1 -ml-1 rounded hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-white transition-colors"
+              title="Return to Command Center Dashboard"
+              aria-label="Back to Dashboard"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
             <MapPin className="w-4 h-4 text-rose-500" strokeWidth={1.5} />
             <span className="text-xs font-semibold text-[var(--text-primary)]">Map Canvas</span>
           </div>
@@ -569,121 +596,131 @@ export function MapPage() {
             <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] tabular-nums">
               {locatedIncidents.length} Located
             </span>
-          </div>
-        </div>
-
-        {error && (
-          <div className="p-2 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-2">
-            <span className="truncate">{error}</span>
             <button
-              onClick={() => fetchIncidents()}
-              className="text-[11px] underline font-semibold text-rose-400 hover:text-rose-200 shrink-0"
+              type="button"
+              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+              className="sm:hidden p-1 rounded hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-white transition-colors"
+              aria-label="Toggle map filters on mobile"
             >
-              Retry
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${mobileFiltersOpen ? 'rotate-180' : ''}`} />
             </button>
           </div>
-        )}
-
-        {/* Layer Mode Segmented Switcher */}
-        <div className="bg-[var(--surface-1-solid)] p-1 rounded-lg border border-[var(--border-subtle)] flex items-center justify-between gap-1 text-[11px]">
-          <button
-            type="button"
-            onClick={() => setMapViewMode('all')}
-            className={`flex-1 py-1 rounded font-medium transition-colors ${
-              mapViewMode === 'all'
-                ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapViewMode('pins')}
-            className={`flex-1 py-1 rounded font-medium transition-colors ${
-              mapViewMode === 'pins'
-                ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            Pins
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapViewMode('heat')}
-            className={`flex-1 py-1 rounded font-medium transition-colors ${
-              mapViewMode === 'heat'
-                ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            Heat
-          </button>
         </div>
 
-        {/* Locate My Current Position Action Button */}
-        <button
-          type="button"
-          onClick={() => setLocateRequested((c) => c + 1)}
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/40 text-teal-300 text-xs font-semibold transition-all shadow-sm active:scale-95 group focus:outline-none focus:ring-1 focus:ring-teal-400 cursor-pointer"
-          title="Center map on your current GPS coordinates"
-        >
-          <Crosshair className="w-3.5 h-3.5 text-teal-400 group-hover:rotate-45 transition-transform" />
-          <span>My Current Location</span>
-        </button>
+        <div className={`${mobileFiltersOpen ? 'block' : 'hidden'} sm:block space-y-2.5`}>
+          {error && (
+            <div className="p-2 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-2">
+              <span className="truncate">{error}</span>
+              <button
+                onClick={() => fetchIncidents()}
+                className="text-[11px] underline font-semibold text-rose-400 hover:text-rose-200 shrink-0"
+              >
+                Retry
+              </button>
+            </div>
+          )}
 
-        {/* Priority Filter */}
-        <div className="flex items-center gap-1.5 text-xs">
-          <Filter className="w-3.5 h-3.5 text-[var(--text-muted)]" strokeWidth={1.5} />
-          <select
-            value={selectedTier}
-            onChange={(e) => setSelectedTier(e.target.value as any)}
-            className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-md px-2 py-1 text-xs text-[var(--text-primary)] focus-visible:ring-1"
+          {/* Layer Mode Segmented Switcher */}
+          <div className="bg-[var(--surface-1-solid)] p-1 rounded-lg border border-[var(--border-subtle)] flex items-center justify-between gap-1 text-[11px]">
+            <button
+              type="button"
+              onClick={() => setMapViewMode('all')}
+              className={`flex-1 py-1 rounded font-medium transition-colors ${
+                mapViewMode === 'all'
+                  ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapViewMode('pins')}
+              className={`flex-1 py-1 rounded font-medium transition-colors ${
+                mapViewMode === 'pins'
+                  ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              Pins
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapViewMode('heat')}
+              className={`flex-1 py-1 rounded font-medium transition-colors ${
+                mapViewMode === 'heat'
+                  ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              Heat
+            </button>
+          </div>
+
+          {/* Locate My Current Position Action Button */}
+          <button
+            type="button"
+            onClick={() => setLocateRequested((c) => c + 1)}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/40 text-teal-300 text-xs font-semibold transition-all shadow-sm active:scale-95 group focus:outline-none focus:ring-1 focus:ring-teal-400 cursor-pointer"
+            title="Center map on your current GPS coordinates"
           >
-            <option value="all">All Tiers ({locatedIncidents.length})</option>
-            <option value="critical">Critical Only</option>
-            <option value="high">High Only</option>
-            <option value="medium">Medium Only</option>
-            <option value="low">Low Only</option>
-          </select>
-        </div>
+            <Crosshair className="w-3.5 h-3.5 text-teal-400 group-hover:rotate-45 transition-transform" />
+            <span>My Current Location</span>
+          </button>
 
-        {/* Proximity / Within Range Filter */}
-        <div className="flex items-center gap-1.5 text-xs">
-          <Compass className="w-3.5 h-3.5 text-teal-400 shrink-0" strokeWidth={1.5} />
-          <select
-            value={selectedRadiusKm ?? 'all'}
-            onChange={(e) =>
-              setSelectedRadiusKm(e.target.value === 'all' ? null : Number(e.target.value))
-            }
-            aria-label="Filter incidents within range of your current location"
-            className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-md px-2 py-1 text-xs text-[var(--text-primary)] focus-visible:ring-1 cursor-pointer"
-          >
-            <option value="all">Range: All Distances</option>
-            <option value={5}>Within 5 km of Me</option>
-            <option value={10}>Within 10 km of Me</option>
-            <option value={25}>Within 25 km of Me</option>
-            <option value={50}>Within 50 km of Me</option>
-          </select>
-        </div>
+          {/* Priority Filter */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <Filter className="w-3.5 h-3.5 text-[var(--text-muted)]" strokeWidth={1.5} />
+            <select
+              value={selectedTier}
+              onChange={(e) => setSelectedTier(e.target.value as any)}
+              className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-md px-2 py-1 text-xs text-[var(--text-primary)] focus-visible:ring-1"
+            >
+              <option value="all">All Tiers ({locatedIncidents.length})</option>
+              <option value="critical">Critical Only</option>
+              <option value="high">High Only</option>
+              <option value="medium">Medium Only</option>
+              <option value="low">Low Only</option>
+            </select>
+          </div>
 
-        {/* Legend */}
-        <div className="pt-2 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-1 text-[10px] text-[var(--text-secondary)]">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-rose-600 shrink-0" />
-            <span>Critical</span>
+          {/* Proximity / Within Range Filter */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <Compass className="w-3.5 h-3.5 text-teal-400 shrink-0" strokeWidth={1.5} />
+            <select
+              value={selectedRadiusKm ?? 'all'}
+              onChange={(e) =>
+                setSelectedRadiusKm(e.target.value === 'all' ? null : Number(e.target.value))
+              }
+              aria-label="Filter incidents within range of your current location"
+              className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-md px-2 py-1 text-xs text-[var(--text-primary)] focus-visible:ring-1 cursor-pointer"
+            >
+              <option value="all">Range: All Distances</option>
+              <option value={5}>Within 5 km of Me</option>
+              <option value={10}>Within 10 km of Me</option>
+              <option value={25}>Within 25 km of Me</option>
+              <option value={50}>Within 50 km of Me</option>
+            </select>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-            <span>High</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-            <span>Medium</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-slate-500 shrink-0" />
-            <span>Low</span>
+
+          {/* Legend */}
+          <div className="pt-2 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-1 text-[10px] text-[var(--text-secondary)]">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-600 shrink-0" />
+              <span>Critical</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              <span>High</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+              <span>Medium</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-slate-500 shrink-0" />
+              <span>Low</span>
+            </div>
           </div>
         </div>
       </div>

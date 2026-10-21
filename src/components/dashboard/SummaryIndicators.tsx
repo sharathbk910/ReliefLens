@@ -60,28 +60,33 @@ export function SummaryIndicators({
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 md:gap-4 mb-4">
       {indicators.map((ind) => (
         <button
           key={ind.id}
           type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`text-left p-4 rounded-xl corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm hover:shadow-md hover:-translate-y-0.5`}
+          className={`text-left p-3 sm:p-3.5 md:p-4 rounded-xl corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} tactical-card-interactive cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm relative`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+          <div className="corner-bracket cross-tl"></div>
+          <div className="corner-bracket cross-tr"></div>
+          <div className="corner-bracket cross-bl"></div>
+          <div className="corner-bracket cross-br"></div>
+
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors truncate pr-1">
               {ind.label}
             </span>
-            <div className="p-1.5 rounded-md bg-black/40 border border-white/5 group-hover:border-[#EBFC72]/40 transition-colors">
+            <div className="p-1 sm:p-1.5 rounded-md bg-black/40 border border-white/5 group-hover:border-[#EBFC72]/40 transition-colors shrink-0">
               {ind.icon}
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl md:text-3xl font-extrabold font-mono tabular-nums ${ind.countColor}`}>
+            <span className={`text-xl sm:text-2xl md:text-3xl font-extrabold font-mono tabular-nums ${ind.countColor}`}>
               {ind.count}
             </span>
           </div>
-          <p className="text-[11px] font-mono text-[var(--text-muted)] mt-1 truncate">
+          <p className="text-[10px] sm:text-[11px] font-mono text-[var(--text-muted)] mt-0.5 sm:mt-1 truncate">
             {ind.desc}
           </p>
         </button>

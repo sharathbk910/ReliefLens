@@ -2,14 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { MapPin, ArrowRight, ExternalLink, Crosshair, Loader2 } from 'lucide-react';
+import { MapPin, ArrowRight, ExternalLink, Crosshair, Loader2, RefreshCw } from 'lucide-react';
 import type { Incident, PriorityTier } from '../../shared/types.ts';
+import { calculateHaversineMeters } from '../../shared/duplicate.ts';
+import { dataService } from '../../lib/dataService.ts';
 import { PriorityBadge, StatusBadge } from '../ui/Badge.tsx';
 import { useToast } from '../ui/Toast.tsx';
 import { config } from '../../config/env.ts';
 
 interface DashboardMapPreviewProps {
   incidents: Incident[];
+  allIncidents?: Incident[];
   isLoading?: boolean;
 }
 
@@ -78,7 +81,6 @@ function MapAutoInitializer({
   userLocation: { lat: number; lng: number; accuracy: number } | null;
 }) {
   const map = useMap();
-  const prevCountRef = useRef<number>(-1);
   const containerRef = useRef<HTMLElement | null>(null);
 
   // Invalidate map size automatically on mount, resize, and layout changes
@@ -86,9 +88,11 @@ function MapAutoInitializer({
     containerRef.current = map.getContainer();
     map.invalidateSize();
 
-    const t1 = setTimeout(() => map.invalidateSize(), 60);
-    const t2 = setTimeout(() => map.invalidateSize(), 200);
-    const t3 = setTimeout(() => map.invalidateSize(), 500);
+    const raf = requestAnimationFrame(() => map.invalidateSize());
+    const t1 = setTimeout(() => map.invalidateSize(), 50);
+    const t2 = setTimeout(() => map.invalidateSize(), 150);
+    const t3 = setTimeout(() => map.invalidateSize(), 350);
+    const t4 = setTimeout(() => map.invalidateSize(), 700);
 
     let ro: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
@@ -102,15 +106,17 @@ function MapAutoInitializer({
     window.addEventListener('resize', onResize);
 
     return () => {
+      cancelAnimationFrame(raf);
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
       if (ro) ro.disconnect();
       window.removeEventListener('resize', onResize);
     };
   }, [map]);
 
-  // Fit bounds to include both incidents and user location automatically without requiring clicks
+  // Fit bounds to include incident markers automatically without requiring clicks
   useEffect(() => {
     const valid = incidents.filter(
       (i) =>
@@ -127,9 +133,13 @@ function MapAutoInitializer({
         valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
       );
 
-      // Extend bounds to also encompass the user's location if available
+      // Only extend bounds if user location is nearby (< 100km) to keep focus on incident cluster
       if (userLocation) {
-        bounds.extend([userLocation.lat, userLocation.lng]);
+        const center = bounds.getCenter();
+        const distMeters = calculateHaversineMeters(userLocation.lat, userLocation.lng, center.lat, center.lng);
+        if (distMeters < 100_000) {
+          bounds.extend([userLocation.lat, userLocation.lng]);
+        }
       }
 
       if (valid.length === 1 && !userLocation) {
@@ -137,7 +147,6 @@ function MapAutoInitializer({
       } else {
         map.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
       }
-      prevCountRef.current = valid.length;
     } else if (userLocation) {
       map.setView([userLocation.lat, userLocation.lng], 13);
     } else {
@@ -159,14 +168,11 @@ function MiniLocateMeControl({
   const map = useMap();
   const toast = useToast();
   const [isLocating, setIsLocating] = useState(false);
-  const autoLocatedRef = useRef(false);
 
-  const handleLocate = (isAuto = false) => {
+  const handleLocate = () => {
     if (isLocating) return;
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      if (!isAuto) {
-        toast.error('Not Supported', 'Geolocation is not supported by your browser.');
-      }
+      toast.error('Not Supported', 'Geolocation is not supported by your browser.');
       return;
     }
 
@@ -187,30 +193,19 @@ function MiniLocateMeControl({
       },
       (err) => {
         setIsLocating(false);
-        if (!isAuto) {
-          if (err.code === 1) {
-            toast.error('Location Access Denied', 'Please allow location access in your browser.');
-          } else {
-            toast.error('Location Unavailable', err.message || 'Unable to retrieve location.');
-          }
+        if (err.code === 1) {
+          toast.error('Location Access Denied', 'Please allow location access in your browser address bar.');
+        } else {
+          toast.error('Location Unavailable', err.message || 'Unable to retrieve location.');
         }
       },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   };
 
-  // Automatically detect and center on location upon mounting
-  useEffect(() => {
-    if (!autoLocatedRef.current) {
-      autoLocatedRef.current = true;
-      handleLocate(true);
-    }
-  }, []);
-
-  // When locate button in header or external trigger is clicked
   useEffect(() => {
     if (locateRequested > 0) {
-      handleLocate(false);
+      handleLocate();
     }
   }, [locateRequested]);
 
@@ -226,7 +221,7 @@ function MiniLocateMeControl({
     >
       <button
         type="button"
-        onClick={() => handleLocate(false)}
+        onClick={handleLocate}
         disabled={isLocating}
         title="Locate My Current Position"
         aria-label="Locate My Current Position"
@@ -247,6 +242,7 @@ function MiniLocateMeControl({
 
 export function DashboardMapPreview({
   incidents,
+  allIncidents,
   isLoading = false,
 }: DashboardMapPreviewProps) {
   const [locateRequested, setLocateRequested] = useState<number>(0);
@@ -268,13 +264,27 @@ export function DashboardMapPreview({
     return null;
   });
 
-  const locatedIncidents = incidents.filter(
-    (i) =>
-      typeof i.latitude === 'number' &&
-      typeof i.longitude === 'number' &&
-      !isNaN(i.latitude) &&
-      !isNaN(i.longitude)
-  );
+  // Prioritize allIncidents for map overview if provided and non-empty
+  const sourceIncidents = (allIncidents && allIncidents.length > 0) ? allIncidents : incidents;
+
+  // Deduplicate by ID and ensure valid coordinates
+  const locatedIncidents = React.useMemo(() => {
+    const seen = new Set<string>();
+    const result: Incident[] = [];
+    for (const inc of sourceIncidents) {
+      if (
+        typeof inc.latitude === 'number' &&
+        typeof inc.longitude === 'number' &&
+        !isNaN(inc.latitude) &&
+        !isNaN(inc.longitude) &&
+        !seen.has(inc.id)
+      ) {
+        seen.add(inc.id);
+        result.push(inc);
+      }
+    }
+    return result;
+  }, [sourceIncidents]);
 
   const tileUrl = config.map.tileUrl;
 
@@ -282,45 +292,51 @@ export function DashboardMapPreview({
   const defaultLng = config.map.defaultCenter?.[1] ?? 77.5946;
 
   const centerLat =
-    userLocation?.lat ??
-    (locatedIncidents.length > 0
-      ? locatedIncidents.reduce((acc, cur) => acc + cur.latitude!, 0) /
-        locatedIncidents.length
-      : defaultLat);
+    locatedIncidents.length > 0
+      ? locatedIncidents.reduce((acc, cur) => acc + cur.latitude!, 0) / locatedIncidents.length
+      : (userLocation?.lat ?? defaultLat);
 
   const centerLng =
-    userLocation?.lng ??
-    (locatedIncidents.length > 0
-      ? locatedIncidents.reduce((acc, cur) => acc + cur.longitude!, 0) /
-        locatedIncidents.length
-      : defaultLng);
+    locatedIncidents.length > 0
+      ? locatedIncidents.reduce((acc, cur) => acc + cur.longitude!, 0) / locatedIncidents.length
+      : (userLocation?.lng ?? defaultLng);
 
   return (
-    <div className="surface-z1 rounded-xl flex flex-col h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm relative">
+    <div className="surface-z1 rounded-xl flex flex-col h-[280px] sm:h-[380px] xl:h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm relative corner-cross">
+      <div className="corner-bracket cross-tl"></div>
+      <div className="corner-bracket cross-tr"></div>
+      <div className="corner-bracket cross-bl"></div>
+      <div className="corner-bracket cross-br"></div>
+
       {/* Header */}
-      <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-1)]">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-teal-400" strokeWidth={1.5} />
-          <h3 className="text-xs font-semibold text-[var(--text-primary)]">
+      <div className="p-2.5 sm:p-3.5 border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2 bg-[var(--surface-1)]">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400 shrink-0" strokeWidth={1.5} />
+          <h3 className="text-xs font-semibold text-[var(--text-primary)] font-mono uppercase tracking-wider truncate">
             Spatial Distribution
           </h3>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums shrink-0">
             {locatedIncidents.length} pinned
           </span>
+          <span className="hidden md:inline-flex items-center gap-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-950/60 text-teal-300 border border-teal-500/30 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping" />
+            LIVE RADAR
+          </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={() => setLocateRequested((prev) => prev + 1)}
-            className="text-[11px] text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1 transition-colors px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 cursor-pointer"
+            className="text-[10px] sm:text-[11px] text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1 transition-colors px-1.5 sm:px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 cursor-pointer"
             title="Center to current GPS location"
           >
             <Crosshair className="w-3 h-3" />
-            <span>My Location</span>
+            <span className="hidden sm:inline">My Location</span>
+            <span className="sm:hidden">GPS</span>
           </button>
           <Link
             to="/map"
-            className="text-[11px] text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1 transition-colors ml-1"
+            className="text-[10px] sm:text-[11px] text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1 transition-colors font-mono"
           >
             <span>Full Canvas</span>
             <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
@@ -329,12 +345,12 @@ export function DashboardMapPreview({
       </div>
 
       {/* Map Area */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative bg-[#0B0F12]">
         {isLoading && locatedIncidents.length === 0 && (
           <div className="absolute inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141611] border border-teal-500/30 text-teal-300 font-mono text-xs shadow-xl">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
-              <span>Initializing spatial telemetry...</span>
+              <span>Loading incident coordinates...</span>
             </div>
           </div>
         )}
@@ -347,11 +363,9 @@ export function DashboardMapPreview({
           attributionControl={false}
           className="w-full h-full"
         >
-          <TileLayer
-            url={tileUrl}
-          />
+          <TileLayer url={tileUrl} />
 
-          {/* Auto-fit bounds on load or center on user location, invalidates size immediately */}
+          {/* Auto-fit bounds on load or updates without manual clicking */}
           <MapAutoInitializer incidents={locatedIncidents} userLocation={userLocation} />
 
           {/* Floating Target Button */}

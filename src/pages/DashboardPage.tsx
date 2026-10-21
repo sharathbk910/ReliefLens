@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileSpreadsheet, Crosshair, Loader2 } from 'lucide-react';
+import { FileSpreadsheet, Crosshair, Loader2, Mic } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
 import { IncidentFilters } from '../components/dashboard/IncidentFilters.tsx';
 import { IncidentTable } from '../components/dashboard/IncidentTable.tsx';
@@ -23,6 +23,7 @@ export function DashboardPage() {
 
   const {
     incidents,
+    allIncidents,
     total,
     page,
     setPage,
@@ -94,59 +95,77 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Crisis Reassurance & Guidance Hero Banner */}
-      <div className="corner-cross bg-gradient-to-r from-[#171813] via-[#1b1d16] to-[#141510] border border-[#2d3024] p-4 sm:p-5 rounded-xl shadow-lg relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-full bg-[radial-gradient(ellipse_at_top_right,_rgba(235,252,114,0.06),_transparent_70%)] pointer-events-none" />
-
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-1.5 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="blinker-square" />
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#EBFC72] font-semibold">
-                DISASTER COORDINATION PROTOCOL ACTIVE
-              </span>
-              <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                // ZERO BLACK-BOX AI
-              </span>
-            </div>
-            <h2 className="text-lg sm:text-xl font-extrabold font-heading text-white tracking-tight">
-              TRAPPED IN A DISASTER? WE COORDINATE FAST, TRANSPARENT RESCUE.
-            </h2>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-              Immediate distress triage for vulnerable, remote, and flood-trapped citizens. Deterministic 4-factor scoring ensures life-or-death dispatches are transparent, fast, and auditable.
-            </p>
+    <div className="space-y-3.5 sm:space-y-4 animate-fade-in">
+      {/* Executive Command Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-[var(--border-subtle)]">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="blinker-square" />
+            <h1 className="text-base sm:text-lg md:text-xl font-bold font-heading text-white tracking-tight">
+              Incident Command Center
+            </h1>
+            <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EBFC72]/15 text-[#EBFC72] border border-[#EBFC72]/30 shrink-0">
+              Live Triage
+            </span>
           </div>
+          <p className="text-[11px] sm:text-xs text-[var(--text-muted)] font-mono mt-0.5 leading-snug">
+            Deterministic 4-factor scoring • Fast and auditable emergency response
+          </p>
+        </div>
 
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <button
-              onClick={() => navigate('/reports/new')}
-              className="px-4 py-2 rounded-lg bg-[#EBFC72] hover:bg-[#d8e860] text-black font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>🚨</span> SUBMIT EMERGENCY REPORT
-            </button>
-            <button
-              onClick={handleSyncToMyLocation}
-              disabled={isSyncingLocation}
-              className="px-3 py-2 rounded-lg bg-black/40 hover:bg-black/60 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5"
-            >
-              {isSyncingLocation ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
-              ) : (
-                <Crosshair className="w-3.5 h-3.5 text-teal-400" />
-              )}
-              <span>{isSyncingLocation ? 'SYNCING GPS...' : 'SYNC TO MY AREA'}</span>
-            </button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsExportOpen(true)}
-              leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
-              className="text-xs shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
-            >
-              Export Manifest
-            </Button>
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
+            className="flex-1 sm:flex-none justify-center px-2.5 sm:px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            title="Open Multilingual Voice Emergency Assistant"
+          >
+            <Mic className="w-3.5 h-3.5 text-rose-400" />
+            <span>Voice SOS</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleSyncToMyLocation}
+            disabled={isSyncingLocation}
+            className="flex-1 sm:flex-none justify-center px-2.5 sm:px-3 py-1.5 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            title="Anchor simulated incidents around your current location"
+          >
+            {isSyncingLocation ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
+            ) : (
+              <Crosshair className="w-3.5 h-3.5 text-teal-400" />
+            )}
+            <span className="hidden sm:inline">{isSyncingLocation ? 'SYNCING GPS...' : 'SYNC TO MY AREA'}</span>
+            <span className="sm:hidden">{isSyncingLocation ? 'SYNCING...' : 'SYNC GPS'}</span>
+          </button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsExportOpen(true)}
+            leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
+            className="flex-1 sm:flex-none justify-center text-xs shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
+          >
+            Export Manifest
+          </Button>
+        </div>
+      </div>
+
+      {/* Live Tactical Response Telemetry Strip */}
+      <div className="surface-z1 px-3 sm:px-3.5 py-2 rounded-xl flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono border border-[var(--border-subtle)] bg-[#12130f]/90">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            <span className="font-bold">LIVE TELEMETRY</span>
           </div>
+          <span className="text-[var(--text-muted)]">•</span>
+          <span className="text-[var(--text-secondary)]">24/7 HUMAN RESCUE COORDINATION</span>
+          <span className="text-[var(--text-muted)] hidden md:inline">•</span>
+          <span className="text-amber-300 font-semibold hidden md:inline">SAFETY FLOOR (45 PTS)</span>
+        </div>
+        <div className="flex items-center gap-1.5 sm:gap-2 text-[var(--text-muted)]">
+          <span>RULESET: v1.0.0</span>
+          <span>•</span>
+          <span className="text-[#EBFC72] font-semibold">FAILSAFE ACTIVE</span>
         </div>
       </div>
 
@@ -159,28 +178,28 @@ export function DashboardPage() {
         onFilterClick={handleIndicatorClick}
       />
 
-      {/* Scoring Explainer Panel */}
-      <ScoringExplainer />
+      {/* Scoring Explainer & Filter Toolbar */}
+      <div className="space-y-2">
+        <IncidentFilters
+          filters={filters as any}
+          onChange={updateFilters}
+          onClear={clearFilters}
+          districts={districts}
+        />
+        <ScoringExplainer />
+      </div>
 
-      {/* Tactical Dispatch Control HUD (Interactive Slide-to-Confirm Failsafe) */}
-      <TacticalDispatchControl
-        selectedIncident={selectedIncident}
-        onDispatchConfirmed={() => {
-          refresh();
-        }}
-      />
-
-      {/* Filter Toolbar */}
-      <IncidentFilters
-        filters={filters as any}
-        onChange={updateFilters}
-        onClear={clearFilters}
-        districts={districts}
-      />
-
-      {/* Incidents Table + Spatial Map Preview (Side-by-side on xl+ displays, stacked on mobile/tablet) */}
+      {/* Incidents Table + Spatial Map Preview */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-        <div className="xl:col-span-7 2xl:col-span-8 space-y-4 min-w-0 w-full">
+        <div className="xl:col-span-7 2xl:col-span-8 space-y-3 min-w-0 w-full">
+          {/* Tactical Dispatch Control HUD (appears when an incident is targeted) */}
+          <TacticalDispatchControl
+            selectedIncident={selectedIncident}
+            onDispatchConfirmed={() => {
+              refresh();
+            }}
+          />
+
           <IncidentTable
             incidents={incidents}
             isLoading={isLoading}
@@ -193,7 +212,11 @@ export function DashboardPage() {
           />
         </div>
         <div className="xl:col-span-5 2xl:col-span-4 min-w-0 w-full xl:sticky xl:top-4">
-          <DashboardMapPreview incidents={incidents} isLoading={isLoading} />
+          <DashboardMapPreview
+            incidents={incidents}
+            allIncidents={allIncidents}
+            isLoading={isLoading}
+          />
         </div>
       </div>
 
