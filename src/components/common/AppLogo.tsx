@@ -10,14 +10,14 @@ export interface AppLogoProps {
   badge?: string;
 }
 
-export function ResQWaveIconMark({ className = 'w-8 h-8' }: { className?: string }) {
+export function ResQWaveIconMark({ className = 'w-9 h-9' }: { className?: string }) {
   return (
     <img
-      src="/favicon.svg"
-      alt="ResQWave Mark"
-      className={`${className} object-contain select-none`}
-      width={64}
-      height={64}
+      src="/logo.png"
+      alt="ResQWave Logo"
+      className={`${className} object-contain select-none drop-shadow-sm transition-transform duration-200`}
+      width={128}
+      height={128}
       loading="eager"
       decoding="async"
     />
@@ -34,11 +34,11 @@ export function AppLogo({
   badge = 'v1.0',
 }: AppLogoProps) {
   const iconSizeClasses = {
-    xs: 'w-6 h-6 p-0.5',
-    sm: 'w-7 h-7 p-0.5',
-    md: 'w-9 h-9 p-1',
-    lg: 'w-12 h-12 p-1.5',
-    xl: 'w-20 h-20 sm:w-24 sm:h-24 p-2',
+    xs: 'w-7 h-7',
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10',
+    lg: 'w-14 h-14',
+    xl: 'w-24 h-24',
   };
 
   const shouldShowText = variant !== 'icon' && showText;
@@ -46,9 +46,9 @@ export function AppLogo({
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      {/* Icon Mark with subtle modern containment */}
+      {/* Icon Mark with crisp modern presentation */}
       <div
-        className={`${iconSizeClasses[size]} shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-b from-sky-50 to-white dark:from-slate-800 dark:to-slate-900 border border-sky-200/80 dark:border-teal-500/30 shadow-sm transition-transform duration-200 hover:scale-105`}
+        className={`${iconSizeClasses[size]} shrink-0 flex items-center justify-center rounded-xl bg-white/90 dark:bg-slate-800/90 border border-sky-100 dark:border-teal-500/20 shadow-xs p-1 transition-transform duration-200 hover:scale-105`}
       >
         <ResQWaveIconMark className="w-full h-full" />
       </div>
