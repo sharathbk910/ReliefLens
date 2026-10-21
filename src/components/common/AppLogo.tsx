@@ -35,9 +35,9 @@ export function AppLogo({
 }: AppLogoProps) {
   const iconSizeClasses = {
     xs: 'w-7 h-7',
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-14 h-14',
+    sm: 'w-9 h-9',
+    md: 'w-11 h-11',
+    lg: 'w-16 h-16',
     xl: 'w-24 h-24',
   };
 
@@ -48,7 +48,7 @@ export function AppLogo({
     <div className={`flex items-center gap-2.5 ${className}`}>
       {/* Icon Mark with crisp modern presentation */}
       <div
-        className={`${iconSizeClasses[size]} shrink-0 flex items-center justify-center rounded-xl bg-white/90 dark:bg-slate-800/90 border border-sky-100 dark:border-teal-500/20 shadow-xs p-1 transition-transform duration-200 hover:scale-105`}
+        className={`${iconSizeClasses[size]} shrink-0 flex items-center justify-center transition-transform duration-200 hover:scale-105`}
       >
         <ResQWaveIconMark className="w-full h-full" />
       </div>
