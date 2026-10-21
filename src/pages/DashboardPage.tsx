@@ -172,7 +172,7 @@ export function DashboardPage() {
 
       {/* 6. Incidents Table + Right Column (Map Preview + Emergency Helpline Widget) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-        <div className="xl:col-span-7 2xl:col-span-8 space-y-3 min-w-0 w-full">
+        <div className="xl:col-span-8 space-y-3 min-w-0 w-full">
           {/* Tactical Dispatch Control HUD (appears when an incident is targeted) */}
           <TacticalDispatchControl
             selectedIncident={selectedIncident}
@@ -194,7 +194,7 @@ export function DashboardPage() {
         </div>
 
         {/* Right Column: Geographic Map + Emergency Helplines & Crisis Guide (Sticky docked, prevents dead vertical void) */}
-        <div className="xl:col-span-5 2xl:col-span-4 min-w-0 w-full space-y-4 xl:sticky xl:top-14 self-start">
+        <div className="xl:col-span-4 min-w-0 w-full space-y-4 xl:sticky xl:top-14 self-start">
           <DashboardMapPreview
             incidents={incidents}
             allIncidents={allIncidents}
