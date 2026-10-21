@@ -260,7 +260,7 @@ export function VoiceRecorder({
       console.error('Voice analysis failed', err);
       setErrorMessage(
         err.message ||
-          'Failed to analyze voice recording with Google Gemini. You can retry recording or continue with manual reporting.'
+          'Unable to analyse voice recording. You can retry recording or continue with manual reporting.'
       );
       setRecorderState('error');
     }
@@ -287,16 +287,16 @@ export function VoiceRecorder({
               {hasGeminiKey ? (
                 <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 flex items-center gap-1 font-mono">
                   <Sparkles className="w-2.5 h-2.5" />
-                  Gemini 2.5 Flash
+                  Voice Engine Active
                 </Badge>
               ) : (
-                <Badge variant="outline" className="text-[10px] text-amber-400 border-amber-500/30 font-mono">
-                  AI Fallback
+                <Badge variant="outline" className="text-[10px] text-sky-400 border-sky-500/30 font-mono">
+                  Voice Engine
                 </Badge>
               )}
             </h3>
             <p className="text-xs text-slate-400">
-              Speak in any language (e.g. Kannada, Hindi, English, Tamil, Telugu). Gemini detects speech automatically.
+              Speak in any language (e.g. Kannada, Hindi, English, Tamil, Telugu). Your report will be analysed automatically.
             </p>
           </div>
         </div>
@@ -431,11 +431,11 @@ export function VoiceRecorder({
             </div>
           </div>
 
-          {/* Explicit Submission to Gemini */}
+          {/* Explicit Submission */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <Shield className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span>Audio is securely transmitted to Gemini for transcription and extraction.</span>
+              <span>Audio is securely processed to analyse and extract incident details.</span>
             </div>
 
             <Button
@@ -445,7 +445,7 @@ export function VoiceRecorder({
               className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-md shadow-emerald-900/30 shrink-0 w-full sm:w-auto"
             >
               <Sparkles className="w-4 h-4" />
-              Analyze with Gemini
+              Analyse Report
             </Button>
           </div>
         </div>
@@ -454,14 +454,13 @@ export function VoiceRecorder({
           <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3 animate-spin">
             <Sparkles className="w-7 h-7 text-emerald-400" />
           </div>
-          <h4 className="text-sm font-semibold text-slate-200">Analyzing Speech with Google Gemini</h4>
+          <h4 className="text-sm font-semibold text-slate-200">Analysing your report...</h4>
           <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-            Detecting spoken language, generating original transcription, producing normalized description, and
-            extracting emergency details...
+            Detecting spoken language, transcribing speech, and extracting emergency details...
           </p>
           <div className="flex items-center justify-center gap-2 mt-4 text-[11px] text-slate-500">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Processing audio via secure Supabase Edge Function</span>
+            <span>Securely analysing report details</span>
           </div>
         </div>
       ) : (

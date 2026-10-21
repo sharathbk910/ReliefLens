@@ -80,13 +80,13 @@ export function EditableExtractionPreview({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              Gemini AI Structured Draft
+              Analysed Incident Summary
               <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30">
                 Ready for Review
               </Badge>
             </h3>
             <p className="text-xs text-slate-400">
-              Review and edit the AI-extracted details below before applying to your report.
+              Review and edit the analysed details below before applying to your report.
             </p>
           </div>
         </div>

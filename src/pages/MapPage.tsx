@@ -99,10 +99,28 @@ function getHeatCircleStyle(tier: PriorityTier) {
   return configs[tier] || configs.low;
 }
 
-// Automatically fits map bounds to actual incident marker coordinates
-function AutoFitBounds({ incidents }: { incidents: Incident[] }) {
+// Automatically fits map bounds to actual incident marker coordinates and invalidates container size
+function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
   const map = useMap();
-  const fittedRef = useRef(false);
+  const prevCountRef = useRef<number>(-1);
+
+  // Invalidate map size so Leaflet renders tiles immediately on open without requiring a click
+  useEffect(() => {
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 80);
+    const t2 = setTimeout(() => map.invalidateSize(), 300);
+    const t3 = setTimeout(() => map.invalidateSize(), 800);
+
+    const onResize = () => map.invalidateSize();
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [map]);
 
   useEffect(() => {
     const valid = incidents.filter(
@@ -114,8 +132,9 @@ function AutoFitBounds({ incidents }: { incidents: Incident[] }) {
     );
     if (valid.length === 0) return;
 
-    if (!fittedRef.current) {
-      fittedRef.current = true;
+    if (prevCountRef.current !== valid.length) {
+      prevCountRef.current = valid.length;
+      map.invalidateSize();
       if (valid.length === 1) {
         map.setView([valid[0].latitude!, valid[0].longitude!], 13);
       } else {
@@ -209,6 +228,7 @@ function LocateMeControl({
 export function MapPage() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [tileError, setTileError] = useState(false);
   const [selectedTier, setSelectedTier] = useState<PriorityTier | 'all'>('all');
   const [mapViewMode, setMapViewMode] = useState<'all' | 'pins' | 'heat'>('all');
@@ -222,19 +242,61 @@ export function MapPage() {
     import.meta.env.VITE_MAP_TILE_URL ||
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-  useEffect(() => {
-    async function load() {
-      setIsLoading(true);
-      try {
-        const res = await dataService.getIncidents({ pageSize: 500 });
-        setIncidents(res.incidents);
-      } catch (err) {
-        console.error('Failed to load map incidents', err);
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchIncidents = async (silent = false) => {
+    if (!silent) setIsLoading(true);
+    setError(null);
+    try {
+      const res = await dataService.getIncidents({ pageSize: 500 });
+      setIncidents(res.incidents);
+    } catch (err: any) {
+      console.error('Failed to load map incidents', err);
+      if (!silent) setError(err.message || 'Unable to load incident map data.');
+    } finally {
+      if (!silent) setIsLoading(false);
     }
-    load();
+  };
+
+  // Automatic data loading and real-time live synchronization
+  useEffect(() => {
+    fetchIncidents();
+
+    // 1. Subscribe to incident updates (localDB or Supabase real-time)
+    const unsubscribe = dataService.subscribeToIncidents(() => {
+      fetchIncidents(true);
+    });
+
+    // 2. Refresh every 25 seconds to keep map coordinates continuously fresh
+    const refreshInterval = setInterval(() => {
+      fetchIncidents(true);
+    }, 25000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(refreshInterval);
+    };
+  }, []);
+
+  // Automatic geolocation check: if user already granted permission, center without extra click
+  useEffect(() => {
+    if (typeof window === 'undefined' || !navigator.geolocation) return;
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: 'geolocation' })
+        .then((perm) => {
+          if (perm.state === 'granted') {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const { latitude, longitude, accuracy } = pos.coords;
+                setUserLocation({ lat: latitude, lng: longitude, accuracy: Math.round(accuracy) });
+              },
+              (err) => console.warn('Auto-locate permission check notice:', err.message),
+              { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+            );
+          }
+        })
+        .catch((e) => console.warn('Permissions query notice:', e));
+    }
   }, []);
 
   const locatedIncidents = incidents.filter(
@@ -305,8 +367,8 @@ export function MapPage() {
               }}
             />
 
-            {/* Automatically adjust bounds to fit loaded incidents */}
-            <AutoFitBounds incidents={locatedIncidents} />
+            {/* Automatically adjust bounds to fit loaded incidents and invalidate container size */}
+            <MapAutoInitializer incidents={locatedIncidents} />
 
             {/* Google Maps style floating Locate Me control */}
             <LocateMeControl
@@ -418,10 +480,30 @@ export function MapPage() {
             <MapPin className="w-4 h-4 text-rose-500" strokeWidth={1.5} />
             <span className="text-xs font-semibold text-[var(--text-primary)]">Map Canvas</span>
           </div>
-          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] tabular-nums">
-            {locatedIncidents.length} Located
-          </span>
+          <div className="flex items-center gap-1.5">
+            {isLoading && (
+              <span className="flex items-center gap-1 text-[10px] text-teal-400 font-mono">
+                <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                Live
+              </span>
+            )}
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] tabular-nums">
+              {locatedIncidents.length} Located
+            </span>
+          </div>
         </div>
+
+        {error && (
+          <div className="p-2 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-2">
+            <span className="truncate">{error}</span>
+            <button
+              onClick={() => fetchIncidents()}
+              className="text-[11px] underline font-semibold text-rose-400 hover:text-rose-200 shrink-0"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Layer Mode Segmented Switcher */}
         <div className="bg-[var(--surface-1-solid)] p-1 rounded-lg border border-[var(--border-subtle)] flex items-center justify-between gap-1 text-[11px]">

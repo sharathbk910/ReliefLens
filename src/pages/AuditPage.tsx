@@ -150,7 +150,7 @@ export function AuditPage() {
       </div>
 
       {/* Audit Log Table */}
-      <div className="surface-z1 overflow-hidden shadow-sm animate-spatial-enter">
+      <div className="surface-z1 overflow-hidden shadow-sm animate-fade-in">
         <div className="table-scroll-container">
           <table className="w-full text-left text-xs border-collapse">
             <thead>

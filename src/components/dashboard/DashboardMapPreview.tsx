@@ -68,10 +68,29 @@ function createUserLocationMiniIcon() {
   });
 }
 
-function AutoFitBoundsPreview({ incidents }: { incidents: Incident[] }) {
+function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
   const map = useMap();
-  const fittedRef = useRef(false);
+  const prevCountRef = useRef<number>(-1);
 
+  // Invalidate map size so Leaflet renders tiles immediately without requiring a click
+  useEffect(() => {
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 80);
+    const t2 = setTimeout(() => map.invalidateSize(), 300);
+    const t3 = setTimeout(() => map.invalidateSize(), 800);
+
+    const onResize = () => map.invalidateSize();
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [map]);
+
+  // Automatically fit map bounds to current incident coordinates
   useEffect(() => {
     const valid = incidents.filter(
       (i) =>
@@ -82,15 +101,16 @@ function AutoFitBoundsPreview({ incidents }: { incidents: Incident[] }) {
     );
     if (valid.length === 0) return;
 
-    if (!fittedRef.current) {
-      fittedRef.current = true;
+    if (prevCountRef.current !== valid.length) {
+      prevCountRef.current = valid.length;
+      map.invalidateSize();
       if (valid.length === 1) {
         map.setView([valid[0].latitude!, valid[0].longitude!], 13);
       } else {
         const bounds = L.latLngBounds(
           valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
         );
-        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+        map.fitBounds(bounds, { padding: [35, 35], maxZoom: 14 });
       }
     }
   }, [incidents, map]);
@@ -167,6 +187,29 @@ function MiniLocateMeControl({
 export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
 
+  // Automatically detect user location if permission is already granted, without requiring manual button click
+  useEffect(() => {
+    if (typeof window === 'undefined' || !navigator.geolocation) return;
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: 'geolocation' })
+        .then((perm) => {
+          if (perm.state === 'granted') {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const { latitude, longitude, accuracy } = pos.coords;
+                setUserLocation({ lat: latitude, lng: longitude, accuracy: Math.round(accuracy) });
+              },
+              (err) => console.warn('Auto-locate permission check notice:', err.message),
+              { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+            );
+          }
+        })
+        .catch((e) => console.warn('Permissions query notice:', e));
+    }
+  }, []);
+
   const locatedIncidents = incidents.filter(
     (i) =>
       typeof i.latitude === 'number' &&
@@ -227,8 +270,8 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
             url={tileUrl}
           />
 
-          {/* Auto-fit bounds on load */}
-          <AutoFitBoundsPreview incidents={locatedIncidents} />
+          {/* Auto-fit bounds on load and invalidates size immediately */}
+          <MapAutoInitializer incidents={locatedIncidents} />
 
           {/* Floating Target Button */}
           <MiniLocateMeControl onLocated={(loc) => setUserLocation(loc)} />

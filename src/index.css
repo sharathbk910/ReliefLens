@@ -308,10 +308,11 @@
   background: var(--surface-2-solid) !important;
 }
 
-/* Table scroll cue */
+/* Table scroll cue & containment */
 .table-scroll-container {
   position: relative;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
 }
 

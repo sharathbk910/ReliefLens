@@ -66,9 +66,45 @@ function loadInitialDB(): LocalDB {
   return db;
 }
 
+type IncidentChangeListener = () => void;
+const incidentListeners = new Set<IncidentChangeListener>();
+
+function notifyIncidentChange() {
+  incidentListeners.forEach((listener) => {
+    try {
+      listener();
+    } catch (e) {
+      console.error('Incident change listener error:', e);
+    }
+  });
+}
+
 function saveDB(db: LocalDB) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  }
+  notifyIncidentChange();
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_KEY) {
+      localDB = loadInitialDB();
+      notifyIncidentChange();
+    }
+  });
+}
+
+if (isSupabaseConfigured && supabase) {
+  try {
+    supabase
+      .channel('realtime:incidents')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'incidents' }, () => {
+        notifyIncidentChange();
+      })
+      .subscribe();
+  } catch (err) {
+    console.warn('Realtime subscription setup notice:', err);
   }
 }
 
@@ -1040,6 +1076,14 @@ export const dataService = {
 
     // 3. Resilient fallback mode when offline or Edge Function is not yet deployed
     return getFallbackVoiceExtraction();
+  },
+
+  // 12. Real-time / Event Subscription for Auto-updating components
+  subscribeToIncidents(callback: () => void): () => void {
+    incidentListeners.add(callback);
+    return () => {
+      incidentListeners.delete(callback);
+    };
   },
 };
 

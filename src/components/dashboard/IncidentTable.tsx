@@ -100,19 +100,29 @@ export function IncidentTable({
         ))}
       </div>
 
-      {/* 2. Desktop & Tablet Table (>= 768px - Section G Table Scroll Container) */}
+      {/* 2. Desktop & Tablet Table (>= 768px - Fixed Layout, No Unintended Sliding) */}
       <div className="hidden md:block table-scroll-container">
-        <table className="w-full text-left text-xs border-collapse min-w-[880px]">
+        <table className="w-full text-left text-xs border-collapse table-fixed min-w-[820px]">
+          <colgroup>
+            <col className="w-[145px]" />
+            <col className="w-auto" />
+            <col className="w-[155px]" />
+            <col className="w-[85px]" />
+            <col className="w-[135px]" />
+            <col className="w-[100px]" />
+            <col className="w-[130px]" />
+            <col className="w-[45px]" />
+          </colgroup>
           <thead>
-            <tr className="bg-[var(--surface-1)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium">
-              <th className="py-3 px-4 min-w-[150px] whitespace-nowrap">Priority & Score</th>
-              <th className="py-3 px-4 min-w-[220px]">Incident Details</th>
-              <th className="py-3 px-4 min-w-[160px]">District / Location</th>
-              <th className="py-3 px-4 min-w-[90px] text-center whitespace-nowrap">Reports</th>
-              <th className="py-3 px-4 min-w-[150px] whitespace-nowrap">Verification</th>
-              <th className="py-3 px-4 min-w-[100px] whitespace-nowrap">Status</th>
-              <th className="py-3 px-4 min-w-[140px] whitespace-nowrap">Uncertainty</th>
-              <th className="py-3 px-4 w-12 text-right whitespace-nowrap">Action</th>
+            <tr className="bg-[var(--surface-1)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium select-none">
+              <th className="py-3 px-3.5 whitespace-nowrap">Priority & Score</th>
+              <th className="py-3 px-3.5">Incident Details</th>
+              <th className="py-3 px-3.5">District / Location</th>
+              <th className="py-3 px-3.5 text-center whitespace-nowrap">Reports</th>
+              <th className="py-3 px-3.5 whitespace-nowrap">Verification</th>
+              <th className="py-3 px-3.5 whitespace-nowrap">Status</th>
+              <th className="py-3 px-3.5 whitespace-nowrap">Uncertainty</th>
+              <th className="py-3 px-2 text-center whitespace-nowrap">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-primary)]">
@@ -127,7 +137,7 @@ export function IncidentTable({
                   className="hover:bg-[var(--surface-2-solid)] transition-colors cursor-pointer group"
                 >
                   {/* Priority & Score */}
-                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                  <td className="py-3 px-3.5 align-top whitespace-nowrap">
                     <div className="flex flex-col gap-1 items-start whitespace-nowrap">
                       <PriorityBadge
                         tier={incident.priority_tier}
@@ -147,26 +157,26 @@ export function IncidentTable({
                   </td>
 
                   {/* Title & Type */}
-                  <td className="py-3.5 px-4 align-top">
-                    <div className="font-semibold text-[var(--text-primary)] group-hover:text-teal-300 transition-colors line-clamp-1">
+                  <td className="py-3 px-3.5 align-top overflow-hidden">
+                    <div className="font-semibold text-[var(--text-primary)] group-hover:text-teal-300 transition-colors truncate">
                       {incident.title}
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-[11px] text-[var(--text-secondary)]">
-                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-[10px] whitespace-nowrap">
+                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-[10px] whitespace-nowrap shrink-0">
                         {incident.incident_type}
                       </span>
-                      <span className="flex items-center gap-1 tabular-nums text-[var(--text-muted)] whitespace-nowrap">
-                        <Clock className="w-3 h-3" strokeWidth={1.5} />
+                      <span className="flex items-center gap-1 tabular-nums text-[var(--text-muted)] whitespace-nowrap truncate">
+                        <Clock className="w-3 h-3 shrink-0" strokeWidth={1.5} />
                         {formatTimeAgo(incident.last_reported_at)}
                       </span>
                     </div>
                   </td>
 
                   {/* Location */}
-                  <td className="py-3.5 px-4 align-top">
+                  <td className="py-3 px-3.5 align-top overflow-hidden">
                     <div className="flex items-start gap-1 text-[var(--text-primary)]">
                       <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" strokeWidth={1.5} />
-                      <div className="truncate max-w-[160px]">
+                      <div className="truncate">
                         <p className="font-medium text-[var(--text-primary)] truncate">
                           {incident.district || 'Unassigned District'}
                         </p>
@@ -178,7 +188,7 @@ export function IncidentTable({
                   </td>
 
                   {/* Report Count */}
-                  <td className="py-3.5 px-4 align-top text-center whitespace-nowrap">
+                  <td className="py-3 px-3.5 align-top text-center whitespace-nowrap">
                     <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-medium tabular-nums whitespace-nowrap">
                       <span>{incident.report_count}</span>
                       <span className="text-[10px] text-[var(--text-muted)]">
@@ -188,18 +198,18 @@ export function IncidentTable({
                   </td>
 
                   {/* Verification Level */}
-                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                  <td className="py-3 px-3.5 align-top whitespace-nowrap">
                     <VerificationBadge level={incident.verification_level} />
                   </td>
 
                   {/* Status */}
-                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                  <td className="py-3 px-3.5 align-top whitespace-nowrap">
                     <StatusBadge status={incident.status} />
                   </td>
 
                   {/* Uncertainty Flags */}
-                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
-                    <div className="flex flex-wrap gap-1 max-w-[180px]">
+                  <td className="py-3 px-3.5 align-top whitespace-nowrap">
+                    <div className="flex flex-wrap gap-1 max-w-[150px]">
                       {incident.uncertainty_flags && incident.uncertainty_flags.length > 0 ? (
                         incident.uncertainty_flags.map((flag) => (
                           <UncertaintyBadge key={flag} flag={flag} />
@@ -213,9 +223,9 @@ export function IncidentTable({
                     </div>
                   </td>
 
-                  {/* Action Link */}
-                  <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
-                    <span className="inline-flex items-center text-[var(--text-muted)] group-hover:text-teal-400 group-hover:translate-x-0.5 transition-all">
+                  {/* Action Link (Stable, No Translate) */}
+                  <td className="py-3 px-2 align-top text-center whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center text-[var(--text-muted)] group-hover:text-teal-400 transition-colors">
                       <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                     </span>
                   </td>

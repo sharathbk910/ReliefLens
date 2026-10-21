@@ -61,7 +61,7 @@ export function EmergencyVoiceFAB() {
                     Quick Emergency Voice Report
                   </h3>
                   <p className="text-[11px] text-[var(--text-muted)]">
-                    Speak your situation in any language • Gemini AI auto-detects details
+                    Speak your situation in any language • Audio is analysed automatically
                   </p>
                 </div>
               </div>

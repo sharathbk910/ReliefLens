@@ -92,6 +92,21 @@ export function DashboardPage() {
 
   useEffect(() => {
     loadData();
+
+    // 1. Subscribe to real-time incident changes (localDB and Supabase)
+    const unsubscribe = dataService.subscribeToIncidents(() => {
+      loadData();
+    });
+
+    // 2. Periodic background refresh (every 25 seconds) to ensure fresh data
+    const refreshInterval = setInterval(() => {
+      loadData();
+    }, 25000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(refreshInterval);
+    };
   }, [loadData]);
 
   const handleFilterChange = (updated: Partial<typeof filters>) => {
@@ -126,7 +141,7 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="space-y-4 animate-spatial-enter">
+    <div className="space-y-4 animate-fade-in">
       {/* Operational Header - Immediate Live Data, No Marketing Hero */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1">
         <div>
@@ -171,8 +186,8 @@ export function DashboardPage() {
       />
 
       {/* Incidents Table + Spatial Map Preview (Beside on desktop, stacked on mobile) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        <div className="lg:col-span-8 space-y-4 min-w-0">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+        <div className="xl:col-span-8 space-y-4 min-w-0">
           <IncidentTable
             incidents={incidents}
             isLoading={isLoading}
@@ -182,7 +197,7 @@ export function DashboardPage() {
             onPageChange={(p) => setPage(p)}
           />
         </div>
-        <div className="lg:col-span-4 min-w-0 sticky top-4">
+        <div className="xl:col-span-4 min-w-0 xl:sticky xl:top-4">
           <DashboardMapPreview incidents={incidents} />
         </div>
       </div>
