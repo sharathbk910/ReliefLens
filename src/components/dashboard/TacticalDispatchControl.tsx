@@ -84,10 +84,10 @@ export function TacticalDispatchControl({
 
   return (
     <div className="relative surface-z2 border-2 border-amber-400/40 rounded-xl p-3.5 shadow-xl shadow-amber-950/20 space-y-3 animate-fade-in select-none">
-      <div className="corner-cross cross-tl"></div>
-      <div className="corner-cross cross-tr"></div>
-      <div className="corner-cross cross-bl"></div>
-      <div className="corner-cross cross-br"></div>
+      <div className="corner-bracket cross-tl"></div>
+      <div className="corner-bracket cross-tr"></div>
+      <div className="corner-bracket cross-bl"></div>
+      <div className="corner-bracket cross-br"></div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-[var(--border-subtle)]">
         <div className="space-y-0.5 min-w-0">

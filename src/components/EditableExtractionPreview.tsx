@@ -105,7 +105,7 @@ export function EditableExtractionPreview({
         <div className="p-3.5 rounded-lg bg-amber-950/20 border border-amber-800/40 text-xs space-y-2">
           <div className="flex items-center gap-2 font-medium text-amber-300">
             <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
-            <span>Uncertainties & Missing Details Identified by AI</span>
+            <span>Uncertainties & Missing Details Identified</span>
           </div>
           {formData.missingInformation && formData.missingInformation.length > 0 && (
             <div className="flex flex-wrap gap-1.5 items-center">

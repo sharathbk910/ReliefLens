@@ -322,9 +322,19 @@
 /* Table scroll cue & containment */
 .table-scroll-container {
   position: relative;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 200ms ease-out forwards;
 }
 
 /* Reduced motion preference (Section E) */
@@ -348,47 +358,62 @@
    INVERSA CRISIS TACTICAL DESIGN SYSTEM UTILITIES
    ==================================================================== */
 
-/* Corner Reticle Brackets */
+/* Corner Reticle Brackets - Container class preserves normal block flow */
 .corner-cross {
+  position: relative;
+}
+
+/* Reticle marks placed at panel corners */
+.corner-bracket,
+.corner-cross-mark,
+.corner-cross > .corner-bracket {
   position: absolute;
   width: 9px;
   height: 9px;
   pointer-events: none;
   z-index: 10;
 }
-.corner-cross::before,
-.corner-cross::after {
+.corner-bracket::before,
+.corner-bracket::after,
+.corner-cross-mark::before,
+.corner-cross-mark::after {
   content: '';
   position: absolute;
   background-color: var(--rescue-yellow, #ebfc72);
 }
-.corner-cross::before {
+.corner-bracket::before,
+.corner-cross-mark::before {
   top: 0;
   left: 0;
   width: 100%;
   height: 1.5px;
 }
-.corner-cross::after {
+.corner-bracket::after,
+.corner-cross-mark::after {
   top: 0;
   left: 0;
   width: 1.5px;
   height: 100%;
 }
-.corner-cross.cross-tl {
+.corner-bracket.cross-tl,
+.corner-cross-mark.cross-tl {
   top: 6px;
   left: 6px;
 }
-.corner-cross.cross-tr {
+.corner-bracket.cross-tr,
+.corner-cross-mark.cross-tr {
   top: 6px;
   right: 6px;
   transform: rotate(90deg);
 }
-.corner-cross.cross-bl {
+.corner-bracket.cross-bl,
+.corner-cross-mark.cross-bl {
   bottom: 6px;
   left: 6px;
   transform: rotate(-90deg);
 }
-.corner-cross.cross-br {
+.corner-bracket.cross-br,
+.corner-cross-mark.cross-br {
   bottom: 6px;
   right: 6px;
   transform: rotate(180deg);

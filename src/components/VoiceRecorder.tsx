@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/Button.tsx';
 import { Badge } from './ui/Badge.tsx';
+import { useToast } from './ui/Toast.tsx';
 import { AudioWaveform } from './voice/AudioWaveform.tsx';
 import { dataService } from '../lib/dataService.ts';
 import { config } from '../config/env.ts';
@@ -45,13 +46,14 @@ export function VoiceRecorder({
   onCancel,
   onSwitchToManual,
 }: VoiceRecorderProps) {
+  const toast = useToast();
   const [recorderState, setRecorderState] = useState<VoiceRecorderState>('ready');
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [hasGeminiKey] = useState(() => config.ai.hasClientKey);
+  const [hasVoiceEngine] = useState(() => config.ai.hasClientKey);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -236,9 +238,9 @@ export function VoiceRecorder({
     }
   };
 
-  const analyzeWithGemini = async () => {
+  const analyzeReport = async () => {
     if (!audioBlob) {
-      setErrorMessage('No recorded audio to analyze.');
+      setErrorMessage('Unable to analyse your report. Please try again.');
       setRecorderState('error');
       return;
     }
@@ -247,17 +249,15 @@ export function VoiceRecorder({
       setRecorderState('analyzing');
       setErrorMessage(null);
 
-      // Invoke official Gemini voice analysis through Edge Function
+      // Invoke multilingual voice analysis through backend service
       const result = await dataService.analyzeVoiceReport(audioBlob);
 
       setRecorderState('review_ready');
+      toast.success('Your report has been analysed.');
       onExtractionSuccess(result);
     } catch (err: any) {
       console.error('Voice analysis failed', err);
-      setErrorMessage(
-        err.message ||
-          'Unable to analyse voice recording. You can retry recording or continue with manual reporting.'
-      );
+      setErrorMessage('Unable to analyse your report. Please try again.');
       setRecorderState('error');
     }
   };
@@ -280,16 +280,10 @@ export function VoiceRecorder({
           <div>
             <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
               Multilingual Voice Reporting
-              {hasGeminiKey ? (
-                <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 flex items-center gap-1 font-mono">
-                  <Sparkles className="w-2.5 h-2.5" />
-                  Voice Engine Active
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="text-[10px] text-sky-400 border-sky-500/30 font-mono">
-                  Voice Engine
-                </Badge>
-              )}
+              <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 flex items-center gap-1 font-mono">
+                <Sparkles className="w-2.5 h-2.5" />
+                Active
+              </Badge>
             </h3>
             <p className="text-xs text-slate-400">
               Speak in any language (e.g. Kannada, Hindi, English, Tamil, Telugu). Your report will be analysed automatically.
@@ -437,7 +431,7 @@ export function VoiceRecorder({
             <Button
               variant="primary"
               size="md"
-              onClick={analyzeWithGemini}
+              onClick={analyzeReport}
               className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-md shadow-emerald-900/30 shrink-0 w-full sm:w-auto"
             >
               <Sparkles className="w-4 h-4" />
@@ -456,7 +450,7 @@ export function VoiceRecorder({
           </p>
           <div className="flex items-center justify-center gap-2 mt-4 text-[11px] text-slate-500">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Securely analysing report details</span>
+            <span>Processing emergency observations</span>
           </div>
         </div>
       ) : (
@@ -465,8 +459,10 @@ export function VoiceRecorder({
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h4 className="text-sm font-medium text-rose-200">Voice Processing Notice</h4>
-              <p className="text-xs text-slate-300 mt-1 leading-relaxed">{errorMessage}</p>
+              <h4 className="text-sm font-medium text-rose-200">Processing Notice</h4>
+              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                {errorMessage || 'Unable to analyse your report. Please try again.'}
+              </p>
 
               <div className="flex items-center gap-2.5 mt-4">
                 <Button variant="outline" size="sm" onClick={handleRecordAgain} className="gap-1.5 border-slate-700">

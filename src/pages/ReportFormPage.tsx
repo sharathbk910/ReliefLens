@@ -478,7 +478,7 @@ export function ReportFormPage() {
               Disaster Incident Observation Report
             </h1>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              Rapid ingestion via AI voice extraction, live GPS telemetry, or manual field entry.
+              Rapid ingestion via voice extraction, live GPS telemetry, or manual field entry.
             </p>
           </div>
           <button

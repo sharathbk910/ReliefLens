@@ -10,6 +10,7 @@ import { config } from '../../config/env.ts';
 
 interface DashboardMapPreviewProps {
   incidents: Incident[];
+  isLoading?: boolean;
 }
 
 function createMiniMarkerIcon(tier: PriorityTier) {
@@ -78,13 +79,24 @@ function MapAutoInitializer({
 }) {
   const map = useMap();
   const prevCountRef = useRef<number>(-1);
+  const containerRef = useRef<HTMLElement | null>(null);
 
-  // Invalidate map size so Leaflet renders tiles immediately without requiring a click
+  // Invalidate map size automatically on mount, resize, and layout changes
   useEffect(() => {
+    containerRef.current = map.getContainer();
     map.invalidateSize();
-    const t1 = setTimeout(() => map.invalidateSize(), 80);
-    const t2 = setTimeout(() => map.invalidateSize(), 300);
-    const t3 = setTimeout(() => map.invalidateSize(), 800);
+
+    const t1 = setTimeout(() => map.invalidateSize(), 60);
+    const t2 = setTimeout(() => map.invalidateSize(), 200);
+    const t3 = setTimeout(() => map.invalidateSize(), 500);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      ro = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      ro.observe(containerRef.current);
+    }
 
     const onResize = () => map.invalidateSize();
     window.addEventListener('resize', onResize);
@@ -93,17 +105,13 @@ function MapAutoInitializer({
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      if (ro) ro.disconnect();
       window.removeEventListener('resize', onResize);
     };
   }, [map]);
 
-  // If user location is detected, center on user location; otherwise fit to incidents
+  // Fit bounds to include both incidents and user location automatically without requiring clicks
   useEffect(() => {
-    if (userLocation) {
-      map.setView([userLocation.lat, userLocation.lng], 14);
-      return;
-    }
-
     const valid = incidents.filter(
       (i) =>
         typeof i.latitude === 'number' &&
@@ -111,19 +119,30 @@ function MapAutoInitializer({
         !isNaN(i.latitude) &&
         !isNaN(i.longitude)
     );
-    if (valid.length === 0) return;
 
-    if (prevCountRef.current !== valid.length) {
-      prevCountRef.current = valid.length;
-      map.invalidateSize();
-      if (valid.length === 1) {
+    map.invalidateSize();
+
+    if (valid.length > 0) {
+      const bounds = L.latLngBounds(
+        valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
+      );
+
+      // Extend bounds to also encompass the user's location if available
+      if (userLocation) {
+        bounds.extend([userLocation.lat, userLocation.lng]);
+      }
+
+      if (valid.length === 1 && !userLocation) {
         map.setView([valid[0].latitude!, valid[0].longitude!], 13);
       } else {
-        const bounds = L.latLngBounds(
-          valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
-        );
-        map.fitBounds(bounds, { padding: [35, 35], maxZoom: 14 });
+        map.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
       }
+      prevCountRef.current = valid.length;
+    } else if (userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 13);
+    } else {
+      const defaultCenter = config.map.defaultCenter || [12.9716, 77.5946];
+      map.setView([defaultCenter[0], defaultCenter[1]], 12);
     }
   }, [incidents, userLocation, map]);
 
@@ -226,7 +245,10 @@ function MiniLocateMeControl({
   );
 }
 
-export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
+export function DashboardMapPreview({
+  incidents,
+  isLoading = false,
+}: DashboardMapPreviewProps) {
   const [locateRequested, setLocateRequested] = useState<number>(0);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(() => {
     if (typeof window !== 'undefined') {
@@ -256,22 +278,25 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
 
   const tileUrl = config.map.tileUrl;
 
+  const defaultLat = config.map.defaultCenter?.[0] ?? 12.9716;
+  const defaultLng = config.map.defaultCenter?.[1] ?? 77.5946;
+
   const centerLat =
     userLocation?.lat ??
     (locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.latitude!, 0) /
         locatedIncidents.length
-      : 37.7749);
+      : defaultLat);
 
   const centerLng =
     userLocation?.lng ??
     (locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.longitude!, 0) /
         locatedIncidents.length
-      : -122.4194);
+      : defaultLng);
 
   return (
-    <div className="surface-z1 rounded-2xl flex flex-col h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm">
+    <div className="surface-z1 rounded-xl flex flex-col h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm relative">
       {/* Header */}
       <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--surface-1)]">
         <div className="flex items-center gap-2">
@@ -279,7 +304,7 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
           <h3 className="text-xs font-semibold text-[var(--text-primary)]">
             Spatial Distribution
           </h3>
-          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums">
             {locatedIncidents.length} pinned
           </span>
         </div>
@@ -305,9 +330,18 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
 
       {/* Map Area */}
       <div className="flex-1 relative">
+        {isLoading && locatedIncidents.length === 0 && (
+          <div className="absolute inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141611] border border-teal-500/30 text-teal-300 font-mono text-xs shadow-xl">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
+              <span>Initializing spatial telemetry...</span>
+            </div>
+          </div>
+        )}
+
         <MapContainer
           center={[centerLat, centerLng]}
-          zoom={11}
+          zoom={12}
           scrollWheelZoom={false}
           zoomControl={false}
           attributionControl={false}

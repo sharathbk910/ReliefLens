@@ -143,27 +143,27 @@ export function IncidentTable({
 
       {/* 2. Desktop & Tablet Table (>= 768px - Fixed Layout, No Unintended Sliding or Overlapping) */}
       <div className="hidden md:block table-scroll-container">
-        <table className="w-full text-left text-xs border-collapse table-fixed min-w-[1100px]">
+        <table className="w-full text-left text-xs border-collapse table-fixed min-w-[1150px]">
           <colgroup>
-            <col className="w-[145px]" />
-            <col className="w-[260px]" />
-            <col className="w-[170px]" />
-            <col className="w-[85px]" />
-            <col className="w-[140px]" />
-            <col className="w-[100px]" />
             <col className="w-[150px]" />
-            <col className="w-[45px]" />
+            <col className="w-[280px]" />
+            <col className="w-[180px]" />
+            <col className="w-[90px]" />
+            <col className="w-[140px]" />
+            <col className="w-[110px]" />
+            <col className="w-[150px]" />
+            <col className="w-[50px]" />
           </colgroup>
           <thead>
             <tr className="bg-[var(--surface-1)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium select-none">
-              <th className="py-3 px-3.5 whitespace-nowrap">Priority & Score</th>
-              <th className="py-3 px-3.5 whitespace-nowrap">Incident Details</th>
-              <th className="py-3 px-3.5 whitespace-nowrap">District / Location</th>
-              <th className="py-3 px-3.5 text-center whitespace-nowrap">Reports</th>
-              <th className="py-3 px-3.5 whitespace-nowrap">Verification</th>
-              <th className="py-3 px-3.5 whitespace-nowrap">Status</th>
-              <th className="py-3 px-3.5 whitespace-nowrap">Uncertainty</th>
-              <th className="py-3 px-2 text-center whitespace-nowrap">Action</th>
+              <th className="py-3 px-3.5 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Priority & Score</th>
+              <th className="py-3 px-3.5 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Incident Details</th>
+              <th className="py-3 px-3.5 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">District / Location</th>
+              <th className="py-3 px-3.5 text-center whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Reports</th>
+              <th className="py-3 px-3.5 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Verification</th>
+              <th className="py-3 px-3.5 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Status</th>
+              <th className="py-3 px-3.5 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Uncertainty</th>
+              <th className="py-3 px-2 text-center whitespace-nowrap text-[11px] font-mono uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-primary)]">
@@ -184,12 +184,12 @@ export function IncidentTable({
                   }}
                   className={`transition-colors cursor-pointer group ${
                     isSelected
-                      ? 'bg-[#EBFC72]/10 hover:bg-[#EBFC72]/15 border-l-2 border-l-[#EBFC72]'
+                      ? 'bg-[#EBFC72]/10 hover:bg-[#EBFC72]/15 shadow-[inset_3px_0_0_0_#EBFC72]'
                       : 'hover:bg-[var(--surface-2-solid)]'
                   }`}
                 >
                   {/* Priority & Score */}
-                  <td className="py-3 px-3.5 align-top whitespace-nowrap">
+                  <td className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
                     <div className="flex flex-col gap-1 items-start whitespace-nowrap">
                       <PriorityBadge
                         tier={incident.priority_tier}

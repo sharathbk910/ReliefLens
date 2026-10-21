@@ -178,9 +178,9 @@ export function DashboardPage() {
         districts={districts}
       />
 
-      {/* Incidents Table + Spatial Map Preview (Full responsive layout, side-by-side on 2xl+ displays) */}
-      <div className="grid grid-cols-1 2xl:grid-cols-12 gap-5 items-start">
-        <div className="2xl:col-span-8 space-y-4 min-w-0 w-full">
+      {/* Incidents Table + Spatial Map Preview (Side-by-side on xl+ displays, stacked on mobile/tablet) */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+        <div className="xl:col-span-7 2xl:col-span-8 space-y-4 min-w-0 w-full">
           <IncidentTable
             incidents={incidents}
             isLoading={isLoading}
@@ -192,8 +192,8 @@ export function DashboardPage() {
             onSelectIncident={(incident) => setSelectedIncident(incident)}
           />
         </div>
-        <div className="2xl:col-span-4 min-w-0 w-full 2xl:sticky 2xl:top-4">
-          <DashboardMapPreview incidents={incidents} />
+        <div className="xl:col-span-5 2xl:col-span-4 min-w-0 w-full xl:sticky xl:top-4">
+          <DashboardMapPreview incidents={incidents} isLoading={isLoading} />
         </div>
       </div>
 
