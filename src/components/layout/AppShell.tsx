@@ -133,30 +133,6 @@ export function AppShell() {
           </div>
 
           <div className="ml-auto flex items-center gap-2 shrink-0 flex-nowrap">
-            {/* Compact Header Quick Report Link (Hero banner below serves as primary emergency CTA) */}
-            <button
-              onClick={() => navigate('/reports/new')}
-              className="px-2.5 py-1.5 rounded-lg bg-[var(--surface-2-solid)] hover:bg-rose-500/15 border border-[var(--border-strong)] hover:border-rose-500/50 text-[var(--text-secondary)] hover:text-rose-300 font-mono text-xs font-semibold tracking-wide flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
-              title="Submit a disaster emergency report"
-            >
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
-              <span className="hidden sm:inline">Emergency Report</span>
-              <span className="sm:hidden">Report</span>
-            </button>
-
-            {/* Quick Multilingual Voice Action Button */}
-            {currentUser.role !== 'viewer' && (
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
-                className="px-2.5 py-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/40 text-amber-300 hover:text-white font-mono text-xs font-semibold tracking-wide flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
-                title="Quick Multilingual Voice Emergency Report"
-              >
-                <Mic className="w-3.5 h-3.5 text-[#EBFC72]" />
-                <span className="hidden sm:inline">Voice SOS</span>
-              </button>
-            )}
-
             {/* FIXED LOGGED-IN DETAILS PILL & PERSONA SWITCHER */}
             <div className="relative shrink-0" ref={userDropdownRef}>
               <button
@@ -218,6 +194,9 @@ export function AppShell() {
               )}
             </div>
 
+            {/* Functional Divider separating user identity from system utilities */}
+            <div className="h-5 w-px bg-[var(--border-subtle)] mx-1 hidden sm:block" />
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -259,16 +238,16 @@ export function AppShell() {
             <AppLogo size="md" showText={true} className="hidden lg:flex" />
           </div>
 
-          {/* New Report Primary Action (Unified styling matching hero emergency button) */}
+          {/* New Report Secondary Action (Preserves dominance of hero emergency trigger) */}
           <div className="p-2.5">
             {currentUser.role !== 'viewer' ? (
               <Button
-                variant="primary"
+                variant="secondary"
                 size="md"
-                className="w-full justify-center lg:justify-start shadow-md shadow-rose-950/40 px-2.5 bg-rose-600 hover:bg-rose-500 text-white font-mono font-bold tracking-wide border border-rose-500 rounded-lg"
-                leftIcon={<Plus className="w-4 h-4 shrink-0" strokeWidth={2} />}
+                className="w-full justify-center lg:justify-start px-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-mono font-medium tracking-wide border border-slate-700 rounded-lg shadow-sm"
+                leftIcon={<Plus className="w-4 h-4 shrink-0 text-amber-400" strokeWidth={2} />}
                 onClick={() => navigate('/reports/new')}
-                title="Create New Emergency Report"
+                title="Create New Incident Report"
               >
                 <span className="hidden lg:inline text-xs">New Report</span>
               </Button>

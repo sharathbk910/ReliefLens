@@ -143,10 +143,10 @@ export function VerificationBadge({ level }: { level: VerificationLevel }) {
       label: 'Partially Corroborated',
     },
     unverified: {
-      text: 'text-rose-300',
-      border: 'border-rose-500/40',
-      bg: 'bg-rose-950/50',
-      label: 'Unverified Evidence',
+      text: 'text-slate-400',
+      border: 'border-slate-700/60',
+      bg: 'bg-slate-800/40',
+      label: 'Unverified',
     },
   };
 

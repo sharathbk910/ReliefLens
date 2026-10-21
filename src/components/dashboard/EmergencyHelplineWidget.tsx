@@ -48,12 +48,14 @@ export function EmergencyHelplineWidget() {
             Emergency Help & Helplines
           </h2>
         </div>
-        <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/5">
+        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-lg border border-[var(--border-subtle)]">
           <button
             type="button"
             onClick={() => setActiveTab('hotlines')}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-              activeTab === 'hotlines' ? 'bg-amber-400/20 text-amber-300 font-bold' : 'text-[var(--text-muted)] hover:text-white'
+            className={`px-2.5 py-1 rounded-md text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
+              activeTab === 'hotlines'
+                ? 'bg-amber-400/20 text-amber-300 font-bold border-amber-400/40 shadow-sm'
+                : 'bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border-transparent'
             }`}
           >
             Hotlines
@@ -61,8 +63,10 @@ export function EmergencyHelplineWidget() {
           <button
             type="button"
             onClick={() => setActiveTab('guide')}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-              activeTab === 'guide' ? 'bg-teal-500/20 text-teal-300 font-bold' : 'text-[var(--text-muted)] hover:text-white'
+            className={`px-2.5 py-1 rounded-md text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
+              activeTab === 'guide'
+                ? 'bg-teal-500/20 text-teal-300 font-bold border-teal-500/40 shadow-sm'
+                : 'bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border-transparent'
             }`}
           >
             How It Works
@@ -70,8 +74,10 @@ export function EmergencyHelplineWidget() {
           <button
             type="button"
             onClick={() => setActiveTab('safety')}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-              activeTab === 'safety' ? 'bg-rose-500/20 text-rose-300 font-bold' : 'text-[var(--text-muted)] hover:text-white'
+            className={`px-2.5 py-1 rounded-md text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
+              activeTab === 'safety'
+                ? 'bg-rose-500/20 text-rose-300 font-bold border-rose-500/40 shadow-sm'
+                : 'bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border-transparent'
             }`}
           >
             Safety
@@ -82,7 +88,7 @@ export function EmergencyHelplineWidget() {
       {/* Tab 1: Emergency Helplines */}
       {activeTab === 'hotlines' && (
         <div className="space-y-2 animate-fade-in">
-          <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed">
             Need urgent assistance? Tap any hotline below to dial immediately from your phone or mobile device:
           </p>
           <div className="grid grid-cols-1 gap-2">
@@ -96,11 +102,11 @@ export function EmergencyHelplineWidget() {
                     <span className={`text-base font-bold font-mono ${hl.color}`}>
                       {hl.number}
                     </span>
-                    <span className="text-[11px] font-semibold text-[var(--text-primary)] truncate">
+                    <span className="text-xs font-semibold text-[var(--text-primary)] truncate">
                       {hl.label}
                     </span>
                   </div>
-                  <p className="text-[10px] text-[var(--text-muted)] truncate">
+                  <p className="text-xs text-[var(--text-muted)] truncate mt-0.5">
                     {hl.desc}
                   </p>
                 </div>

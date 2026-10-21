@@ -7,28 +7,28 @@ export function ScoringExplainer() {
 
   return (
     <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl overflow-hidden transition-all shadow-sm">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
-        className="w-full flex items-center justify-between px-3.5 py-2.5 text-left group cursor-pointer hover:bg-[var(--surface-2-solid)] transition-colors gap-2"
-      >
-        <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 py-2 gap-2 bg-[#12130f]/60">
+        <div className="flex items-center gap-2 min-w-0">
           <Cpu className="w-4 h-4 text-amber-400 shrink-0" />
-          <span className="text-xs font-semibold text-[var(--text-primary)]">
-            Triage Scoring Formula
+          <span className="text-xs font-semibold text-[var(--text-primary)] shrink-0">
+            Triage Scoring Formula:
           </span>
-          <span className="hidden sm:inline text-xs text-[var(--text-muted)] truncate">
-            (Danger 30% • People 25% • Freshness 20% • Vulnerability 15% • Confidence 10%)
+          <span className="hidden md:inline text-xs text-[var(--text-muted)] truncate">
+            Danger 30% • People 25% • Freshness 20% • Vulnerability 15% • Confidence 10%
           </span>
         </div>
-        <span className="text-xs font-mono text-[var(--text-secondary)] group-hover:text-white flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-[var(--border-subtle)] group-hover:bg-[var(--border-strong)] transition-colors border border-[var(--border-subtle)]">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          className="self-start sm:self-auto text-xs font-mono text-[var(--text-secondary)] hover:text-white flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] transition-colors border border-[var(--border-subtle)] cursor-pointer"
+        >
           <span>{open ? 'Hide Formula' : 'How It Works'}</span>
           <ChevronDown
             className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           />
-        </span>
-      </button>
+        </button>
+      </div>
 
       {open && (
         <div className="p-4 pt-1 border-t border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] space-y-3 animate-slide-down">

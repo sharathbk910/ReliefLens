@@ -154,12 +154,12 @@ export function IncidentTable({
 
       {/* 2. Desktop & Tablet Table (>= 768px - Fixed Layout, No Unintended Sliding or Overlapping) */}
       <div className="hidden md:block w-full max-w-full overflow-x-auto table-scroll-container">
-        <table className="w-full text-left text-xs border-collapse table-fixed min-w-[1180px]">
+        <table className="w-full text-left text-xs border-collapse table-fixed min-w-[1200px]">
           <colgroup>
             <col style={{ width: '150px' }} className="w-[150px]" />
             <col style={{ width: '270px' }} className="w-[270px]" />
             <col style={{ width: '210px' }} className="w-[210px]" />
-            <col style={{ width: '90px' }} className="w-[90px]" />
+            <col style={{ width: '120px' }} className="w-[120px]" />
             <col style={{ width: '140px' }} className="w-[140px]" />
             <col style={{ width: '110px' }} className="w-[110px]" />
             <col style={{ width: '150px' }} className="w-[150px]" />
@@ -170,7 +170,7 @@ export function IncidentTable({
               <th style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Priority & Score</th>
               <th style={{ width: '270px', minWidth: '270px', maxWidth: '270px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Incident Details</th>
               <th style={{ width: '210px', minWidth: '210px', maxWidth: '210px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">District / Location</th>
-              <th style={{ width: '90px', minWidth: '90px', maxWidth: '90px' }} className="py-3 px-3.5 text-center whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Reports</th>
+              <th style={{ width: '120px', minWidth: '120px', maxWidth: '120px' }} className="py-3 px-3.5 text-center whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Reports</th>
               <th style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Verification</th>
               <th style={{ width: '110px', minWidth: '110px', maxWidth: '110px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Status</th>
               <th style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 whitespace-nowrap text-xs font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">Uncertainty</th>
@@ -201,23 +201,23 @@ export function IncidentTable({
                 >
                   {/* Priority & Score */}
                   <td style={{ width: '150px', minWidth: '150px', maxWidth: '150px' }} className="py-3 px-3.5 align-top whitespace-nowrap overflow-hidden">
-                    <div className="flex flex-col gap-1 items-start whitespace-nowrap">
+                    <div className="flex flex-col gap-2 items-start whitespace-nowrap">
                       <PriorityBadge
                         tier={incident.priority_tier}
                         score={incident.effective_score}
                       />
                       {hasFloorApplied && (
-                        <span className="text-[10px] text-amber-400 font-mono whitespace-nowrap">
+                        <span className="text-xs text-amber-400 font-mono whitespace-nowrap pt-0.5">
                           Floor Adjusted (45)
                         </span>
                       )}
                       {hasOverride && (
-                        <span className="text-[10px] text-teal-400 font-mono whitespace-nowrap">
+                        <span className="text-xs text-teal-400 font-mono whitespace-nowrap pt-0.5">
                           Manual Override
                         </span>
                       )}
                       {isSelected && (
-                        <span className="text-[9px] font-mono uppercase tracking-wider text-[#EBFC72] font-bold">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#EBFC72] font-bold">
                           ● TARGETED IN HUD
                         </span>
                       )}
@@ -261,11 +261,11 @@ export function IncidentTable({
                   </td>
 
                   {/* Report Count */}
-                  <td style={{ width: '90px', minWidth: '90px', maxWidth: '90px' }} className="py-3 px-3.5 align-top text-center whitespace-nowrap overflow-hidden">
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-medium tabular-nums whitespace-nowrap">
+                  <td style={{ width: '120px', minWidth: '120px', maxWidth: '120px' }} className="py-3 px-3.5 align-top text-center whitespace-nowrap overflow-hidden">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-medium tabular-nums whitespace-nowrap">
                       <span>{incident.report_count}</span>
-                      <span className="text-[10px] text-[var(--text-muted)]">
-                        ({incident.distinct_channel_count} ch)
+                      <span className="text-xs text-[var(--text-muted)]" title={`${incident.distinct_channel_count} reporting channels`}>
+                        ({incident.distinct_channel_count} {incident.distinct_channel_count === 1 ? 'channel' : 'channels'})
                       </span>
                     </div>
                   </td>

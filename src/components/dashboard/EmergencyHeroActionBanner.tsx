@@ -22,7 +22,7 @@ export function EmergencyHeroActionBanner({
         {/* Left Side: Human Friendly Emergency Message */}
         <div className="space-y-1.5 max-w-xl">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-[11px] font-bold uppercase tracking-wider">
+            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-xs font-bold uppercase tracking-wide">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
               Active Disaster Response System
             </span>
@@ -48,7 +48,7 @@ export function EmergencyHeroActionBanner({
             className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-900/40 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
             <ShieldAlert className="w-4 h-4" />
-            <span>REPORT EMERGENCY</span>
+            <span>Report Emergency</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
 

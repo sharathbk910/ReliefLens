@@ -105,28 +105,28 @@ export function DashboardPage() {
       />
 
       {/* 2. Executive Command Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-[var(--border-subtle)]">
-        <div>
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-[var(--border-subtle)]">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square" />
-            <h2 className="text-base sm:text-lg font-bold font-heading text-white tracking-tight">
+            <h2 className="text-base sm:text-lg font-bold font-heading text-white tracking-tight leading-none">
               Emergency Rescue & Response Center
             </h2>
-            <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EBFC72]/15 text-[#EBFC72] border border-[#EBFC72]/30 shrink-0">
+            <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EBFC72]/15 text-[#EBFC72] border border-[#EBFC72]/30 shrink-0">
               Live Crisis Feed
             </span>
           </div>
-          <p className="text-[11px] sm:text-xs text-[var(--text-muted)] font-mono mt-0.5 leading-snug">
+          <p className="text-xs text-[var(--text-muted)] font-mono mt-1 leading-normal">
             Prioritizing life-safety, trapped victims, and urgent medical needs
           </p>
         </div>
 
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto shrink-0 self-start sm:self-center">
           <button
             type="button"
             onClick={handleSyncToMyLocation}
             disabled={isSyncingLocation}
-            className="flex-1 sm:flex-none justify-center px-2.5 sm:px-3 py-1.5 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="flex-1 sm:flex-none justify-center px-3 py-1.5 h-9 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             title="Anchor simulated incidents around your current location"
           >
             {isSyncingLocation ? (
@@ -142,7 +142,7 @@ export function DashboardPage() {
             size="sm"
             onClick={() => setIsExportOpen(true)}
             leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
-            className="flex-1 sm:flex-none justify-center text-xs shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
+            className="flex-1 sm:flex-none justify-center text-xs h-9 shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
           >
             Export Manifest
           </Button>

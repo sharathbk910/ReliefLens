@@ -43,6 +43,40 @@ function createMiniMarkerIcon(tier: PriorityTier) {
   });
 }
 
+function createClusterMarkerIcon(count: number, tier: PriorityTier) {
+  const colors: Record<PriorityTier, string> = {
+    critical: '#e11d48',
+    high: '#f59e0b',
+    medium: '#3b82f6',
+    low: '#64748b',
+  };
+  const color = colors[tier] || colors.low;
+
+  return L.divIcon({
+    className: 'custom-leaflet-cluster-marker',
+    html: `
+      <div style="
+        background-color: ${color};
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-family: monospace;
+        font-size: 11px;
+        font-weight: bold;
+      ">${count}</div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
+  });
+}
+
 function createUserLocationMiniIcon() {
   return L.divIcon({
     className: 'user-location-mini-marker',
@@ -286,6 +320,49 @@ export function DashboardMapPreview({
     return result;
   }, [sourceIncidents]);
 
+  // Group incidents into clusters if within ~700m to resolve overlap along dense zones (Issue #4)
+  const clusteredNodes = React.useMemo(() => {
+    const clusters: Array<{
+      id: string;
+      lat: number;
+      lng: number;
+      incidents: Incident[];
+      highestTier: PriorityTier;
+    }> = [];
+
+    const tierPriority: Record<PriorityTier, number> = {
+      critical: 4,
+      high: 3,
+      medium: 2,
+      low: 1,
+    };
+
+    for (const inc of locatedIncidents) {
+      const match = clusters.find(
+        (c) =>
+          Math.abs(c.lat - inc.latitude!) < 0.007 &&
+          Math.abs(c.lng - inc.longitude!) < 0.007
+      );
+
+      if (match) {
+        match.incidents.push(inc);
+        if (tierPriority[inc.priority_tier] > tierPriority[match.highestTier]) {
+          match.highestTier = inc.priority_tier;
+        }
+      } else {
+        clusters.push({
+          id: inc.id,
+          lat: inc.latitude!,
+          lng: inc.longitude!,
+          incidents: [inc],
+          highestTier: inc.priority_tier,
+        });
+      }
+    }
+
+    return clusters;
+  }, [locatedIncidents]);
+
   const tileUrl = config.map.tileUrl;
 
   const defaultLat = config.map.defaultCenter?.[0] ?? 12.9716;
@@ -316,7 +393,7 @@ export function DashboardMapPreview({
             Spatial Distribution
           </h3>
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums shrink-0">
-            {locatedIncidents.length} pinned
+            {locatedIncidents.length} pinned ({clusteredNodes.length} zones)
           </span>
           <span className="hidden md:inline-flex items-center gap-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-950/60 text-teal-300 border border-teal-500/30 shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping" />
@@ -324,19 +401,9 @@ export function DashboardMapPreview({
           </span>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => setLocateRequested((prev) => prev + 1)}
-            className="text-[10px] sm:text-[11px] text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1 transition-colors px-1.5 sm:px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 cursor-pointer"
-            title="Center to current GPS location"
-          >
-            <Crosshair className="w-3 h-3" />
-            <span className="hidden sm:inline">My Location</span>
-            <span className="sm:hidden">GPS</span>
-          </button>
           <Link
             to="/map"
-            className="text-[10px] sm:text-[11px] text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1 transition-colors font-mono"
+            className="text-xs text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1 transition-colors font-mono px-2 py-0.5 rounded bg-[var(--surface-2-solid)] border border-[var(--border-subtle)]"
           >
             <span>Full Canvas</span>
             <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
@@ -368,7 +435,7 @@ export function DashboardMapPreview({
           {/* Auto-fit bounds on load or updates without manual clicking */}
           <MapAutoInitializer incidents={locatedIncidents} userLocation={userLocation} />
 
-          {/* Floating Target Button */}
+          {/* Floating Target Button (Single authoritative location trigger - Issue #26) */}
           <MiniLocateMeControl
             onLocated={(loc) => setUserLocation(loc)}
             locateRequested={locateRequested}
@@ -401,31 +468,49 @@ export function DashboardMapPreview({
             </>
           )}
 
-          {locatedIncidents.map((inc) => (
-            <Marker
-              key={inc.id}
-              position={[inc.latitude!, inc.longitude!]}
-              icon={createMiniMarkerIcon(inc.priority_tier)}
-            >
-              <Popup>
-                <div className="p-1 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between gap-1.5">
-                    <PriorityBadge tier={inc.priority_tier} score={inc.effective_score} />
-                    <StatusBadge status={inc.status} />
+          {clusteredNodes.map((cluster) => {
+            const isMulti = cluster.incidents.length > 1;
+            const primaryInc = cluster.incidents[0];
+
+            return (
+              <Marker
+                key={cluster.id}
+                position={[cluster.lat, cluster.lng]}
+                icon={
+                  isMulti
+                    ? createClusterMarkerIcon(cluster.incidents.length, cluster.highestTier)
+                    : createMiniMarkerIcon(primaryInc.priority_tier)
+                }
+              >
+                <Popup>
+                  <div className="p-1 space-y-2 text-xs max-h-56 overflow-y-auto">
+                    {isMulti && (
+                      <div className="font-mono text-[10px] text-amber-300 font-bold border-b border-white/10 pb-1">
+                        CLUSTERING: {cluster.incidents.length} INCIDENTS AT THIS ZONE
+                      </div>
+                    )}
+                    {cluster.incidents.map((inc) => (
+                      <div key={inc.id} className="space-y-1 pb-1.5 border-b border-white/10 last:border-b-0">
+                        <div className="flex items-center justify-between gap-1.5">
+                          <PriorityBadge tier={inc.priority_tier} score={inc.effective_score} />
+                          <StatusBadge status={inc.status} />
+                        </div>
+                        <p className="font-semibold text-white line-clamp-1">{inc.title}</p>
+                        <p className="text-[11px] text-slate-300 truncate">{inc.district || inc.location_text}</p>
+                        <Link
+                          to={`/incidents/${inc.id}`}
+                          className="inline-flex items-center gap-1 text-[11px] text-teal-400 hover:text-teal-300 font-medium pt-0.5"
+                        >
+                          <span>View Details</span>
+                          <ArrowRight className="w-3 h-3" strokeWidth={1.5} />
+                        </Link>
+                      </div>
+                    ))}
                   </div>
-                  <p className="font-semibold text-white line-clamp-1">{inc.title}</p>
-                  <p className="text-[11px] text-slate-300 truncate">{inc.district || inc.location_text}</p>
-                  <Link
-                    to={`/incidents/${inc.id}`}
-                    className="inline-flex items-center gap-1 text-[11px] text-teal-400 hover:text-teal-300 font-medium pt-1"
-                  >
-                    <span>View Details</span>
-                    <ArrowRight className="w-3 h-3" strokeWidth={1.5} />
-                  </Link>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>
