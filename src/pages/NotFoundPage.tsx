@@ -17,11 +17,18 @@ export function NotFoundPage() {
           The requested emergency coordination page does not exist or has been moved.
         </p>
       </div>
-      <Link to="/dashboard">
-        <Button size="sm" variant="secondary" leftIcon={<ArrowLeft className="w-4 h-4" />}>
-          Return to Dashboard
-        </Button>
-      </Link>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Link to="/dashboard">
+          <Button size="sm" variant="secondary" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            Return to Dashboard
+          </Button>
+        </Link>
+        <Link to="/reports/new">
+          <Button size="sm" variant="primary" className="bg-rose-600 hover:bg-rose-500 text-white">
+            🚨 File Emergency Report
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

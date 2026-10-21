@@ -83,10 +83,14 @@ export function App() {
               <Route element={<AppShell />}>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/incidents" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/incidents/:id" element={<IncidentDetailPage />} />
+                <Route path="/incident/:id" element={<IncidentDetailPage />} />
                 <Route path="/reports/new" element={<ReportFormPage />} />
+                <Route path="/report/new" element={<ReportFormPage />} />
                 <Route path="/report" element={<ReportFormPage />} />
-                <Route path="/reports" element={<Navigate to="/reports/new" replace />} />
+                <Route path="/reports" element={<ReportFormPage />} />
+                <Route path="/new-report" element={<ReportFormPage />} />
                 <Route path="/duplicates" element={<DuplicatesPage />} />
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/audit" element={<AuditPage />} />
