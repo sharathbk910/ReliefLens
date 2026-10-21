@@ -11,6 +11,7 @@ import { ReportFormPage } from './pages/ReportFormPage.tsx';
 import { DuplicatesPage } from './pages/DuplicatesPage.tsx';
 import { MapPage } from './pages/MapPage.tsx';
 import { AuditPage } from './pages/AuditPage.tsx';
+import { LandingPage } from './pages/LandingPage.tsx';
 import { NotFoundPage } from './pages/NotFoundPage.tsx';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
@@ -50,13 +51,15 @@ export function App() {
         <ErrorBoundary>
           <BrowserRouter>
             <Routes>
+              {/* Landing Page with Obsidian & Lime System */}
+              <Route path="/" element={<LandingPage />} />
+
               {/* Public Auth Routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
 
               {/* Authenticated Application Shell */}
               <Route element={<AppShell />}>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/incidents/:id" element={<IncidentDetailPage />} />
                 <Route path="/reports/new" element={<ReportFormPage />} />
