@@ -48,14 +48,14 @@ export function EmergencyHelplineWidget() {
             Emergency Help & Helplines
           </h2>
         </div>
-        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-lg border border-[var(--border-subtle)] self-start sm:self-auto shrink-0">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('hotlines')}
             className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
               activeTab === 'hotlines'
-                ? 'bg-amber-400/20 text-amber-300 font-bold border-amber-400/40 shadow-sm'
-                : 'bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border-transparent'
+                ? 'bg-white dark:bg-slate-700 text-sky-700 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-600 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border-transparent'
             }`}
           >
             Hotlines
@@ -65,8 +65,8 @@ export function EmergencyHelplineWidget() {
             onClick={() => setActiveTab('guide')}
             className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
               activeTab === 'guide'
-                ? 'bg-teal-500/20 text-teal-300 font-bold border-teal-500/40 shadow-sm'
-                : 'bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border-transparent'
+                ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 font-bold border-teal-300 dark:border-teal-600 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border-transparent'
             }`}
           >
             How It Works
@@ -76,8 +76,8 @@ export function EmergencyHelplineWidget() {
             onClick={() => setActiveTab('safety')}
             className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
               activeTab === 'safety'
-                ? 'bg-rose-500/20 text-rose-300 font-bold border-rose-500/40 shadow-sm'
-                : 'bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border-transparent'
+                ? 'bg-white dark:bg-slate-700 text-rose-700 dark:text-rose-300 font-bold border-rose-300 dark:border-rose-600 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border-transparent'
             }`}
           >
             Safety
@@ -95,7 +95,7 @@ export function EmergencyHelplineWidget() {
             {hotlines.map((hl) => (
               <div
                 key={hl.number}
-                className={`p-2.5 rounded-lg border ${hl.bg} flex items-center justify-between gap-2.5 transition-all hover:bg-black/30`}
+                className={`p-2.5 rounded-xl border ${hl.bg} flex items-center justify-between gap-2.5 transition-all hover:bg-slate-50 dark:hover:bg-slate-800/60`}
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -115,10 +115,10 @@ export function EmergencyHelplineWidget() {
                     type="button"
                     onClick={() => copyToClipboard(hl.number)}
                     title="Copy phone number"
-                    className="p-1.5 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white border border-[var(--border-subtle)] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-600 hover:text-slate-900 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
                   >
                     {copiedNumber === hl.number ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
                     ) : (
                       <span className="text-xs font-mono px-1">COPY</span>
                     )}

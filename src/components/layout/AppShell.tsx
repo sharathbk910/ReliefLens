@@ -17,6 +17,8 @@ import {
   User,
   SlidersHorizontal,
   Mic,
+  LogOut,
+  LogIn,
 } from 'lucide-react';
 import { dataService } from '../../lib/dataService.ts';
 import { Button } from '../ui/Button.tsx';
@@ -29,7 +31,7 @@ import type { UserRole } from '../../shared/types.ts';
 export function AppShell() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const userDropdownRef = useRef<HTMLDivElement | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const currentUser = dataService.getCurrentUser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,7 +54,7 @@ export function AppShell() {
 
   // Initialize theme from saved preference (defaults to clean modern light theme)
   useEffect(() => {
-    const saved = localStorage.getItem('resqwave-theme');
+    const saved = localStorage.getItem('resqwave-theme-mode');
     if (saved === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
@@ -67,8 +69,8 @@ export function AppShell() {
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
+    localStorage.setItem('resqwave-theme-mode', next);
     localStorage.setItem('resqwave-theme', next);
-    localStorage.setItem('relieflens-theme', next);
     if (next === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
@@ -101,6 +103,15 @@ export function AppShell() {
       label: 'Dashboard',
       icon: <LayoutDashboard className="w-5 h-5 shrink-0" strokeWidth={1.5} />,
     },
+    ...(currentUser.role !== 'viewer'
+      ? [
+          {
+            to: '/reports/new',
+            label: 'New Report',
+            icon: <Plus className="w-5 h-5 shrink-0 text-sky-600 dark:text-sky-400" strokeWidth={2.5} />,
+          },
+        ]
+      : []),
     {
       to: '/duplicates',
       label: 'Duplicate Review',
@@ -125,100 +136,50 @@ export function AppShell() {
   return (
     <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
       {/* 1. Operational Topbar & Emergency Response Strip */}
-      <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-[var(--border-subtle)] bg-[var(--surface-1-solid)]/95 backdrop-blur-md text-xs select-none shadow-sm">
+      <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-xs select-none shadow-xs">
         <div className="flex items-center justify-between gap-2.5 max-w-7xl mx-auto w-full flex-nowrap min-w-0">
           <div className="md:hidden shrink-0">
             <AppLogo size="xs" showText={false} />
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span className="emergency-pulse-dot"></span>
-            <span className="font-mono text-[10px] sm:text-xs font-bold text-amber-400 tracking-wider uppercase hidden xs:inline">
+            <span className="font-mono text-[10px] sm:text-xs font-bold text-sky-700 dark:text-sky-300 tracking-wider uppercase hidden xs:inline">
               ACTIVE DISASTER RESPONSE ZONE
             </span>
           </div>
 
           <div className="ml-auto flex items-center gap-2 shrink-0 flex-nowrap">
-            {/* FIXED LOGGED-IN DETAILS PILL & PERSONA SWITCHER */}
-            <div className="relative shrink-0" ref={userDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] border border-amber-400/40 hover:border-amber-400 transition-all cursor-pointer shadow-sm"
-                title={`Logged in as ${currentUser.display_name} (${currentUser.role}). Tap to switch persona.`}
-              >
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-xs font-bold text-amber-300 shrink-0">
-                  {currentUser.display_name.charAt(0)}
-                </div>
-                <div className="text-left hidden sm:block max-w-[180px] md:max-w-[220px]">
-                  <p className="text-xs font-bold text-[var(--text-primary)] leading-tight whitespace-nowrap">
-                    {currentUser.display_name}
-                  </p>
-                  <p className="text-xs uppercase font-mono text-amber-400 font-bold leading-none">
-                    {currentUser.role}
-                  </p>
-                </div>
-                <ChevronDown className="w-3 h-3 text-[var(--text-muted)] shrink-0" strokeWidth={1.5} />
-              </button>
+            {/* Direct Quick Account Link */}
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-sky-700 hover:bg-sky-50 dark:text-slate-300 dark:hover:text-sky-300 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Go to Login / Account Settings"
+            >
+              <User className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+              <span className="hidden sm:inline">Account & Roles</span>
+            </button>
 
-              {/* Persona Switcher Dropdown Popover */}
-              {userDropdownOpen && (
-                <div className="!absolute right-0 top-full mt-1.5 w-60 z-[100] shadow-xl bg-[var(--surface-1-solid)] backdrop-blur-xl border border-[var(--border-strong)] rounded-xl p-2.5 animate-spatial-enter select-auto">
-                  <div className="px-2 py-1.5 border-b border-[var(--border-subtle)] mb-1">
-                    <p className="text-xs font-mono text-[var(--text-muted)] font-medium">
-                      Currently logged in:
-                    </p>
-                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">
-                      {currentUser.display_name}
-                    </p>
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-400/20 text-amber-300 mt-1 border border-amber-400/30">
-                      Role: {currentUser.role}
-                    </span>
-                  </div>
-
-                  <p className="text-xs font-mono text-[var(--text-muted)] px-2 py-1">
-                    Switch active persona:
-                  </p>
-                  {(['admin', 'coordinator', 'reporter', 'viewer'] as UserRole[]).map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => handleRoleChange(r)}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs flex items-center justify-between transition-colors ${
-                        currentUser.role === r
-                          ? 'bg-amber-400/15 text-amber-300 font-semibold border border-amber-400/30'
-                          : 'text-[var(--text-secondary)] hover:text-white hover:bg-[var(--border-subtle)]'
-                      }`}
-                    >
-                      <span className="capitalize">{r}</span>
-                      {currentUser.role === r && (
-                        <span className="text-[10px] font-mono font-bold text-amber-400">ACTIVE</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Functional Divider separating user identity from system utilities */}
-            <div className="h-5 w-px bg-[var(--border-subtle)] mx-1 hidden sm:block" />
+            {/* Functional Divider */}
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-0.5 hidden sm:block" />
 
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? (
-                <Sun className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <Sun className="w-4 h-4 text-amber-500" strokeWidth={1.5} />
               ) : (
-                <Moon className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <Moon className="w-4 h-4 text-slate-600" strokeWidth={1.5} />
               )}
             </button>
             <button
               onClick={handleResetData}
               title="Reset simulated scenario data"
-              className="hidden lg:flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/30 hover:bg-amber-500/10 font-mono transition-colors"
+              className="hidden lg:flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-500/10 font-mono transition-colors cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" strokeWidth={1.5} />
               <span>Reset Data</span>
@@ -243,42 +204,18 @@ export function AppShell() {
             <AppLogo size="md" showText={true} className="hidden lg:flex" />
           </div>
 
-          {/* New Report Secondary Action (Preserves dominance of hero emergency trigger) */}
-          <div className="p-2.5">
-            {currentUser.role !== 'viewer' ? (
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full justify-center lg:justify-start px-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-mono font-medium tracking-wide border border-slate-700 rounded-lg shadow-sm"
-                leftIcon={<Plus className="w-4 h-4 shrink-0 text-amber-400" strokeWidth={2} />}
-                onClick={() => navigate('/reports/new')}
-                title="Create New Incident Report"
-              >
-                <span className="hidden lg:inline text-xs">New Report</span>
-              </Button>
-            ) : (
-              <div
-                title="Viewers have read-only access and cannot submit reports."
-                className="p-2 rounded-lg bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] text-center flex items-center justify-center font-mono"
-              >
-                <Lock className="w-4 h-4" strokeWidth={1.5} />
-                <span className="hidden lg:inline ml-1.5 text-xs">Read-Only</span>
-              </div>
-            )}
-          </div>
-
-          {/* Navigation Links with Tactical Highlight */}
-          <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+          {/* Navigation Links with Clean Modern Active Indicator */}
+          <nav className="flex-1 p-2 space-y-1.5 overflow-y-auto">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 title={item.label}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-mono transition-all duration-200 relative group ${
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 relative group ${
                     isActive
-                      ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40 shadow-sm font-bold'
-                      : 'text-[var(--text-secondary)] hover:text-white hover:bg-[var(--border-subtle)]'
+                      ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-xs font-semibold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`
                 }
               >
@@ -288,61 +225,84 @@ export function AppShell() {
             ))}
           </nav>
 
-          {/* Quick Crisis Hotline Card in Sidebar */}
-          <div className="hidden lg:block mx-2.5 mb-2 p-2.5 rounded-xl bg-black/40 border border-rose-500/25 space-y-2 select-none">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-semibold text-rose-300 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-                24/7 Crisis Helpline
-              </span>
-              <span className="text-[10px] font-mono text-[var(--text-muted)]">TOLL-FREE</span>
-            </div>
-            <div className="grid grid-cols-3 gap-1 pt-0.5">
-              <a
-                href="tel:112"
-                className="p-1 rounded bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-center font-mono font-bold text-xs text-rose-200 hover:text-white transition-colors"
-                title="Dial 112 National Emergency"
+          {/* User Account & Login Session Controls in Sidebar Bottom */}
+          <div className="mt-auto p-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 rounded-b-xl relative" ref={userDropdownRef}>
+            <div className="flex items-center justify-between gap-1.5 p-1.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 min-w-0 flex-1 text-left cursor-pointer hover:opacity-90 transition-opacity"
+                title={`Logged in as ${currentUser.display_name}. Click to switch role.`}
               >
-                112
-              </a>
-              <a
-                href="tel:108"
-                className="p-1 rounded bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-center font-mono font-bold text-xs text-amber-200 hover:text-white transition-colors"
-                title="Dial 108 Disaster Ambulance"
-              >
-                108
-              </a>
-              <a
-                href="tel:101"
-                className="p-1 rounded bg-orange-950/60 hover:bg-orange-900 border border-orange-500/30 text-center font-mono font-bold text-xs text-orange-200 hover:text-white transition-colors"
-                title="Dial 101 Fire & Rescue"
-              >
-                101
-              </a>
-            </div>
-            <p className="text-xs text-[var(--text-muted)] leading-normal text-center">
-              Direct live emergency response line
-            </p>
-          </div>
+                <div className="w-7 h-7 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 border border-sky-200 dark:border-sky-700 flex items-center justify-center text-xs font-bold shrink-0">
+                  {currentUser.display_name.charAt(0)}
+                </div>
+                <div className="hidden lg:block truncate min-w-0">
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                    {currentUser.display_name}
+                  </p>
+                  <p className="text-[10px] uppercase font-mono text-sky-600 dark:text-sky-400 font-bold">
+                    {currentUser.role}
+                  </p>
+                </div>
+              </button>
 
-          {/* User Account / Active Identity Display in Sidebar Bottom (Clean status, no duplicate dropdown) */}
-          <div className="mt-auto bg-[var(--surface-1-solid)] p-2.5 border-t border-[var(--border-subtle)] rounded-b-xl">
-            <div
-              className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-[var(--surface-1-solid)] border border-[var(--border-subtle)]"
-              title={`Logged in as ${currentUser.display_name}. Use top-right profile to change persona.`}
-            >
-              <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xs font-bold text-amber-300 shrink-0">
-                {currentUser.display_name.charAt(0)}
-              </div>
-              <div className="hidden lg:block text-left truncate min-w-0">
-                <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
-                  {currentUser.display_name}
-                </p>
-                <p className="text-[10px] uppercase font-mono text-amber-400 font-bold">
-                  {currentUser.role}
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold text-slate-500 hover:text-sky-700 hover:bg-sky-50 dark:text-slate-400 dark:hover:text-sky-300 dark:hover:bg-slate-700/60 transition-colors cursor-pointer"
+                title="Switch Account / Sign In"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Login</span>
+              </button>
             </div>
+
+            {/* Persona Switcher Dropdown Popover */}
+            {userDropdownOpen && (
+              <div className="absolute left-2 bottom-full mb-2 w-56 z-[100] shadow-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 animate-spatial-enter select-auto">
+                <div className="px-2 py-1.5 border-b border-slate-100 dark:border-slate-700 mb-1">
+                  <p className="text-[10px] font-mono text-slate-400 font-medium">Currently Active:</p>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{currentUser.display_name}</p>
+                  <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300 mt-1">
+                    Role: {currentUser.role}
+                  </span>
+                </div>
+
+                <p className="text-[10px] font-mono text-slate-400 px-2 py-1">Quick switch persona:</p>
+                {(['admin', 'coordinator', 'reporter', 'viewer'] as UserRole[]).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => handleRoleChange(r)}
+                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                      currentUser.role === r
+                        ? 'bg-sky-50 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-semibold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                    }`}
+                  >
+                    <span className="capitalize">{r}</span>
+                    {currentUser.role === r && (
+                      <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400">ACTIVE</span>
+                    )}
+                  </button>
+                ))}
+
+                <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      navigate('/login');
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-700/50 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Go to Full Login Page</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
