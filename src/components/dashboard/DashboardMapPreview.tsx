@@ -43,33 +43,39 @@ function createUserLocationMiniIcon() {
   return L.divIcon({
     className: 'user-location-mini-marker',
     html: `
-      <div style="position: relative; width: 18px; height: 18px;">
+      <div style="position: relative; width: 20px; height: 20px;">
         <div style="
           position: absolute;
           inset: 0;
           border-radius: 50%;
-          background: rgba(20, 184, 166, 0.4);
+          background: rgba(20, 184, 166, 0.45);
           animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
         "></div>
         <div style="
           position: relative;
           width: 14px;
           height: 14px;
-          margin: 2px;
+          margin: 3px;
           border-radius: 50%;
           background: #0d9488;
-          border: 2px solid #ffffff;
-          box-shadow: 0 0 8px rgba(13, 148, 136, 0.8);
+          border: 2.5px solid #ffffff;
+          box-shadow: 0 0 8px rgba(13, 148, 136, 0.9), 0 2px 4px rgba(0,0,0,0.5);
         "></div>
       </div>
     `,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
-    popupAnchor: [0, -9],
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10],
   });
 }
 
-function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
+function MapAutoInitializer({
+  incidents,
+  userLocation,
+}: {
+  incidents: Incident[];
+  userLocation: { lat: number; lng: number; accuracy: number } | null;
+}) {
   const map = useMap();
   const prevCountRef = useRef<number>(-1);
 
@@ -91,8 +97,13 @@ function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
     };
   }, [map]);
 
-  // Automatically fit map bounds to current incident coordinates
+  // If user location is detected, center on user location; otherwise fit to incidents
   useEffect(() => {
+    if (userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 14);
+      return;
+    }
+
     const valid = incidents.filter(
       (i) =>
         typeof i.latitude === 'number' &&
@@ -114,24 +125,29 @@ function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
         map.fitBounds(bounds, { padding: [35, 35], maxZoom: 14 });
       }
     }
-  }, [incidents, map]);
+  }, [incidents, userLocation, map]);
 
   return null;
 }
 
 function MiniLocateMeControl({
   onLocated,
+  locateRequested,
 }: {
   onLocated: (loc: { lat: number; lng: number; accuracy: number }) => void;
+  locateRequested: number;
 }) {
   const map = useMap();
   const toast = useToast();
   const [isLocating, setIsLocating] = useState(false);
+  const autoLocatedRef = useRef(false);
 
-  const handleLocate = () => {
+  const handleLocate = (isAuto = false) => {
     if (isLocating) return;
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      toast.error('Not Supported', 'Geolocation is not supported by your browser.');
+      if (!isAuto) {
+        toast.error('Not Supported', 'Geolocation is not supported by your browser.');
+      }
       return;
     }
 
@@ -140,52 +156,78 @@ function MiniLocateMeControl({
       (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
         const loc = { lat: latitude, lng: longitude, accuracy: Math.round(accuracy) };
+        try {
+          localStorage.setItem('relieflens_user_lat', latitude.toString());
+          localStorage.setItem('relieflens_user_lng', longitude.toString());
+          localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
+        } catch (_) {}
         onLocated(loc);
         map.flyTo([latitude, longitude], 14, { duration: 1.2 });
-        toast.success('Location Found', `Centered to current GPS coordinates (±${loc.accuracy}m).`);
+        toast.success('Location Found', `Map centered to your current position (±${loc.accuracy}m).`);
         setIsLocating(false);
       },
       (err) => {
         setIsLocating(false);
-        if (err.code === 1) {
-          toast.error('Location Access Denied', 'Please allow location access in your browser.');
-        } else {
-          toast.error('Location Unavailable', err.message || 'Unable to retrieve location.');
+        if (!isAuto) {
+          if (err.code === 1) {
+            toast.error('Location Access Denied', 'Please allow location access in your browser.');
+          } else {
+            toast.error('Location Unavailable', err.message || 'Unable to retrieve location.');
+          }
         }
       },
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
     );
   };
 
+  // Automatically detect and center on location upon mounting
+  useEffect(() => {
+    if (!autoLocatedRef.current) {
+      autoLocatedRef.current = true;
+      handleLocate(true);
+    }
+  }, []);
+
+  // When locate button in header or external trigger is clicked
+  useEffect(() => {
+    if (locateRequested > 0) {
+      handleLocate(false);
+    }
+  }, [locateRequested]);
+
   return (
     <div
       style={{
         position: 'absolute',
-        bottom: '12px',
-        right: '12px',
+        bottom: '14px',
+        right: '14px',
         zIndex: 1000,
         pointerEvents: 'auto',
       }}
     >
       <button
         type="button"
-        onClick={handleLocate}
+        onClick={() => handleLocate(false)}
         disabled={isLocating}
-        title="Locate Me (Google Maps style)"
-        aria-label="Locate Me"
-        className="w-8 h-8 rounded-full bg-[var(--surface-1-solid)] hover:bg-[var(--surface-2-solid)] border border-teal-500/50 hover:border-teal-400 text-teal-400 shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none"
+        title="Locate My Current Position"
+        aria-label="Locate My Current Position"
+        className="h-9 px-3 rounded-full bg-[var(--surface-1-solid)] hover:bg-[var(--surface-2-solid)] border-2 border-teal-500/80 hover:border-teal-400 text-teal-400 shadow-2xl flex items-center gap-1.5 transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer"
       >
         {isLocating ? (
           <Loader2 className="w-4 h-4 animate-spin text-teal-400" />
         ) : (
-          <Crosshair className="w-4 h-4 text-teal-400" />
+          <Crosshair className="w-4 h-4 text-teal-400 group-hover:rotate-45 transition-transform" />
         )}
+        <span className="text-[11px] font-semibold text-[var(--text-primary)] group-hover:text-teal-300">
+          {isLocating ? 'Locating...' : 'My Location'}
+        </span>
       </button>
     </div>
   );
 }
 
 export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
+  const [locateRequested, setLocateRequested] = useState<number>(0);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -203,26 +245,6 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
     }
     return null;
   });
-
-  // Automatically detect and update user location as soon as website/preview opens
-  useEffect(() => {
-    if (typeof window === 'undefined' || !navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        const loc = { lat: latitude, lng: longitude, accuracy: Math.round(accuracy) };
-        setUserLocation(loc);
-        try {
-          localStorage.setItem('relieflens_user_lat', latitude.toString());
-          localStorage.setItem('relieflens_user_lng', longitude.toString());
-          localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
-        } catch (_) {}
-      },
-      (err) => console.warn('Dashboard map auto-locate notice:', err.message),
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
-    );
-  }, []);
 
   const locatedIncidents = incidents.filter(
     (i) =>
@@ -261,13 +283,24 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
             {locatedIncidents.length} pinned
           </span>
         </div>
-        <Link
-          to="/map"
-          className="text-[11px] text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1 transition-colors"
-        >
-          <span>Full Canvas</span>
-          <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setLocateRequested((prev) => prev + 1)}
+            className="text-[11px] text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1 transition-colors px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 cursor-pointer"
+            title="Center to current GPS location"
+          >
+            <Crosshair className="w-3 h-3" />
+            <span>My Location</span>
+          </button>
+          <Link
+            to="/map"
+            className="text-[11px] text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1 transition-colors ml-1"
+          >
+            <span>Full Canvas</span>
+            <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
+          </Link>
+        </div>
       </div>
 
       {/* Map Area */}
@@ -284,11 +317,14 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
             url={tileUrl}
           />
 
-          {/* Auto-fit bounds on load and invalidates size immediately */}
-          <MapAutoInitializer incidents={locatedIncidents} />
+          {/* Auto-fit bounds on load or center on user location, invalidates size immediately */}
+          <MapAutoInitializer incidents={locatedIncidents} userLocation={userLocation} />
 
           {/* Floating Target Button */}
-          <MiniLocateMeControl onLocated={(loc) => setUserLocation(loc)} />
+          <MiniLocateMeControl
+            onLocated={(loc) => setUserLocation(loc)}
+            locateRequested={locateRequested}
+          />
 
           {/* User Location Pulse Marker */}
           {userLocation && (
