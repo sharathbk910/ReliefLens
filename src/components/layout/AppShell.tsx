@@ -105,8 +105,8 @@ export function AppShell() {
       <header className="z-40 px-3 md:px-6 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--surface-1)] backdrop-blur-md text-xs flex items-center justify-between">
         <div className="flex items-center gap-2 max-w-7xl mx-auto w-full">
           <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" strokeWidth={1.5} />
-          <span className="leading-tight text-[var(--text-secondary)] text-[11px] md:text-xs">
-            <strong className="text-[var(--text-primary)] font-semibold">Operational Prototype:</strong> ReliefLens provides decision support for emergency coordination. Not an official 911 dispatch replacement.
+          <span className="leading-tight text-[var(--text-secondary)] text-[10px] sm:text-xs truncate sm:whitespace-normal">
+            <strong className="text-[var(--text-primary)] font-semibold">Prototype:</strong> <span className="hidden sm:inline">ReliefLens provides decision support for emergency coordination.</span> Not for 911 dispatch.
           </span>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {/* Theme Toggle Button */}
@@ -230,7 +230,7 @@ export function AppShell() {
 
             {/* Role Switcher Menu */}
             {userDropdownOpen && (
-              <div className="absolute bottom-16 left-2 right-2 lg:w-56 surface-z2 p-2 z-50 animate-spatial-enter">
+              <div className="absolute bottom-16 left-2 right-2 md:left-full md:bottom-2 md:ml-2 md:w-56 md:right-auto lg:left-2 lg:ml-0 lg:w-56 lg:bottom-16 surface-z2 p-2 z-50 animate-spatial-enter shadow-2xl">
                 <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] px-2 py-1">
                   Active Persona:
                 </p>
@@ -257,7 +257,9 @@ export function AppShell() {
         <main
           id="main-content"
           className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${
-            location.pathname === '/reports/new' ? 'pb-4 md:pb-6' : 'pb-20 md:pb-6'
+            location.pathname === '/reports/new' || location.pathname === '/map'
+              ? 'pb-4 md:pb-6'
+              : 'pb-32 md:pb-16'
           }`}
         >
           <div className="flex-1 p-3 md:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-page-enter">

@@ -219,6 +219,7 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
           center={[centerLat, centerLng]}
           zoom={11}
           scrollWheelZoom={false}
+          zoomControl={false}
           className="w-full h-full"
         >
           <TileLayer

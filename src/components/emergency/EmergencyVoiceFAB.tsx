@@ -9,8 +9,8 @@ export function EmergencyVoiceFAB() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If already on the new report page, don't show the FAB to avoid duplication
-  if (location.pathname === '/reports/new') {
+  // If already on report form or map page, don't show the FAB to avoid duplication and overlapping with map drawers
+  if (location.pathname === '/reports/new' || location.pathname === '/map') {
     return null;
   }
 
@@ -27,31 +27,28 @@ export function EmergencyVoiceFAB() {
   return (
     <>
       {/* Floating Action Button (Spatial Z-3 Layer) */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 md:right-8 z-40 select-none">
+      <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 md:right-8 z-40 select-none">
         <button
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Quick Emergency Voice Report"
-          className="group relative flex items-center gap-2.5 px-3.5 py-3 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow-xl shadow-rose-900/40 transition-all duration-200 active:scale-95 border border-rose-400/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+          className="group relative flex items-center justify-center w-11 h-11 sm:w-auto sm:h-auto p-0 sm:px-3.5 sm:py-3 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow-xl shadow-rose-900/40 transition-all duration-200 active:scale-95 border border-rose-400/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
         >
           {/* Pulsing beacon glow */}
           <span className="absolute -inset-1 rounded-full bg-rose-500/25 animate-ping pointer-events-none opacity-75" />
 
-          <div className="relative flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
-            <Mic className="w-3.5 h-3.5" strokeWidth={2} />
+          <div className="relative flex items-center justify-center w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-white/20">
+            <Mic className="w-4 h-4 sm:w-3.5 sm:h-3.5" strokeWidth={2} />
           </div>
-          <span className="relative hidden sm:inline tracking-wide font-heading">
+          <span className="relative hidden sm:inline tracking-wide font-heading pr-0.5">
             Emergency Voice Report
-          </span>
-          <span className="relative sm:hidden tracking-wide font-heading">
-            Voice Report
           </span>
         </button>
       </div>
 
       {/* Quick Voice Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-lg surface-z3 rounded-2xl border border-[var(--border-strong)] shadow-2xl overflow-hidden animate-scale-in">
             {/* Modal Header */}
             <div className="px-5 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-rose-500/10">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import {
   MapPin,
@@ -187,15 +187,7 @@ function LocateMeControl({
   };
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: '24px',
-        right: '24px',
-        zIndex: 1000,
-        pointerEvents: 'auto',
-      }}
-    >
+    <div className="absolute top-4 right-4 md:right-[340px] z-20 pointer-events-auto">
       <button
         type="button"
         onClick={handleLocateMe}
@@ -301,8 +293,10 @@ export function MapPage() {
             center={[centerLat, centerLng]}
             zoom={12}
             scrollWheelZoom={true}
+            zoomControl={false}
             className="w-full h-full"
           >
+            <ZoomControl position="bottomleft" />
             <TileLayer
               url={tileUrl}
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -576,14 +570,14 @@ export function MapPage() {
 
       {/* 4. Mobile Bottom Sheet with 3 Detents (Section D: peek, half, full reachable via buttons) */}
       <div
-        className={`md:hidden absolute left-0 right-0 bottom-0 z-30 surface-z2 rounded-t-2xl shadow-2xl transition-transform duration-300 ${
+        className={`md:hidden absolute left-0 right-0 bottom-[60px] md:bottom-0 z-30 surface-z2 rounded-t-2xl shadow-2xl transition-transform duration-300 ${
           mobileDetent === 'peek'
-            ? 'translate-y-[calc(100%-54px)]'
+            ? 'translate-y-[calc(100%-52px)]'
             : mobileDetent === 'half'
             ? 'translate-y-[calc(100%-280px)]'
             : 'translate-y-0'
         }`}
-        style={{ maxHeight: '85vh', height: '85vh' }}
+        style={{ maxHeight: 'calc(85vh - 60px)', height: 'calc(85vh - 60px)' }}
       >
         {/* Detent Control Bar */}
         <div className="p-2 border-b border-[var(--border-subtle)] flex items-center justify-between select-none">

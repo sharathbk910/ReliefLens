@@ -11,12 +11,12 @@ export function ScoringExplainer() {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-3.5 text-left hover:bg-[var(--border-subtle)] transition-colors"
       >
-        <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-teal-400" />
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mr-2">
+          <HelpCircle className="w-4 h-4 text-teal-400 shrink-0" />
           <span className="text-xs font-semibold text-[var(--text-primary)]">
-            How Deterministic Incident Scoring Works (Ruleset v{RULESET.version})
+            How Deterministic Incident Scoring Works (v{RULESET.version})
           </span>
-          <span className="text-[10px] text-teal-300 font-mono bg-teal-950/50 border border-teal-500/30 px-1.5 py-0.5 rounded">
+          <span className="hidden sm:inline text-[10px] text-teal-300 font-mono bg-teal-950/50 border border-teal-500/30 px-1.5 py-0.5 rounded">
             Auditable Ruleset
           </span>
         </div>
