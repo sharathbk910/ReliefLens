@@ -186,29 +186,42 @@ function MiniLocateMeControl({
 }
 
 export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const lat = localStorage.getItem('relieflens_user_lat');
+        const lng = localStorage.getItem('relieflens_user_lng');
+        const acc = localStorage.getItem('relieflens_user_accuracy');
+        if (lat && lng) {
+          return {
+            lat: parseFloat(lat),
+            lng: parseFloat(lng),
+            accuracy: acc ? parseInt(acc, 10) : 50,
+          };
+        }
+      } catch (_) {}
+    }
+    return null;
+  });
 
-  // Automatically detect user location if permission is already granted, without requiring manual button click
+  // Automatically detect and update user location as soon as website/preview opens
   useEffect(() => {
     if (typeof window === 'undefined' || !navigator.geolocation) return;
 
-    if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions
-        .query({ name: 'geolocation' })
-        .then((perm) => {
-          if (perm.state === 'granted') {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                const { latitude, longitude, accuracy } = pos.coords;
-                setUserLocation({ lat: latitude, lng: longitude, accuracy: Math.round(accuracy) });
-              },
-              (err) => console.warn('Auto-locate permission check notice:', err.message),
-              { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
-            );
-          }
-        })
-        .catch((e) => console.warn('Permissions query notice:', e));
-    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        const loc = { lat: latitude, lng: longitude, accuracy: Math.round(accuracy) };
+        setUserLocation(loc);
+        try {
+          localStorage.setItem('relieflens_user_lat', latitude.toString());
+          localStorage.setItem('relieflens_user_lng', longitude.toString());
+          localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
+        } catch (_) {}
+      },
+      (err) => console.warn('Dashboard map auto-locate notice:', err.message),
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+    );
   }, []);
 
   const locatedIncidents = incidents.filter(
@@ -222,16 +235,18 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
   const tileUrl = config.map.tileUrl;
 
   const centerLat =
-    locatedIncidents.length > 0
+    userLocation?.lat ??
+    (locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.latitude!, 0) /
         locatedIncidents.length
-      : 37.7749;
+      : 37.7749);
 
   const centerLng =
-    locatedIncidents.length > 0
+    userLocation?.lng ??
+    (locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.longitude!, 0) /
         locatedIncidents.length
-      : -122.4194;
+      : -122.4194);
 
   return (
     <div className="surface-z1 rounded-2xl flex flex-col h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm">

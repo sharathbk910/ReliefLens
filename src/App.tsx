@@ -41,6 +41,26 @@ export function App() {
       } catch (e) {
         console.warn('Failed to parse URL params for gemini_key', e);
       }
+
+      // Automatically request and update user's location upon opening the website
+      if (typeof window !== 'undefined' && navigator.geolocation) {
+        try {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const { latitude, longitude, accuracy } = pos.coords;
+              localStorage.setItem('relieflens_user_lat', latitude.toString());
+              localStorage.setItem('relieflens_user_lng', longitude.toString());
+              localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
+            },
+            (err) => {
+              console.warn('Automatic location detection notice on website open:', err.message);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+          );
+        } catch (e) {
+          console.warn('Geolocation initialization error:', e);
+        }
+      }
     }
   }, []);
 

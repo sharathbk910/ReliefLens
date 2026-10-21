@@ -100,8 +100,14 @@ function getHeatCircleStyle(tier: PriorityTier) {
   return configs[tier] || configs.low;
 }
 
-// Automatically fits map bounds to actual incident marker coordinates and invalidates container size
-function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
+// Automatically fits map bounds or centers on user location upon opening
+function MapAutoInitializer({
+  incidents,
+  userLocation,
+}: {
+  incidents: Incident[];
+  userLocation: { lat: number; lng: number; accuracy: number } | null;
+}) {
   const map = useMap();
   const prevCountRef = useRef<number>(-1);
 
@@ -124,6 +130,11 @@ function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
   }, [map]);
 
   useEffect(() => {
+    if (userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 14);
+      return;
+    }
+
     const valid = incidents.filter(
       (i) =>
         typeof i.latitude === 'number' &&
@@ -145,7 +156,7 @@ function MapAutoInitializer({ incidents }: { incidents: Incident[] }) {
         map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
       }
     }
-  }, [incidents, map]);
+  }, [incidents, userLocation, map]);
 
   return null;
 }
@@ -253,7 +264,23 @@ export function MapPage() {
   const [selectedTier, setSelectedTier] = useState<PriorityTier | 'all'>('all');
   const [mapViewMode, setMapViewMode] = useState<'all' | 'pins' | 'heat'>('all');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const lat = localStorage.getItem('relieflens_user_lat');
+        const lng = localStorage.getItem('relieflens_user_lng');
+        const acc = localStorage.getItem('relieflens_user_accuracy');
+        if (lat && lng) {
+          return {
+            lat: parseFloat(lat),
+            lng: parseFloat(lng),
+            accuracy: acc ? parseInt(acc, 10) : 50,
+          };
+        }
+      } catch (_) {}
+    }
+    return null;
+  });
   const [locateRequested, setLocateRequested] = useState(0);
   
   // Mobile sheet detents: 'peek' | 'half' | 'full'
@@ -295,27 +322,12 @@ export function MapPage() {
     };
   }, []);
 
-  // Automatic geolocation check: if user already granted permission, center without extra click
+  // Automatic geolocation: immediately request and update user's location as soon as page opens
   useEffect(() => {
     if (typeof window === 'undefined' || !navigator.geolocation) return;
 
-    if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions
-        .query({ name: 'geolocation' })
-        .then((perm) => {
-          if (perm.state === 'granted') {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                const { latitude, longitude, accuracy } = pos.coords;
-                setUserLocation({ lat: latitude, lng: longitude, accuracy: Math.round(accuracy) });
-              },
-              (err) => console.warn('Auto-locate permission check notice:', err.message),
-              { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
-            );
-          }
-        })
-        .catch((e) => console.warn('Permissions query notice:', e));
-    }
+    // Immediately trigger location detection on page open
+    setLocateRequested((prev) => prev + 1);
   }, []);
 
   const locatedIncidents = incidents.filter(
@@ -332,16 +344,18 @@ export function MapPage() {
   );
 
   const centerLat =
-    locatedIncidents.length > 0
+    userLocation?.lat ??
+    (locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.latitude!, 0) /
         locatedIncidents.length
-      : 37.7749;
+      : 37.7749);
 
   const centerLng =
-    locatedIncidents.length > 0
+    userLocation?.lng ??
+    (locatedIncidents.length > 0
       ? locatedIncidents.reduce((acc, cur) => acc + cur.longitude!, 0) /
         locatedIncidents.length
-      : -122.4194;
+      : -122.4194);
 
   const handleSelectIncident = (inc: Incident) => {
     setSelectedIncident(inc);
@@ -387,7 +401,7 @@ export function MapPage() {
             />
 
             {/* Automatically adjust bounds to fit loaded incidents and invalidate container size */}
-            <MapAutoInitializer incidents={locatedIncidents} />
+            <MapAutoInitializer incidents={locatedIncidents} userLocation={userLocation} />
 
             {/* Google Maps style floating Locate Me control */}
             <LocateMeControl
