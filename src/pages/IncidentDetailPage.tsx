@@ -227,8 +227,8 @@ export function IncidentDetailPage() {
         )}
       </div>
 
-      {/* Incident Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+      {/* Incident Header (Tactical Inversa Aesthetic) */}
+      <div className="corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] rounded-xl p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-2">

@@ -17,6 +17,8 @@ interface IncidentTableProps {
   pageSize: number;
   total: number;
   onPageChange: (newPage: number) => void;
+  selectedIncidentId?: string | null;
+  onSelectIncident?: (incident: Incident) => void;
 }
 
 export function IncidentTable({
@@ -26,6 +28,8 @@ export function IncidentTable({
   pageSize,
   total,
   onPageChange,
+  selectedIncidentId,
+  onSelectIncident,
 }: IncidentTableProps) {
   const navigate = useNavigate();
   const totalPages = Math.ceil(total / pageSize);
@@ -166,12 +170,23 @@ export function IncidentTable({
             {incidents.map((incident) => {
               const hasFloorApplied = incident.score_breakdown?.floor_applied;
               const hasOverride = incident.score_override !== null;
+              const isSelected = selectedIncidentId === incident.id;
 
               return (
                 <tr
                   key={incident.id}
-                  onClick={() => navigate(`/incidents/${incident.id}`)}
-                  className="hover:bg-[var(--surface-2-solid)] transition-colors cursor-pointer group"
+                  onClick={() => {
+                    if (onSelectIncident) {
+                      onSelectIncident(incident);
+                    } else {
+                      navigate(`/incidents/${incident.id}`);
+                    }
+                  }}
+                  className={`transition-colors cursor-pointer group ${
+                    isSelected
+                      ? 'bg-[#EBFC72]/10 hover:bg-[#EBFC72]/15 border-l-2 border-l-[#EBFC72]'
+                      : 'hover:bg-[var(--surface-2-solid)]'
+                  }`}
                 >
                   {/* Priority & Score */}
                   <td className="py-3 px-3.5 align-top whitespace-nowrap">
@@ -188,6 +203,11 @@ export function IncidentTable({
                       {hasOverride && (
                         <span className="text-[10px] text-teal-400 font-mono whitespace-nowrap">
                           Manual Override
+                        </span>
+                      )}
+                      {isSelected && (
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-[#EBFC72] font-bold">
+                          ● TARGETED IN HUD
                         </span>
                       )}
                     </div>
@@ -267,11 +287,18 @@ export function IncidentTable({
                     </div>
                   </td>
 
-                  {/* Action Link (Stable, No Translate) */}
+                  {/* Action Link (Navigate to Incident Details) */}
                   <td className="py-3 px-2 align-top text-center whitespace-nowrap">
-                    <span className="inline-flex items-center justify-center text-[var(--text-muted)] group-hover:text-teal-400 transition-colors">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/incidents/${incident.id}`);
+                      }}
+                      className="p-1.5 rounded hover:bg-white/10 text-[var(--text-muted)] group-hover:text-teal-400 transition-colors"
+                      title="Open full incident record"
+                    >
                       <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
-                    </span>
+                    </button>
                   </td>
                 </tr>
               );

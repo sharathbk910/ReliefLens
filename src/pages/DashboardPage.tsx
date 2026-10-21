@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileSpreadsheet, Crosshair, Loader2 } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
@@ -7,15 +7,18 @@ import { IncidentTable } from '../components/dashboard/IncidentTable.tsx';
 import { ScoringExplainer } from '../components/dashboard/ScoringExplainer.tsx';
 import { DashboardMapPreview } from '../components/dashboard/DashboardMapPreview.tsx';
 import { DispatchExportModal } from '../components/dashboard/DispatchExportModal.tsx';
+import { TacticalDispatchControl } from '../components/dashboard/TacticalDispatchControl.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { useIncidents } from '../hooks/index.ts';
 import { useToast } from '../components/ui/Toast.tsx';
 import { dataService } from '../lib/dataService.ts';
+import type { Incident } from '../shared/types.ts';
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isSyncingLocation, setIsSyncingLocation] = useState(false);
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const toast = useToast();
 
   const {
@@ -30,7 +33,19 @@ export function DashboardPage() {
     clearFilters,
     districts,
     summary,
+    refresh,
   } = useIncidents({ pageSize: 25 });
+
+  useEffect(() => {
+    if (incidents.length > 0) {
+      if (!selectedIncident || !incidents.some((inc) => inc.id === selectedIncident.id)) {
+        const topCritical = incidents.find((inc) => inc.priority_tier === 'critical') || incidents[0];
+        setSelectedIncident(topCritical);
+      }
+    } else {
+      setSelectedIncident(null);
+    }
+  }, [incidents, selectedIncident]);
 
   const handleIndicatorClick = (id: string) => {
     if (id === 'open') {
@@ -80,43 +95,58 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      {/* Operational Header - Immediate Live Data, No Marketing Hero */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight">
-            Incident Coordination Dashboard
-          </h1>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Continuous triage with deterministic multi-factor scoring and spatial cross-referencing.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSyncToMyLocation}
-            disabled={isSyncingLocation}
-            leftIcon={
-              isSyncingLocation ? (
+      {/* Crisis Reassurance & Guidance Hero Banner */}
+      <div className="corner-cross bg-gradient-to-r from-[#171813] via-[#1b1d16] to-[#141510] border border-[#2d3024] p-4 sm:p-5 rounded-xl shadow-lg relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-full bg-[radial-gradient(ellipse_at_top_right,_rgba(235,252,114,0.06),_transparent_70%)] pointer-events-none" />
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="blinker-square" />
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#EBFC72] font-semibold">
+                DISASTER COORDINATION PROTOCOL ACTIVE
+              </span>
+              <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                // ZERO BLACK-BOX AI
+              </span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-extrabold font-heading text-white tracking-tight">
+              TRAPPED IN A DISASTER? WE COORDINATE FAST, TRANSPARENT RESCUE.
+            </h2>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Immediate distress triage for vulnerable, remote, and flood-trapped citizens. Deterministic 4-factor scoring ensures life-or-death dispatches are transparent, fast, and auditable.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={() => navigate('/report')}
+              className="px-4 py-2 rounded-lg bg-[#EBFC72] hover:bg-[#d8e860] text-black font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-1.5"
+            >
+              <span>🚨</span> SUBMIT EMERGENCY REPORT
+            </button>
+            <button
+              onClick={handleSyncToMyLocation}
+              disabled={isSyncingLocation}
+              className="px-3 py-2 rounded-lg bg-black/40 hover:bg-black/60 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5"
+            >
+              {isSyncingLocation ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
               ) : (
                 <Crosshair className="w-3.5 h-3.5 text-teal-400" />
-              )
-            }
-            className="text-xs shrink-0 border-teal-500/40 text-teal-300 hover:bg-teal-950/30 hover:border-teal-400"
-            title="Relocate registered reports to your current area"
-          >
-            {isSyncingLocation ? 'Syncing...' : 'Sync to My Location'}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsExportOpen(true)}
-            leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
-            className="text-xs shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
-          >
-            Export Manifest
-          </Button>
+              )}
+              <span>{isSyncingLocation ? 'SYNCING GPS...' : 'SYNC TO MY AREA'}</span>
+            </button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsExportOpen(true)}
+              leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
+              className="text-xs shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
+            >
+              Export Manifest
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -131,6 +161,14 @@ export function DashboardPage() {
 
       {/* Scoring Explainer Panel */}
       <ScoringExplainer />
+
+      {/* Tactical Dispatch Control HUD (Interactive Slide-to-Confirm Failsafe) */}
+      <TacticalDispatchControl
+        selectedIncident={selectedIncident}
+        onDispatchConfirmed={() => {
+          refresh();
+        }}
+      />
 
       {/* Filter Toolbar */}
       <IncidentFilters
@@ -150,6 +188,8 @@ export function DashboardPage() {
             pageSize={pageSize}
             total={total}
             onPageChange={(p) => setPage(p)}
+            selectedIncidentId={selectedIncident?.id}
+            onSelectIncident={(incident) => setSelectedIncident(incident)}
           />
         </div>
         <div className="2xl:col-span-4 min-w-0 w-full 2xl:sticky 2xl:top-4">

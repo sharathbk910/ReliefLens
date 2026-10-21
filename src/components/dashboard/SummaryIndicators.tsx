@@ -66,22 +66,22 @@ export function SummaryIndicators({
           key={ind.id}
           type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`text-left p-4 rounded-2xl surface-z1 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm hover:shadow-md hover:-translate-y-0.5`}
+          className={`text-left p-4 rounded-xl corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm hover:shadow-md hover:-translate-y-0.5`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
               {ind.label}
             </span>
-            <div className="p-1.5 rounded-lg bg-[var(--surface-2-solid)] border border-[var(--border-subtle)] group-hover:border-teal-500/30 transition-colors">
+            <div className="p-1.5 rounded-md bg-black/40 border border-white/5 group-hover:border-[#EBFC72]/40 transition-colors">
               {ind.icon}
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl md:text-3xl font-extrabold font-heading tabular-nums ${ind.countColor}`}>
+            <span className={`text-2xl md:text-3xl font-extrabold font-mono tabular-nums ${ind.countColor}`}>
               {ind.count}
             </span>
           </div>
-          <p className="text-[11px] text-[var(--text-muted)] mt-1 truncate">
+          <p className="text-[11px] font-mono text-[var(--text-muted)] mt-1 truncate">
             {ind.desc}
           </p>
         </button>

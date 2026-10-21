@@ -463,16 +463,22 @@ export function ReportFormPage() {
 
   return (
     <div className="w-full max-w-2xl mx-auto my-2 md:my-6 animate-spatial-enter">
-      {/* Presentation: Centered Sheet (Surface-Z2, max-w-640px) */}
-      <div className="surface-z2 rounded-2xl overflow-hidden shadow-2xl flex flex-col min-h-[580px]">
+      {/* Presentation: Centered Sheet (Corner Cross Tactical Aesthetic) */}
+      <div className="corner-cross bg-[#141611]/95 border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-2xl flex flex-col min-h-[580px]">
         {/* Header with Close / Cancel */}
         <div className="p-4 md:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="blinker-square" />
+              <span className="text-[10px] font-mono text-[#EBFC72] uppercase tracking-widest font-bold">
+                EMERGENCY INGESTION PROTOCOL
+              </span>
+            </div>
             <h1 className="text-base md:text-lg font-bold font-heading text-[var(--text-primary)]">
-              New Incident Observation Report
+              Disaster Incident Observation Report
             </h1>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              Submit disaster observations via voice or manual entry.
+              Rapid ingestion via AI voice extraction, live GPS telemetry, or manual field entry.
             </p>
           </div>
           <button
