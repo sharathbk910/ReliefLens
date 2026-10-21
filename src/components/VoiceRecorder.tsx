@@ -16,6 +16,7 @@ import { Button } from './ui/Button.tsx';
 import { Badge } from './ui/Badge.tsx';
 import { AudioWaveform } from './voice/AudioWaveform.tsx';
 import { dataService } from '../lib/dataService.ts';
+import { config } from '../config/env.ts';
 import type { VoiceExtractionResult } from '../shared/types.ts';
 
 export type VoiceRecorderState =
@@ -50,12 +51,7 @@ export function VoiceRecorder({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [hasGeminiKey] = useState(() => {
-    return (
-      Boolean(typeof window !== 'undefined' && localStorage.getItem('relieflens_gemini_key')) ||
-      Boolean(import.meta.env.VITE_GEMINI_API_KEY)
-    );
-  });
+  const [hasGeminiKey] = useState(() => config.ai.hasClientKey);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);

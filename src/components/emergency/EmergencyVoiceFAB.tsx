@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mic, X, Radio, ArrowRight, Sparkles } from 'lucide-react';
-import { VoiceRecorder } from '../VoiceRecorder.tsx';
+import { VoiceRecorder } from '../voice/index.ts';
 import type { VoiceExtractionResult } from '../../shared/types.ts';
 
 export function EmergencyVoiceFAB() {

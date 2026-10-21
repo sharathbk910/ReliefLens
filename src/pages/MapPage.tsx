@@ -23,6 +23,7 @@ import { dataService } from '../lib/dataService.ts';
 import type { Incident, PriorityTier } from '../shared/types.ts';
 import { PriorityBadge, StatusBadge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
+import { config } from '../config/env.ts';
 
 function createCustomMarkerIcon(tier: PriorityTier) {
   const colors: Record<PriorityTier, string> = {
@@ -238,9 +239,7 @@ export function MapPage() {
   // Mobile sheet detents: 'peek' | 'half' | 'full'
   const [mobileDetent, setMobileDetent] = useState<'peek' | 'half' | 'full'>('peek');
 
-  const tileUrl =
-    import.meta.env.VITE_MAP_TILE_URL ||
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileUrl = config.map.tileUrl;
 
   const fetchIncidents = async (silent = false) => {
     if (!silent) setIsLoading(true);

@@ -13,6 +13,8 @@ import { MapPage } from './pages/MapPage.tsx';
 import { AuditPage } from './pages/AuditPage.tsx';
 import { NotFoundPage } from './pages/NotFoundPage.tsx';
 
+import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -45,25 +47,27 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Auth Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
+        <ErrorBoundary>
+          <BrowserRouter>
+            <Routes>
+              {/* Public Auth Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
 
-            {/* Authenticated Application Shell */}
-            <Route element={<AppShell />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/incidents/:id" element={<IncidentDetailPage />} />
-              <Route path="/reports/new" element={<ReportFormPage />} />
-              <Route path="/duplicates" element={<DuplicatesPage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/audit" element={<AuditPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+              {/* Authenticated Application Shell */}
+              <Route element={<AppShell />}>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/incidents/:id" element={<IncidentDetailPage />} />
+                <Route path="/reports/new" element={<ReportFormPage />} />
+                <Route path="/duplicates" element={<DuplicatesPage />} />
+                <Route path="/map" element={<MapPage />} />
+                <Route path="/audit" element={<AuditPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ErrorBoundary>
       </ToastProvider>
     </QueryClientProvider>
   );

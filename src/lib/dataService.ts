@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase.ts';
+import { config } from '../config/env.ts';
 import type {
   AuditLogEntry,
   DuplicateCandidate,
@@ -116,7 +117,7 @@ async function callGeminiDirectly(
   mimeType: string,
   apiKey: string
 ): Promise<VoiceExtractionResult> {
-  const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
+  const model = config.ai.model;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const prompt = `You are the ReliefLens Emergency Multilingual Report Assistant.
@@ -1063,9 +1064,7 @@ export const dataService = {
     }
 
     // 2. Direct Gemini API call if configured in browser localStorage or environment
-    const clientGeminiKey =
-      (typeof window !== 'undefined' ? localStorage.getItem('relieflens_gemini_key') : null) ||
-      import.meta.env.VITE_GEMINI_API_KEY;
+    const clientGeminiKey = config.ai.apiKey;
     if (clientGeminiKey && typeof clientGeminiKey === 'string' && clientGeminiKey.trim() !== '') {
       try {
         return await callGeminiDirectly(audioBase64, mimeType, clientGeminiKey.trim());

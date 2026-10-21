@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileSpreadsheet } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
@@ -8,133 +8,33 @@ import { ScoringExplainer } from '../components/dashboard/ScoringExplainer.tsx';
 import { DashboardMapPreview } from '../components/dashboard/DashboardMapPreview.tsx';
 import { DispatchExportModal } from '../components/dashboard/DispatchExportModal.tsx';
 import { Button } from '../components/ui/Button.tsx';
-import { dataService } from '../lib/dataService.ts';
-import type {
-  Incident,
-  IncidentStatus,
-  IncidentType,
-  PriorityTier,
-} from '../shared/types.ts';
+import { useIncidents } from '../hooks/index.ts';
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  const [incidents, setIncidents] = useState<Incident[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(25);
-  const [isLoading, setIsLoading] = useState(true);
   const [isExportOpen, setIsExportOpen] = useState(false);
 
-  // Summary Metrics
-  const [summary, setSummary] = useState({
-    openIncidents: 0,
-    criticalHigh: 0,
-    unresolvedUncertainty: 0,
-    pendingDuplicates: 0,
-  });
-
-  // Filter State
-  const [filters, setFilters] = useState<{
-    search: string;
-    status: IncidentStatus | 'all';
-    incidentType: IncidentType | 'all';
-    priorityTier: PriorityTier | 'all';
-    district: string | 'all';
-    hasUncertainty: boolean;
-    sortBy: 'effective_score' | 'last_reported_at';
-    sortOrder: 'asc' | 'desc';
-  }>({
-    search: '',
-    status: 'all',
-    incidentType: 'all',
-    priorityTier: 'all',
-    district: 'all',
-    hasUncertainty: false,
-    sortBy: 'effective_score',
-    sortOrder: 'desc',
-  });
-
-  const [districts, setDistricts] = useState<string[]>([]);
-
-  // Load Data
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [incidentRes, summaryRes] = await Promise.all([
-        dataService.getIncidents({
-          ...filters,
-          page,
-          pageSize,
-        }),
-        dataService.getDashboardSummary(),
-      ]);
-
-      setIncidents(incidentRes.incidents);
-      setTotal(incidentRes.total);
-      setSummary(summaryRes);
-
-      // Extract unique districts
-      const allIncidents = await dataService.getIncidents({ pageSize: 500 });
-      const uniqueDistricts = Array.from(
-        new Set(
-          allIncidents.incidents
-            .map((i) => i.district)
-            .filter((d): d is string => Boolean(d))
-        )
-      ).sort();
-      setDistricts(uniqueDistricts);
-    } catch (err) {
-      console.error('Failed to load dashboard data', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filters, page, pageSize]);
-
-  useEffect(() => {
-    loadData();
-
-    // 1. Subscribe to real-time incident changes (localDB and Supabase)
-    const unsubscribe = dataService.subscribeToIncidents(() => {
-      loadData();
-    });
-
-    // 2. Periodic background refresh (every 25 seconds) to ensure fresh data
-    const refreshInterval = setInterval(() => {
-      loadData();
-    }, 25000);
-
-    return () => {
-      unsubscribe();
-      clearInterval(refreshInterval);
-    };
-  }, [loadData]);
-
-  const handleFilterChange = (updated: Partial<typeof filters>) => {
-    setFilters((prev) => ({ ...prev, ...updated }));
-    setPage(1); // Reset to page 1 on filter change
-  };
-
-  const handleClearFilters = () => {
-    setFilters({
-      search: '',
-      status: 'all',
-      incidentType: 'all',
-      priorityTier: 'all',
-      district: 'all',
-      hasUncertainty: false,
-      sortBy: 'effective_score',
-      sortOrder: 'desc',
-    });
-    setPage(1);
-  };
+  const {
+    incidents,
+    total,
+    page,
+    setPage,
+    pageSize,
+    isLoading,
+    filters,
+    updateFilters,
+    clearFilters,
+    districts,
+    summary,
+  } = useIncidents({ pageSize: 25 });
 
   const handleIndicatorClick = (id: string) => {
     if (id === 'open') {
-      handleFilterChange({ status: 'new' });
+      updateFilters({ status: 'new' });
     } else if (id === 'critical') {
-      handleFilterChange({ priorityTier: 'critical' });
+      updateFilters({ priorityTier: 'critical' });
     } else if (id === 'uncertainty') {
-      handleFilterChange({ hasUncertainty: true });
+      updateFilters({ hasUncertainty: true });
     } else if (id === 'duplicates') {
       navigate('/duplicates');
     }
@@ -179,9 +79,9 @@ export function DashboardPage() {
 
       {/* Filter Toolbar */}
       <IncidentFilters
-        filters={filters}
-        onChange={handleFilterChange}
-        onClear={handleClearFilters}
+        filters={filters as any}
+        onChange={updateFilters}
+        onClear={clearFilters}
         districts={districts}
       />
 

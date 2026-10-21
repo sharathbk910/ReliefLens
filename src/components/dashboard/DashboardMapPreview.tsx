@@ -6,6 +6,7 @@ import { MapPin, ArrowRight, ExternalLink, Crosshair, Loader2 } from 'lucide-rea
 import type { Incident, PriorityTier } from '../../shared/types.ts';
 import { PriorityBadge, StatusBadge } from '../ui/Badge.tsx';
 import { useToast } from '../ui/Toast.tsx';
+import { config } from '../../config/env.ts';
 
 interface DashboardMapPreviewProps {
   incidents: Incident[];
@@ -218,9 +219,7 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
       !isNaN(i.longitude)
   );
 
-  const tileUrl =
-    import.meta.env.VITE_MAP_TILE_URL ||
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileUrl = config.map.tileUrl;
 
   const centerLat =
     locatedIncidents.length > 0

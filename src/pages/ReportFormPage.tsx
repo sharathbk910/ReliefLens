@@ -26,10 +26,8 @@ import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
 import type { VulnerabilityFlag, VoiceExtractionResult, PriorityTier } from '../shared/types.ts';
-import { VoiceRecorder } from '../components/VoiceRecorder.tsx';
-import { EditableExtractionPreview } from '../components/EditableExtractionPreview.tsx';
-import { CurrentLocationControl, type DetectedLocation } from '../components/CurrentLocationControl.tsx';
-import { LiveLocationControl } from '../components/LiveLocationControl.tsx';
+import { VoiceRecorder, EditableExtractionPreview } from '../components/voice/index.ts';
+import { CurrentLocationControl, LiveLocationControl, type DetectedLocation } from '../components/location/index.ts';
 
 type FormStep = 'input' | 'review' | 'location' | 'confirm';
 
