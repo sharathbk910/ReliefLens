@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, MapPin, Users, CopyCheck, ArrowRight, ShieldCheck, Target, ChevronRight } from 'lucide-react';
 import type { Incident } from '../../shared/types.ts';
+import { calculateHaversineMeters } from '../../shared/duplicate.ts';
 import {
   PriorityBadge,
   StatusBadge,
@@ -28,6 +29,35 @@ export function IncidentTable({
 }: IncidentTableProps) {
   const navigate = useNavigate();
   const totalPages = Math.ceil(total / pageSize);
+
+  const userLocation = React.useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const lat = localStorage.getItem('relieflens_user_lat');
+      const lng = localStorage.getItem('relieflens_user_lng');
+      if (lat && lng) {
+        return { lat: parseFloat(lat), lng: parseFloat(lng) };
+      }
+    } catch (_) {}
+    return null;
+  }, []);
+
+  const getDistanceText = (lat?: number | null, lng?: number | null) => {
+    if (
+      !userLocation ||
+      typeof lat !== 'number' ||
+      typeof lng !== 'number' ||
+      isNaN(lat) ||
+      isNaN(lng)
+    ) {
+      return null;
+    }
+    const meters = calculateHaversineMeters(userLocation.lat, userLocation.lng, lat, lng);
+    if (meters < 1000) {
+      return `${Math.round(meters)}m away`;
+    }
+    return `${(meters / 1000).toFixed(1)} km away`;
+  };
 
   const formatTimeAgo = (isoString: string) => {
     const diffMs = Date.now() - new Date(isoString).getTime();
@@ -91,10 +121,17 @@ export function IncidentTable({
                 <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0" strokeWidth={1.5} />
                 <span className="truncate">{incident.district || incident.location_text || 'No Location'}</span>
               </span>
-              <span className="flex items-center gap-1 tabular-nums shrink-0 font-mono text-[10px]">
-                <Clock className="w-3 h-3 text-[var(--text-muted)]" strokeWidth={1.5} />
-                {formatTimeAgo(incident.last_reported_at)}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                {getDistanceText(incident.latitude, incident.longitude) && (
+                  <span className="text-[10px] text-teal-400 font-mono font-medium">
+                    📍 {getDistanceText(incident.latitude, incident.longitude)}
+                  </span>
+                )}
+                <span className="flex items-center gap-1 tabular-nums font-mono text-[10px]">
+                  <Clock className="w-3 h-3 text-[var(--text-muted)]" strokeWidth={1.5} />
+                  {formatTimeAgo(incident.last_reported_at)}
+                </span>
+              </div>
             </div>
           </div>
         ))}
@@ -176,10 +213,17 @@ export function IncidentTable({
                   <td className="py-3 px-3.5 align-top overflow-hidden">
                     <div className="flex items-start gap-1 text-[var(--text-primary)]">
                       <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" strokeWidth={1.5} />
-                      <div className="truncate">
-                        <p className="font-medium text-[var(--text-primary)] truncate">
-                          {incident.district || 'Unassigned District'}
-                        </p>
+                      <div className="truncate w-full">
+                        <div className="flex items-center justify-between gap-1 truncate">
+                          <p className="font-medium text-[var(--text-primary)] truncate">
+                            {incident.district || 'Unassigned District'}
+                          </p>
+                          {getDistanceText(incident.latitude, incident.longitude) && (
+                            <span className="text-[10px] text-teal-400 font-mono font-medium shrink-0">
+                              📍 {getDistanceText(incident.latitude, incident.longitude)}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[11px] text-[var(--text-muted)] truncate">
                           {incident.location_text || 'No text location'}
                         </p>

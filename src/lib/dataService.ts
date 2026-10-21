@@ -19,6 +19,7 @@ import { calculateIncidentScore, getPriorityTier } from '../shared/scoring.ts';
 import {
   evaluateDuplicatePair,
   findDuplicateSuggestions,
+  calculateHaversineMeters,
 } from '../shared/duplicate.ts';
 import { generateSeedDataset, SEED_PROFILES } from '../data/seedData.ts';
 import type {
@@ -271,6 +272,8 @@ export const dataService = {
     sortOrder?: 'asc' | 'desc';
     page?: number;
     pageSize?: number;
+    maxDistanceKm?: number | 'all';
+    userLocation?: { lat: number; lng: number } | null;
   }): Promise<{ incidents: Incident[]; total: number; page: number; pageSize: number }> {
     const {
       search = '',
@@ -283,6 +286,8 @@ export const dataService = {
       sortOrder = 'desc',
       page = 1,
       pageSize = 25,
+      maxDistanceKm = 'all',
+      userLocation = null,
     } = params;
 
     let items = [...localDB.incidents];
@@ -321,6 +326,27 @@ export const dataService = {
 
     if (hasUncertainty) {
       items = items.filter((i) => i.uncertainty_flags && i.uncertainty_flags.length > 0);
+    }
+
+    // Proximity / Within Range Filter
+    if (typeof maxDistanceKm === 'number' && maxDistanceKm > 0 && userLocation) {
+      items = items.filter((i) => {
+        if (
+          typeof i.latitude !== 'number' ||
+          typeof i.longitude !== 'number' ||
+          isNaN(i.latitude) ||
+          isNaN(i.longitude)
+        ) {
+          return false;
+        }
+        const distMeters = calculateHaversineMeters(
+          userLocation.lat,
+          userLocation.lng,
+          i.latitude,
+          i.longitude
+        );
+        return distMeters <= maxDistanceKm * 1000;
+      });
     }
 
     // Sort

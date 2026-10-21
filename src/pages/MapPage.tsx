@@ -18,8 +18,10 @@ import {
   Flame,
   Crosshair,
   Loader2,
+  Compass,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
+import { calculateHaversineMeters } from '../shared/duplicate.ts';
 import type { Incident, PriorityTier } from '../shared/types.ts';
 import { PriorityBadge, StatusBadge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
@@ -262,6 +264,7 @@ export function MapPage() {
   const [error, setError] = useState<string | null>(null);
   const [tileError, setTileError] = useState(false);
   const [selectedTier, setSelectedTier] = useState<PriorityTier | 'all'>('all');
+  const [selectedRadiusKm, setSelectedRadiusKm] = useState<number | null>(null);
   const [mapViewMode, setMapViewMode] = useState<'all' | 'pins' | 'heat'>('all');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(() => {
@@ -330,14 +333,32 @@ export function MapPage() {
     setLocateRequested((prev) => prev + 1);
   }, []);
 
-  const locatedIncidents = incidents.filter(
-    (i) =>
+  const locatedIncidents = incidents.filter((i) => {
+    const hasCoords =
       typeof i.latitude === 'number' &&
       typeof i.longitude === 'number' &&
       !isNaN(i.latitude) &&
-      !isNaN(i.longitude) &&
-      (selectedTier === 'all' || i.priority_tier === selectedTier)
-  );
+      !isNaN(i.longitude);
+    if (!hasCoords) return false;
+
+    if (selectedTier !== 'all' && i.priority_tier !== selectedTier) {
+      return false;
+    }
+
+    if (selectedRadiusKm !== null && userLocation) {
+      const distMeters = calculateHaversineMeters(
+        userLocation.lat,
+        userLocation.lng,
+        i.latitude!,
+        i.longitude!
+      );
+      if (distMeters > selectedRadiusKm * 1000) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const unlocatedIncidents = incidents.filter(
     (i) => i.latitude === null || i.longitude === null
@@ -442,6 +463,21 @@ export function MapPage() {
                     weight: 1.5,
                   }}
                 />
+
+                {/* Range Perimeter Radius Circle */}
+                {selectedRadiusKm && (
+                  <Circle
+                    center={[userLocation.lat, userLocation.lng]}
+                    radius={selectedRadiusKm * 1000}
+                    pathOptions={{
+                      color: '#0d9488',
+                      fillColor: '#14b8a6',
+                      fillOpacity: 0.08,
+                      weight: 2,
+                      dashArray: '6, 6',
+                    }}
+                  />
+                )}
               </>
             )}
 
@@ -487,6 +523,11 @@ export function MapPage() {
                       </div>
                       <h4 className="font-semibold text-white leading-tight">{inc.title}</h4>
                       <p className="text-[11px] text-slate-300">{inc.district || inc.location_text}</p>
+                      {userLocation && (
+                        <p className="text-[10px] text-teal-400 font-mono font-medium">
+                          📍 {(calculateHaversineMeters(userLocation.lat, userLocation.lng, inc.latitude!, inc.longitude!) / 1000).toFixed(1)} km from your position
+                        </p>
+                      )}
                       <p className="font-mono text-[10px] text-slate-400 tabular-nums">
                         {inc.latitude?.toFixed(4)}, {inc.longitude?.toFixed(4)}
                       </p>
@@ -603,6 +644,25 @@ export function MapPage() {
           </select>
         </div>
 
+        {/* Proximity / Within Range Filter */}
+        <div className="flex items-center gap-1.5 text-xs">
+          <Compass className="w-3.5 h-3.5 text-teal-400 shrink-0" strokeWidth={1.5} />
+          <select
+            value={selectedRadiusKm ?? 'all'}
+            onChange={(e) =>
+              setSelectedRadiusKm(e.target.value === 'all' ? null : Number(e.target.value))
+            }
+            aria-label="Filter incidents within range of your current location"
+            className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-md px-2 py-1 text-xs text-[var(--text-primary)] focus-visible:ring-1 cursor-pointer"
+          >
+            <option value="all">Range: All Distances</option>
+            <option value={5}>Within 5 km of Me</option>
+            <option value={10}>Within 10 km of Me</option>
+            <option value={25}>Within 25 km of Me</option>
+            <option value={50}>Within 50 km of Me</option>
+          </select>
+        </div>
+
         {/* Legend */}
         <div className="pt-2 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-1 text-[10px] text-[var(--text-secondary)]">
           <div className="flex items-center gap-1.5">
@@ -654,8 +714,15 @@ export function MapPage() {
                 <p className="text-xs text-[var(--text-secondary)] mt-1">{selectedIncident.location_text || selectedIncident.district || 'Incident details logged.'}</p>
               </div>
               <div className="p-2 rounded-lg bg-[var(--border-subtle)] text-xs space-y-1">
-                <p className="text-[var(--text-primary)] font-medium">📍 {selectedIncident.district || 'Unassigned District'}</p>
-                <p className="text-[var(--text-muted)]">{selectedIncident.location_text}</p>
+                <div className="flex items-center justify-between gap-1">
+                  <p className="text-[var(--text-primary)] font-medium truncate">📍 {selectedIncident.district || 'Unassigned District'}</p>
+                  {userLocation && selectedIncident.latitude && selectedIncident.longitude && (
+                    <span className="text-[10px] text-teal-400 font-mono font-medium shrink-0">
+                      {(calculateHaversineMeters(userLocation.lat, userLocation.lng, selectedIncident.latitude, selectedIncident.longitude) / 1000).toFixed(1)} km away
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-[var(--text-muted)]">{selectedIncident.location_text}</p>
                 <p className="font-mono text-[10px] text-[var(--text-muted)] tabular-nums">
                   Lat: {selectedIncident.latitude?.toFixed(4)}, Lng: {selectedIncident.longitude?.toFixed(4)}
                 </p>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, X, ArrowUpDown, ChevronDown } from 'lucide-react';
+import { Search, Filter, X, ArrowUpDown, ChevronDown, Compass } from 'lucide-react';
 import type { IncidentStatus, IncidentType, PriorityTier } from '../../shared/types.ts';
 
 interface FiltersState {
@@ -11,6 +11,7 @@ interface FiltersState {
   hasUncertainty: boolean;
   sortBy: 'effective_score' | 'last_reported_at';
   sortOrder: 'asc' | 'desc';
+  maxDistanceKm?: number | 'all';
 }
 
 interface IncidentFiltersProps {
@@ -34,7 +35,8 @@ export function IncidentFilters({
     filters.incidentType !== 'all' ||
     filters.priorityTier !== 'all' ||
     filters.district !== 'all' ||
-    filters.hasUncertainty;
+    filters.hasUncertainty ||
+    (filters.maxDistanceKm !== undefined && filters.maxDistanceKm !== 'all');
 
   return (
     <div className="surface-z1 border border-[var(--border-subtle)] rounded-2xl p-3.5 mb-4 shadow-sm">
@@ -103,6 +105,27 @@ export function IncidentFilters({
           <option value="shelter_request">Shelter Request</option>
           <option value="other">Other</option>
         </select>
+
+        {/* Proximity / Within Range Filter */}
+        <div className="flex items-center gap-1.5 bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2 py-1.5 text-xs text-[var(--text-primary)]">
+          <Compass className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+          <select
+            value={filters.maxDistanceKm ?? 'all'}
+            onChange={(e) =>
+              onChange({
+                maxDistanceKm: e.target.value === 'all' ? 'all' : Number(e.target.value),
+              })
+            }
+            aria-label="Filter incidents within range of your current location"
+            className="bg-transparent text-xs text-[var(--text-primary)] focus:outline-none cursor-pointer"
+          >
+            <option value="all" className="bg-slate-900 text-white">Range: All Distances</option>
+            <option value={5} className="bg-slate-900 text-white">Within 5 km of Me</option>
+            <option value={10} className="bg-slate-900 text-white">Within 10 km of Me</option>
+            <option value={25} className="bg-slate-900 text-white">Within 25 km of Me</option>
+            <option value={50} className="bg-slate-900 text-white">Within 50 km of Me</option>
+          </select>
+        </div>
 
         {/* Toggle Uncertainty Filter */}
         <button

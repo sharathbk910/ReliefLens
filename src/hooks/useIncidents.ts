@@ -11,6 +11,7 @@ export interface IncidentFiltersState {
   hasUncertainty?: boolean;
   sortBy?: 'effective_score' | 'last_reported_at';
   sortOrder?: 'asc' | 'desc';
+  maxDistanceKm?: number | 'all';
 }
 
 export interface UseIncidentsOptions {
@@ -34,6 +35,7 @@ export function useIncidents(options: UseIncidentsOptions = {}) {
       hasUncertainty: false,
       sortBy: 'effective_score',
       sortOrder: 'desc',
+      maxDistanceKm: 'all',
     },
   } = options;
 
@@ -55,15 +57,25 @@ export function useIncidents(options: UseIncidentsOptions = {}) {
     if (!silent) setIsLoading(true);
     setError(null);
 
+    let userLoc: { lat: number; lng: number } | null = null;
+    if (typeof window !== 'undefined') {
+      const latStr = localStorage.getItem('relieflens_user_lat');
+      const lngStr = localStorage.getItem('relieflens_user_lng');
+      if (latStr && lngStr) {
+        userLoc = { lat: parseFloat(latStr), lng: parseFloat(lngStr) };
+      }
+    }
+
     try {
       const [incidentRes, summaryRes, allIncidentsRes] = await Promise.all([
         dataService.getIncidents({
           ...filters,
+          userLocation: userLoc,
           page,
           pageSize,
         }),
         dataService.getDashboardSummary(),
-        dataService.getIncidents({ pageSize: 500 }),
+        dataService.getIncidents({ pageSize: 500, userLocation: userLoc }),
       ]);
 
       setIncidents(incidentRes.incidents);
