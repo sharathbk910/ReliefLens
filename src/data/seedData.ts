@@ -50,8 +50,8 @@ export function generateSeedDataset(options?: {
   baseLng?: number;
 }) {
   const baseTime = new Date('2026-10-20T10:00:00Z').getTime();
-  const targetBaseLat = options?.baseLat ?? 37.7749;
-  const targetBaseLng = options?.baseLng ?? -122.4194;
+  const targetBaseLat = options?.baseLat ?? 12.9716;
+  const targetBaseLng = options?.baseLng ?? 77.5946;
   const deltaLat = targetBaseLat - 37.7749;
   const deltaLng = targetBaseLng - (-122.4194);
 
@@ -817,9 +817,25 @@ export function generateSeedDataset(options?: {
       asOf: new Date(baseTime),
     });
 
+    const typeLabels: Record<string, string> = {
+      flood: 'Flash Flood & Inundation',
+      structure_collapse: 'Structural Collapse',
+      fire: 'Fire Outbreak',
+      medical_emergency: 'Medical Emergency',
+      shelter_request: 'Relief & Shelter Request',
+      water_shortage: 'Critical Water Shortage',
+      food_shortage: 'Emergency Ration Shortage',
+      power_outage: 'Critical Power Outage',
+      landslide: 'Landslide & Slope Failure',
+      earthquake: 'Seismic Tremor & Structural Distress',
+      hazardous_material: 'Hazardous Chemical Incident',
+      other: 'Emergency Incident',
+    };
+    const formattedType = typeLabels[spec.type] || spec.type.replace(/_/g, ' ');
+
     const incident: Incident = {
       id: incidentId,
-      title: `${spec.type.toUpperCase()} in ${spec.dist}: ${spec.loc}`,
+      title: `${formattedType} – ${spec.dist} (${spec.loc})`,
       incident_type: spec.type,
       status: 'new',
       district: spec.dist,

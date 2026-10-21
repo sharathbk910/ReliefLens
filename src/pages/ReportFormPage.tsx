@@ -28,6 +28,7 @@ import { useToast } from '../components/ui/Toast.tsx';
 import type { VulnerabilityFlag, VoiceExtractionResult, PriorityTier } from '../shared/types.ts';
 import { VoiceRecorder, EditableExtractionPreview } from '../components/voice/index.ts';
 import { CurrentLocationControl, LiveLocationControl, type DetectedLocation } from '../components/location/index.ts';
+import { RealisticScenarioTemplates, type RealisticTemplate } from '../components/report/RealisticScenarioTemplates.tsx';
 
 type FormStep = 'input' | 'review' | 'location' | 'confirm';
 
@@ -82,6 +83,59 @@ export function ReportFormPage() {
         placeName: extraction.district || extraction.locationText,
       });
     }
+  };
+
+  const handleSelectRealisticTemplate = (tmpl: RealisticTemplate) => {
+    let lat = 12.9716 + tmpl.latOffset;
+    let lng = 77.5946 + tmpl.lngOffset;
+
+    if (typeof window !== 'undefined') {
+      const savedLat = localStorage.getItem('relieflens_user_lat');
+      const savedLng = localStorage.getItem('relieflens_user_lng');
+      if (savedLat && savedLng) {
+        lat = parseFloat(savedLat) + tmpl.latOffset;
+        lng = parseFloat(savedLng) + tmpl.lngOffset;
+      }
+    }
+
+    const finalLat = Number(lat.toFixed(6));
+    const finalLng = Number(lng.toFixed(6));
+
+    setValue('incident_type', tmpl.incidentType);
+    setValue('description', tmpl.description);
+    setValue('original_transcript', tmpl.originalTranscript);
+    setValue('normalized_description', tmpl.description);
+    setValue('detected_language', 'English (Emergency Call)');
+    setValue('location_text', tmpl.locationText);
+    setValue('district', tmpl.district);
+    setValue('people_at_risk_estimate', tmpl.peopleAtRiskEstimate);
+    setValue('immediate_danger', tmpl.immediateDanger);
+    setValue('vulnerability_flags', tmpl.vulnerabilityFlags);
+    setValue('contact_name', tmpl.contactName);
+    setValue('contact_phone', tmpl.contactPhone);
+    setValue('latitude', finalLat);
+    setValue('longitude', finalLng);
+    setValue('location_precision', 'exact');
+    setValue('location_source', 'gps');
+    setValue('user_confirmed_incident_location', true);
+
+    setDetectedLocation({
+      latitude: finalLat,
+      longitude: finalLng,
+      accuracy: 15,
+      capturedAt: new Date().toISOString(),
+      isConfirmedIncidentLocation: true,
+      district: tmpl.district,
+      locationText: tmpl.locationText,
+      placeName: tmpl.locationText,
+    });
+
+    toast.success(
+      'Loaded Real Emergency Scenario',
+      `"${tmpl.title}" populated with authentic field observations and coordinates.`
+    );
+
+    setActiveStep('review');
   };
 
   // If navigated with prefilled voice extraction from EmergencyVoiceFAB
@@ -457,6 +511,9 @@ export function ReportFormPage() {
             {/* STEP 1: INPUT */}
             {activeStep === 'input' && (
               <div className="space-y-4 animate-spatial-enter">
+                {/* 1-Click Real Emergency Incident Templates */}
+                <RealisticScenarioTemplates onSelectTemplate={handleSelectRealisticTemplate} />
+
                 {/* Method Switcher */}
                 <div className="flex items-center gap-2 p-1 bg-[var(--surface-1-solid)] border border-[var(--border-subtle)] rounded-xl">
                   <button

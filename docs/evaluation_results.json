@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-21T11:37:09.223Z",
+  "timestamp": "2026-10-21T11:50:32.921Z",
   "dataset_size": {
     "total_reports": 65,
     "total_incidents": 65,
@@ -25,7 +25,7 @@
         "score": 0.538,
         "reasons": [
           "Same incident type (shelter_request)",
-          "Locations within 48 meters (full match)",
+          "Locations within 49 meters (full match)",
           "Reports received 20 minutes apart"
         ]
       },
@@ -39,7 +39,7 @@
         "score": 0.53,
         "reasons": [
           "Same incident type (flood)",
-          "Locations within 38 meters (full match)",
+          "Locations within 40 meters (full match)",
           "Reports received 20 minutes apart"
         ]
       }

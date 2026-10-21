@@ -29,7 +29,7 @@ import type {
   UpdateIncidentStatusInput,
 } from '../shared/schemas.ts';
 
-const STORAGE_KEY = 'relieflens_sandbox_db_v1';
+const STORAGE_KEY = 'relieflens_sandbox_db_v2';
 
 interface LocalDB {
   profiles: Profile[];
