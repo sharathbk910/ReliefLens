@@ -384,7 +384,7 @@ drop policy if exists "Coordinators and admins can insert overrides" on public.p
 create policy "Coordinators and admins can insert overrides"
   on public.priority_overrides for insert
   to authenticated
-  using (public.current_user_role() in ('coordinator', 'admin'));
+  with check (public.current_user_role() in ('coordinator', 'admin'));
 
 -- Audit Log Policies
 drop policy if exists "Admins can view audit log" on public.audit_log;
