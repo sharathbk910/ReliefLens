@@ -8,6 +8,8 @@ import { ScoringExplainer } from '../components/dashboard/ScoringExplainer.tsx';
 import { DashboardMapPreview } from '../components/dashboard/DashboardMapPreview.tsx';
 import { DispatchExportModal } from '../components/dashboard/DispatchExportModal.tsx';
 import { TacticalDispatchControl } from '../components/dashboard/TacticalDispatchControl.tsx';
+import { EmergencyHeroActionBanner } from '../components/dashboard/EmergencyHeroActionBanner.tsx';
+import { EmergencyHelplineWidget } from '../components/dashboard/EmergencyHelplineWidget.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { useIncidents } from '../hooks/index.ts';
 import { useToast } from '../components/ui/Toast.tsx';
@@ -95,34 +97,31 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="space-y-3.5 sm:space-y-4 animate-fade-in">
-      {/* Executive Command Header */}
+    <div className="space-y-4 animate-fade-in">
+      {/* 1. Immediate Crisis Action Hero Banner */}
+      <EmergencyHeroActionBanner
+        onSyncLocation={handleSyncToMyLocation}
+        isSyncingLocation={isSyncingLocation}
+      />
+
+      {/* 2. Executive Command Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-[var(--border-subtle)]">
         <div>
           <div className="flex items-center gap-2">
             <span className="blinker-square" />
-            <h1 className="text-base sm:text-lg md:text-xl font-bold font-heading text-white tracking-tight">
-              Incident Command Center
-            </h1>
+            <h2 className="text-base sm:text-lg font-bold font-heading text-white tracking-tight">
+              Emergency Rescue & Response Center
+            </h2>
             <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EBFC72]/15 text-[#EBFC72] border border-[#EBFC72]/30 shrink-0">
-              Live Triage
+              Live Crisis Feed
             </span>
           </div>
           <p className="text-[11px] sm:text-xs text-[var(--text-muted)] font-mono mt-0.5 leading-snug">
-            Deterministic 4-factor scoring • Fast and auditable emergency response
+            Prioritizing life-safety, trapped victims, and urgent medical needs
           </p>
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0">
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
-            className="flex-1 sm:flex-none justify-center px-2.5 sm:px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-            title="Open Multilingual Voice Emergency Assistant"
-          >
-            <Mic className="w-3.5 h-3.5 text-rose-400" />
-            <span>Voice SOS</span>
-          </button>
           <button
             type="button"
             onClick={handleSyncToMyLocation}
@@ -150,26 +149,26 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Live Tactical Response Telemetry Strip */}
+      {/* 3. Live Tactical Response Status Strip */}
       <div className="surface-z1 px-3 sm:px-3.5 py-2 rounded-xl flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono border border-[var(--border-subtle)] bg-[#12130f]/90">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span className="font-bold">LIVE TELEMETRY</span>
+            <span className="font-bold">ACTIVE RESCUE DISPATCH</span>
           </div>
           <span className="text-[var(--text-muted)]">•</span>
           <span className="text-[var(--text-secondary)]">24/7 HUMAN RESCUE COORDINATION</span>
           <span className="text-[var(--text-muted)] hidden md:inline">•</span>
-          <span className="text-amber-300 font-semibold hidden md:inline">SAFETY FLOOR (45 PTS)</span>
+          <span className="text-amber-300 font-semibold hidden md:inline">CRITICAL LIFE PROTECTION ACTIVE</span>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 text-[var(--text-muted)]">
           <span>RULESET: v1.0.0</span>
           <span>•</span>
-          <span className="text-[#EBFC72] font-semibold">FAILSAFE ACTIVE</span>
+          <span className="text-[#EBFC72] font-semibold">24/7 COORDINATION ACTIVE</span>
         </div>
       </div>
 
-      {/* 4 Summary Indicators (Surface-Z1) */}
+      {/* 4. 4 Summary Indicators (Surface-Z1) */}
       <SummaryIndicators
         openIncidents={summary.openIncidents}
         criticalHigh={summary.criticalHigh}
@@ -178,7 +177,7 @@ export function DashboardPage() {
         onFilterClick={handleIndicatorClick}
       />
 
-      {/* Scoring Explainer & Filter Toolbar */}
+      {/* 5. Filter Toolbar & Scoring Explainer */}
       <div className="space-y-2">
         <IncidentFilters
           filters={filters as any}
@@ -189,7 +188,7 @@ export function DashboardPage() {
         <ScoringExplainer />
       </div>
 
-      {/* Incidents Table + Spatial Map Preview */}
+      {/* 6. Incidents Table + Right Column (Map Preview + Emergency Helpline Widget) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
         <div className="xl:col-span-7 2xl:col-span-8 space-y-3 min-w-0 w-full">
           {/* Tactical Dispatch Control HUD (appears when an incident is targeted) */}
@@ -211,12 +210,16 @@ export function DashboardPage() {
             onSelectIncident={(incident) => setSelectedIncident(incident)}
           />
         </div>
-        <div className="xl:col-span-5 2xl:col-span-4 min-w-0 w-full xl:sticky xl:top-4">
+
+        {/* Right Column: Geographic Map + Emergency Helplines & Crisis Guide (Zero Dead Blank Space) */}
+        <div className="xl:col-span-5 2xl:col-span-4 min-w-0 w-full space-y-4">
           <DashboardMapPreview
             incidents={incidents}
             allIncidents={allIncidents}
             isLoading={isLoading}
           />
+
+          <EmergencyHelplineWidget />
         </div>
       </div>
 

@@ -74,12 +74,12 @@ export function TacticalDispatchControl({
     return (
       <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-[var(--text-secondary)] select-none">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="blinker-square shrink-0"></span>
+          <Truck className="w-4 h-4 text-amber-400 shrink-0" />
           <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-amber-300 shrink-0">
-            RESCUE DISPATCH HUD:
+            RESCUE TEAM DISPATCH:
           </span>
           <span className="font-mono text-[11px] text-[var(--text-muted)] truncate">
-            Standby • Select any incident row in the table below to target and dispatch units
+            Tap any incident below to deploy rescue units (boats, helicopters, ambulances)
           </span>
         </div>
         <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[var(--border-subtle)] text-amber-400/80 uppercase shrink-0 self-start sm:self-auto">

@@ -469,16 +469,16 @@ export function ReportFormPage() {
         <div className="p-4 md:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="blinker-square" />
-              <span className="text-[10px] font-mono text-[#EBFC72] uppercase tracking-widest font-bold">
-                EMERGENCY INGESTION PROTOCOL
+              <span className="emergency-pulse-dot" />
+              <span className="text-[10px] font-mono text-rose-400 uppercase tracking-widest font-bold">
+                EMERGENCY RELIEF & RESCUE INTAKE
               </span>
             </div>
             <h1 className="text-base md:text-lg font-bold font-heading text-[var(--text-primary)]">
-              Disaster Incident Observation Report
+              Report an Emergency Incident
             </h1>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              Rapid ingestion via voice extraction, live GPS telemetry, or manual field entry.
+              Speak in any language or enter details below. Rescue teams are alerted immediately.
             </p>
           </div>
           <button

@@ -227,6 +227,43 @@ export function AppShell() {
             ))}
           </nav>
 
+          {/* Quick Crisis Hotline Card in Sidebar (fills empty sidebar space on Desktop) */}
+          <div className="hidden lg:block mx-2.5 mb-2 p-2.5 rounded-xl bg-black/40 border border-rose-500/25 space-y-1.5 select-none">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold uppercase text-rose-300 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                24/7 CRISIS DIAL
+              </span>
+              <span className="text-[9px] font-mono text-[var(--text-muted)]">TOLL-FREE</span>
+            </div>
+            <div className="grid grid-cols-3 gap-1 pt-0.5">
+              <a
+                href="tel:112"
+                className="p-1 rounded bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-center font-mono font-bold text-[11px] text-rose-200 hover:text-white transition-colors"
+                title="Dial 112 National Emergency"
+              >
+                112
+              </a>
+              <a
+                href="tel:108"
+                className="p-1 rounded bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-center font-mono font-bold text-[11px] text-amber-200 hover:text-white transition-colors"
+                title="Dial 108 Disaster Ambulance"
+              >
+                108
+              </a>
+              <a
+                href="tel:101"
+                className="p-1 rounded bg-orange-950/60 hover:bg-orange-900 border border-orange-500/30 text-center font-mono font-bold text-[11px] text-orange-200 hover:text-white transition-colors"
+                title="Dial 101 Fire & Rescue"
+              >
+                101
+              </a>
+            </div>
+            <p className="text-[9px] text-[var(--text-muted)] leading-tight text-center">
+              Direct live emergency response line
+            </p>
+          </div>
+
           {/* User Account / Role Switcher Popover */}
           <div className="p-2.5 border-t border-[var(--border-subtle)] relative">
             <button
