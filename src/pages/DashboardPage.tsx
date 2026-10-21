@@ -120,8 +120,8 @@ export function DashboardPage() {
 
           <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
             <button
-              onClick={() => navigate('/report')}
-              className="px-4 py-2 rounded-lg bg-[#EBFC72] hover:bg-[#d8e860] text-black font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-1.5"
+              onClick={() => navigate('/reports/new')}
+              className="px-4 py-2 rounded-lg bg-[#EBFC72] hover:bg-[#d8e860] text-black font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <span>🚨</span> SUBMIT EMERGENCY REPORT
             </button>

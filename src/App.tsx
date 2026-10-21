@@ -85,6 +85,8 @@ export function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/incidents/:id" element={<IncidentDetailPage />} />
                 <Route path="/reports/new" element={<ReportFormPage />} />
+                <Route path="/report" element={<ReportFormPage />} />
+                <Route path="/reports" element={<Navigate to="/reports/new" replace />} />
                 <Route path="/duplicates" element={<DuplicatesPage />} />
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/audit" element={<AuditPage />} />
