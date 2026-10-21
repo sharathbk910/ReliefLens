@@ -56,7 +56,7 @@ export function ReportFormPage() {
     const originalWording = extraction.transcript || extraction.normalizedDescription || '';
     setValue('description', originalWording);
     setValue('original_transcript', originalWording);
-    setValue('incident_type', extraction.incidentType || 'flood');
+    setValue('incident_type', extraction.incidentType || 'other');
     setValue('location_text', extraction.locationText || '');
     setValue('district', extraction.district || '');
     if (typeof extraction.peopleAtRiskEstimate === 'number') {

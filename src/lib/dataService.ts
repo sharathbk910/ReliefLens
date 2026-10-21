@@ -221,12 +221,22 @@ let localDB: LocalDB = loadInitialDB();
 async function callGeminiDirectly(
   audioBase64: string,
   mimeType: string,
-  apiKey: string
+  apiKey: string,
+  hintTranscript?: string
 ): Promise<VoiceExtractionResult> {
-  const model = config.ai.model;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const candidateModels = Array.from(
+    new Set(
+      [
+        config.ai.model,
+        'gemini-flash-lite-latest',
+        'gemini-3.5-flash-lite',
+        'gemini-3.5-flash',
+        'gemini-3.6-flash',
+      ].filter(Boolean)
+    )
+  );
 
-  const prompt = `You are the ReliefLens Emergency Multilingual Report Assistant.
+  let prompt = `You are the ReliefLens Emergency Multilingual Report Assistant.
 Transcribe the speech faithfully in its original language and script.
 Detect the spoken language (e.g. Kannada, Hindi, English, Tamil, Telugu, Spanish, etc.).
 Translate and produce a clear, normalized English description.
@@ -251,6 +261,10 @@ Extract structured incident information into valid JSON with these fields:
   "fieldEvidence": string[]
 }`;
 
+  if (hintTranscript && hintTranscript.trim().length > 0) {
+    prompt += `\n\nLive Speech Recognition guidance from audio input: "${hintTranscript.trim()}". Analyze both the audio recording and this real-time utterance to accurately capture names, locations, casualty numbers, and emergency type.`;
+  }
+
   const payload = {
     contents: [
       {
@@ -271,46 +285,76 @@ Extract structured incident information into valid JSON with these fields:
     },
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+  let lastError: any = null;
+  for (const model of candidateModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        lastError = new Error(`Gemini model ${model} error (${response.status}): ${errorBody}`);
+        console.warn(`Gemini model ${model} failed with ${response.status}, cascading to next model...`);
+        continue;
+      }
+
+      const json = await response.json();
+      const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) {
+        continue;
+      }
+
+      const cleanedText = rawText.replace(/```json\n?|\n?```/g, '').trim();
+      const parsed = JSON.parse(cleanedText);
+
+      const validTypes: IncidentType[] = [
+        'flood',
+        'fire',
+        'medical',
+        'landslide',
+        'earthquake',
+        'shelter_request',
+        'other',
+      ];
+      const rawType = (parsed.incidentType || '').toLowerCase();
+      const incidentType: IncidentType = validTypes.includes(rawType as IncidentType)
+        ? (rawType as IncidentType)
+        : 'other';
+
+      return {
+        transcript: parsed.transcript || hintTranscript || '',
+        detectedLanguage: parsed.detectedLanguage || 'English',
+        normalizedDescription: parsed.normalizedDescription || parsed.transcript || hintTranscript || '',
+        title: parsed.title || 'Emergency Voice Report',
+        incidentType,
+        locationText: parsed.locationText || null,
+        district: parsed.district || null,
+        latitude: typeof parsed.latitude === 'number' ? parsed.latitude : null,
+        longitude: typeof parsed.longitude === 'number' ? parsed.longitude : null,
+        locationPrecision: parsed.locationPrecision || 'approximate',
+        peopleAtRiskEstimate:
+          typeof parsed.peopleAtRiskEstimate === 'number' ? parsed.peopleAtRiskEstimate : null,
+        immediateDanger: Boolean(parsed.immediateDanger),
+        vulnerabilityFlags: Array.isArray(parsed.vulnerabilityFlags) ? parsed.vulnerabilityFlags : [],
+        reportedAt: parsed.reportedAt || null,
+        missingInformation: Array.isArray(parsed.missingInformation) ? parsed.missingInformation : [],
+        uncertaintyNotes: Array.isArray(parsed.uncertaintyNotes) ? parsed.uncertaintyNotes : [],
+        fieldEvidence: Array.isArray(parsed.fieldEvidence) ? parsed.fieldEvidence : [],
+      };
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`Error invoking Gemini model ${model}:`, err.message);
+    }
   }
 
-  const json = await response.json();
-  const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!rawText) {
-    throw new Error('Gemini API returned empty extraction text.');
-  }
-
-  const parsed = JSON.parse(rawText);
-  return {
-    transcript: parsed.transcript || '',
-    detectedLanguage: parsed.detectedLanguage || 'English',
-    normalizedDescription: parsed.normalizedDescription || parsed.transcript || '',
-    title: parsed.title || 'Emergency Voice Report',
-    incidentType: parsed.incidentType || 'other',
-    locationText: parsed.locationText || null,
-    district: parsed.district || null,
-    latitude: typeof parsed.latitude === 'number' ? parsed.latitude : null,
-    longitude: typeof parsed.longitude === 'number' ? parsed.longitude : null,
-    locationPrecision: parsed.locationPrecision || 'approximate',
-    peopleAtRiskEstimate: typeof parsed.peopleAtRiskEstimate === 'number' ? parsed.peopleAtRiskEstimate : null,
-    immediateDanger: Boolean(parsed.immediateDanger),
-    vulnerabilityFlags: Array.isArray(parsed.vulnerabilityFlags) ? parsed.vulnerabilityFlags : [],
-    reportedAt: parsed.reportedAt || null,
-    missingInformation: Array.isArray(parsed.missingInformation) ? parsed.missingInformation : [],
-    uncertaintyNotes: Array.isArray(parsed.uncertaintyNotes) ? parsed.uncertaintyNotes : [],
-    fieldEvidence: Array.isArray(parsed.fieldEvidence) ? parsed.fieldEvidence : [],
-  };
+  throw lastError || new Error('All Gemini models failed to process audio.');
 }
 
-function getFallbackVoiceExtraction(): VoiceExtractionResult {
+function getFallbackVoiceExtraction(hintTranscript?: string): VoiceExtractionResult {
   let fallbackLat = 12.9716;
   let fallbackLng = 77.5946;
   if (typeof window !== 'undefined') {
@@ -322,24 +366,92 @@ function getFallbackVoiceExtraction(): VoiceExtractionResult {
     }
   }
 
+  // If the user's spoken words were captured via Web Speech or hints, extract their ACTUAL situation dynamically
+  if (hintTranscript && hintTranscript.trim().length > 0) {
+    const text = hintTranscript.trim();
+    const lower = text.toLowerCase();
+
+    let incidentType: IncidentType = 'other';
+    let defaultTitle = 'Emergency Report';
+
+    if (/\b(fire|smoke|burning|flame|blaze|explosion|peenya|ಬೆಂಕಿ|ಆಗ್|आग|தீ|തീ)\b/i.test(lower)) {
+      incidentType = 'fire';
+      defaultTitle = 'Fire Emergency Alert';
+    } else if (
+      /\b(medical|ambulance|hospital|bleeding|injury|injured|heart|unconscious|pregnant|stroke|ವೈದ್ಯಕೀಯ|ಆಸ್ಪತ್ರೆ|अस्पताल|घायल)\b/i.test(
+        lower
+      )
+    ) {
+      incidentType = 'medical';
+      defaultTitle = 'Urgent Medical Assistance Required';
+    } else if (
+      /\b(landslide|mudslide|rockfall|debris|slope|collapse|ಭೂಕುಸಿತ|भूस्खलन)\b/i.test(lower)
+    ) {
+      incidentType = 'landslide';
+      defaultTitle = 'Landslide / Debris Hazard';
+    } else if (
+      /\b(earthquake|tremor|quake|shaking|aftershock|ಭೂಕಂಪ|भूकंप)\b/i.test(lower)
+    ) {
+      incidentType = 'earthquake';
+      defaultTitle = 'Earthquake Damage Report';
+    } else if (
+      /\b(flood|water|submerged|overflow|drowning|river|breach|inundation|ಪ್ರವಾಹ|ನೀರು|बाढ़)\b/i.test(
+        lower
+      )
+    ) {
+      incidentType = 'flood';
+      defaultTitle = 'Flood & Evacuation Assistance';
+    } else if (
+      /\b(shelter|food|ration|starving|homeless|displaced|ಆಶ್ರಯ|ಊಟ|ನೀರು|आश्रय)\b/i.test(lower)
+    ) {
+      incidentType = 'shelter_request';
+      defaultTitle = 'Emergency Shelter & Supplies Needed';
+    }
+
+    const numMatch = lower.match(/\b(\d+)\s*(people|persons|families|workers|children|members|ಜನ|लोग)\b/);
+    const peopleEstimate = numMatch ? parseInt(numMatch[1], 10) : null;
+
+    return {
+      transcript: text,
+      detectedLanguage: 'Spoken Speech Capture',
+      normalizedDescription: text,
+      title: defaultTitle,
+      incidentType,
+      locationText: 'Reported Location',
+      district: null,
+      latitude: fallbackLat,
+      longitude: fallbackLng,
+      locationPrecision: 'approximate',
+      peopleAtRiskEstimate: peopleEstimate,
+      immediateDanger: true,
+      vulnerabilityFlags: [],
+      reportedAt: new Date().toISOString(),
+      missingInformation: ['Verify exact landmark and contact details'],
+      uncertaintyNotes: ['Extracted from direct voice capture during connection fallback'],
+      fieldEvidence: ['Real-time speech transcript recorded'],
+    };
+  }
+
+  // Resilient fallback when audio transcription is unreachable: DO NOT fabricate a flood!
   return {
-    transcript: 'Severe water inflow and rising flood levels near the bridge. Multiple families require evacuation assistance.',
-    detectedLanguage: 'English (Emergency Fallback)',
-    normalizedDescription: 'Flash flooding observed near river crossing. Water levels exceeding safety barrier with families stranded nearby.',
-    title: 'Flash Flood Near Bridge Crossing',
-    incidentType: 'flood',
-    locationText: 'Central Bridge & Main Bypass Road',
-    district: 'River Valley Sector',
+    transcript: '',
+    detectedLanguage: 'Voice Input',
+    normalizedDescription:
+      'Emergency voice audio recorded. Please review the incident type and provide the incident description.',
+    title: 'Emergency Voice Report',
+    incidentType: 'other',
+    locationText: null,
+    district: null,
     latitude: fallbackLat,
     longitude: fallbackLng,
     locationPrecision: 'approximate',
-    peopleAtRiskEstimate: 6,
+    peopleAtRiskEstimate: null,
     immediateDanger: true,
-    vulnerabilityFlags: ['elderly_present'],
+    vulnerabilityFlags: [],
     reportedAt: new Date().toISOString(),
-    missingInformation: ['Exact building number'],
-    uncertaintyNotes: ['Depth estimate approximate from voice report'],
-    fieldEvidence: ['Voice recording captured and processed successfully'],
+    missingInformation: ['Audio transcription unavailable - please confirm incident type and details manually.'],
+    uncertaintyNotes: ['Manual review required'],
+    fieldEvidence: ['Voice audio captured'],
   };
 }
 
@@ -1216,8 +1328,8 @@ export const dataService = {
     };
   },
 
-  // 11. Multilingual Voice Report Analysis (Gemini via Supabase Edge Function)
-  async analyzeVoiceReport(audioBlob: Blob): Promise<VoiceExtractionResult> {
+  // 11. Multilingual Voice Report Analysis (Gemini via Edge Function / Direct API / Dynamic fallback)
+  async analyzeVoiceReport(audioBlob: Blob, hintTranscript?: string): Promise<VoiceExtractionResult> {
     const user = this.getCurrentUser();
     if (user.role === 'viewer') {
       throw new Error('Forbidden: Viewers cannot create or analyze reports.');
@@ -1251,7 +1363,7 @@ export const dataService = {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase.functions.invoke('analyze-voice-report', {
-          body: { audioBase64, mimeType },
+          body: { audioBase64, mimeType, hintTranscript },
         });
 
         if (!error && data?.data) {
@@ -1265,18 +1377,18 @@ export const dataService = {
       }
     }
 
-    // 2. Direct Gemini API call if configured in browser localStorage or environment
+    // 2. Direct Gemini API call with model cascade and live transcription hint
     const clientGeminiKey = config.ai.apiKey;
     if (clientGeminiKey && typeof clientGeminiKey === 'string' && clientGeminiKey.trim() !== '') {
       try {
-        return await callGeminiDirectly(audioBase64, mimeType, clientGeminiKey.trim());
+        return await callGeminiDirectly(audioBase64, mimeType, clientGeminiKey.trim(), hintTranscript);
       } catch (geminiErr: any) {
         console.warn('Direct Gemini call failed, falling back:', geminiErr);
       }
     }
 
     // 3. Resilient fallback mode when offline or Edge Function is not yet deployed
-    return getFallbackVoiceExtraction();
+    return getFallbackVoiceExtraction(hintTranscript);
   },
 
   // 12. Real-time / Event Subscription for Auto-updating components

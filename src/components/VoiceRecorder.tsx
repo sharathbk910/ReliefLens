@@ -54,8 +54,10 @@ export function VoiceRecorder({
   const [isPlaying, setIsPlaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasVoiceEngine] = useState(() => config.ai.hasClientKey);
+  const [liveTranscript, setLiveTranscript] = useState<string>('');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const speechRecognitionRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerIntervalRef = useRef<number | null>(null);
@@ -77,6 +79,12 @@ export function VoiceRecorder({
       // Clean up microphone tracks and timer on unmount
       stopAllTracks();
       clearTimer();
+      if (speechRecognitionRef.current) {
+        try {
+          speechRecognitionRef.current.stop();
+        } catch (e) {}
+        speechRecognitionRef.current = null;
+      }
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);
       }
@@ -116,6 +124,7 @@ export function VoiceRecorder({
 
   const startRecording = async () => {
     setErrorMessage(null);
+    setLiveTranscript('');
     setRecorderState('requesting_permission');
 
     try {
@@ -168,6 +177,36 @@ export function VoiceRecorder({
       setRecorderState('recording');
       setElapsedSeconds(0);
 
+      // Start client-side speech recognition in parallel if supported
+      if (typeof window !== 'undefined') {
+        const SpeechRecognitionClass =
+          (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRecognitionClass) {
+          try {
+            const recognition = new SpeechRecognitionClass();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = navigator.language || 'en-US';
+            recognition.onresult = (event: any) => {
+              let text = '';
+              for (let i = 0; i < event.results.length; ++i) {
+                text += event.results[i][0].transcript;
+              }
+              if (text.trim()) {
+                setLiveTranscript(text.trim());
+              }
+            };
+            recognition.onerror = () => {
+              // Graceful: ignore SpeechRecognition errors; raw audio is processed via Gemini
+            };
+            recognition.start();
+            speechRecognitionRef.current = recognition;
+          } catch (e) {
+            console.debug('SpeechRecognition initialization skipped:', e);
+          }
+        }
+      }
+
       // Start elapsed timer
       timerIntervalRef.current = window.setInterval(() => {
         setElapsedSeconds((prev) => {
@@ -195,6 +234,12 @@ export function VoiceRecorder({
   };
 
   const stopRecording = () => {
+    if (speechRecognitionRef.current) {
+      try {
+        speechRecognitionRef.current.stop();
+      } catch (e) {}
+      speechRecognitionRef.current = null;
+    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
     }
@@ -203,11 +248,18 @@ export function VoiceRecorder({
   };
 
   const handleRecordAgain = () => {
+    if (speechRecognitionRef.current) {
+      try {
+        speechRecognitionRef.current.stop();
+      } catch (e) {}
+      speechRecognitionRef.current = null;
+    }
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
       setAudioUrl(null);
     }
     setAudioBlob(null);
+    setLiveTranscript('');
     setElapsedSeconds(0);
     setErrorMessage(null);
     setIsPlaying(false);
@@ -249,8 +301,8 @@ export function VoiceRecorder({
       setRecorderState('analyzing');
       setErrorMessage(null);
 
-      // Invoke multilingual voice analysis through backend service
-      const result = await dataService.analyzeVoiceReport(audioBlob);
+      // Invoke multilingual voice analysis through backend service with live speech hint
+      const result = await dataService.analyzeVoiceReport(audioBlob, liveTranscript);
 
       setRecorderState('review_ready');
       toast.success('Your report has been analysed.');
@@ -383,6 +435,18 @@ export function VoiceRecorder({
             barColor="#f43f5e"
             className="mt-4"
           />
+
+          {liveTranscript && (
+            <div className="mt-3 p-2.5 rounded-lg bg-slate-950/70 border border-emerald-500/30 text-left max-h-24 overflow-y-auto">
+              <div className="text-[10px] font-mono uppercase text-emerald-400 flex items-center gap-1.5 mb-1 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                Real-Time Voice Detection:
+              </div>
+              <p className="text-xs text-slate-200 italic leading-relaxed">
+                "{liveTranscript}"
+              </p>
+            </div>
+          )}
         </div>
       ) : recorderState === 'recording_stopped' ? (
         <div className="py-4 px-2">
@@ -419,6 +483,18 @@ export function VoiceRecorder({
                 Record Again
               </Button>
             </div>
+
+            {liveTranscript && (
+              <div className="mt-3 pt-3 border-t border-slate-700/60 text-left">
+                <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5 mb-1">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Spoken Words Detected
+                </div>
+                <p className="text-xs text-slate-200 italic leading-relaxed">
+                  "{liveTranscript}"
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Explicit Submission */}

@@ -70,7 +70,7 @@ export const config: Config = {
     defaultZoom: 12,
   },
   ai: {
-    model: import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash',
+    model: import.meta.env.VITE_GEMINI_MODEL || 'gemini-flash-lite-latest',
     apiKey: clientGeminiKey,
     hasClientKey: Boolean(clientGeminiKey && clientGeminiKey.trim()),
   },
