@@ -100,45 +100,34 @@ export function AppShell() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans relative bg-[#0c0c0c] text-[#ebebeb] selection:bg-[#ccff00] selection:text-black overflow-x-hidden">
-      {/* Background Grid Pattern & Ambient Glows */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-20 z-0"
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
-        }}
-      />
-      <div className="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#ccff00]/5 blur-[140px] pointer-events-none z-0" />
-      <div className="fixed bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#10b981]/5 blur-[140px] pointer-events-none z-0" />
-
+    <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
       {/* 1. Mandatory Safety Disclaimer Banner (Spatial Topbar) */}
-      <header className="z-40 px-3 md:px-6 py-2 border-b border-white/10 bg-[#0c0c0c]/80 backdrop-blur-xl text-xs flex items-center justify-between">
+      <header className="z-40 px-3 md:px-6 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--surface-1)] backdrop-blur-md text-xs flex items-center justify-between">
         <div className="flex items-center gap-2 max-w-7xl mx-auto w-full">
-          <AlertTriangle className="w-3.5 h-3.5 text-[#ccff00] shrink-0" strokeWidth={2} />
-          <span className="leading-tight text-white/60 text-[10px] sm:text-xs truncate sm:whitespace-normal font-mono">
-            <strong className="text-[#ccff00] font-bold">PROTOTYPE // 0x01:</strong> <span className="hidden sm:inline">ReliefLens provides decision support for emergency coordination.</span> Not for 911 dispatch.
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" strokeWidth={1.5} />
+          <span className="leading-tight text-[var(--text-secondary)] text-[10px] sm:text-xs truncate sm:whitespace-normal">
+            <strong className="text-[var(--text-primary)] font-semibold">Prototype:</strong> <span className="hidden sm:inline">ReliefLens provides decision support for emergency coordination.</span> Not for 911 dispatch.
           </span>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? (
-                <Sun className="w-3.5 h-3.5" strokeWidth={1.8} />
+                <Sun className="w-3.5 h-3.5" strokeWidth={1.5} />
               ) : (
-                <Moon className="w-3.5 h-3.5" strokeWidth={1.8} />
+                <Moon className="w-3.5 h-3.5" strokeWidth={1.5} />
               )}
             </button>
             <button
               onClick={handleResetData}
               title="Reset simulated scenario data"
-              className="hidden sm:flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[#ccff00] hover:text-black px-2.5 py-1 rounded-full border border-[#ccff00]/40 hover:bg-[#ccff00] transition-colors"
+              className="hidden sm:flex items-center gap-1 text-[11px] text-amber-500 hover:text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/10 transition-colors"
             >
-              <RefreshCw className="w-3 h-3" strokeWidth={2} />
+              <RefreshCw className="w-3 h-3" strokeWidth={1.5} />
               <span>Reset Data</span>
             </button>
           </div>
@@ -149,31 +138,25 @@ export function AppShell() {
       <OfflineBanner />
 
       {/* Main Spatial Body */}
-      <div className="flex-1 flex overflow-hidden relative z-10">
+      <div className="flex-1 flex overflow-hidden relative">
         {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) */}
         <aside
           aria-label="Primary Navigation"
-          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shrink-0 transition-all duration-300 z-30 select-none overflow-hidden"
+          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none"
         >
           {/* Logo & Operational Status */}
           <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center gap-2.5">
-            <button
-              onClick={() => navigate('/')}
-              title="Return to System Overview"
-              className="w-8 h-8 rounded-lg bg-[#ccff00] text-black font-bold flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(204,255,0,0.3)] hover:scale-105 transition-transform"
-            >
-              <Radio className="w-4 h-4 text-black" strokeWidth={2.2} />
-            </button>
+            <div className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0 shadow-sm">
+              <Radio className="w-4 h-4" strokeWidth={1.5} />
+            </div>
             <div className="hidden lg:block min-w-0">
               <div className="font-bold text-[var(--text-primary)] text-sm tracking-tight font-heading flex items-center gap-1.5">
                 <span>ReliefLens</span>
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30 font-semibold">
+                <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   v1.0
                 </span>
               </div>
-              <p className="text-[10px] text-[var(--text-muted)] truncate font-mono uppercase tracking-wider">
-                Industrial_Core
-              </p>
+              <p className="text-[10px] text-[var(--text-muted)] truncate">Crisis Coordination</p>
             </div>
           </div>
 
@@ -183,17 +166,17 @@ export function AppShell() {
               <Button
                 variant="primary"
                 size="md"
-                className="w-full justify-center lg:justify-start shadow-md px-2.5"
-                leftIcon={<Plus className="w-4 h-4 shrink-0" strokeWidth={2} />}
+                className="w-full justify-center lg:justify-start shadow-md shadow-rose-950/20 px-2.5"
+                leftIcon={<Plus className="w-4 h-4 shrink-0" strokeWidth={1.5} />}
                 onClick={() => navigate('/reports/new')}
                 title="Create New Emergency Report"
               >
-                <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider font-mono">New Report</span>
+                <span className="hidden lg:inline text-xs font-semibold">New Report</span>
               </Button>
             ) : (
               <div
                 title="Viewers have read-only access and cannot submit reports."
-                className="p-2 rounded-lg bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] text-center flex items-center justify-center font-mono"
+                className="p-2 rounded-lg bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] text-center flex items-center justify-center"
               >
                 <Lock className="w-4 h-4" strokeWidth={1.5} />
                 <span className="hidden lg:inline ml-1.5 text-[11px]">Read-Only</span>
@@ -211,7 +194,7 @@ export function AppShell() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30 shadow-[0_0_15px_rgba(204,255,0,0.15)] font-semibold'
+                      ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-sm font-semibold'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                   }`
                 }
@@ -230,7 +213,7 @@ export function AppShell() {
               className="w-full flex items-center justify-between p-1.5 lg:p-2 rounded-lg hover:bg-[var(--border-subtle)] transition-colors border border-transparent hover:border-[var(--border-subtle)]"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-[#ccff00]/15 border border-[#ccff00]/40 flex items-center justify-center text-xs font-bold text-[#ccff00] shrink-0 font-mono">
+                <div className="w-7 h-7 rounded-full bg-[var(--border-subtle)] border border-[var(--border-strong)] flex items-center justify-center text-xs font-semibold text-rose-400 shrink-0">
                   {currentUser.display_name.charAt(0)}
                 </div>
                 <div className="hidden lg:block text-left truncate min-w-0">
@@ -255,14 +238,14 @@ export function AppShell() {
                   <button
                     key={r}
                     onClick={() => handleRoleChange(r)}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs flex items-center justify-between transition-colors font-mono ${
+                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs flex items-center justify-between transition-colors ${
                       currentUser.role === r
-                        ? 'bg-[#ccff00]/15 text-[#ccff00] font-semibold border border-[#ccff00]/30'
+                        ? 'bg-rose-500/15 text-rose-400 font-semibold border border-rose-500/30'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                     }`}
                   >
                     <span className="capitalize">{r}</span>
-                    {currentUser.role === r && <UserCheck className="w-3.5 h-3.5 text-[#ccff00]" strokeWidth={1.5} />}
+                    {currentUser.role === r && <UserCheck className="w-3.5 h-3.5 text-rose-400" strokeWidth={1.5} />}
                   </button>
                 ))}
               </div>
@@ -289,14 +272,14 @@ export function AppShell() {
       {location.pathname !== '/reports/new' && (
         <nav
           aria-label="Mobile Navigation Dock"
-          className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl border border-white/10"
+          className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl"
           style={{ paddingBottom: 'calc(0.375rem + env(safe-area-inset-bottom, 0px))' }}
         >
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
               `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-                isActive ? 'text-[#ccff00] font-semibold' : 'text-[var(--text-muted)]'
+                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
               }`
             }
           >
@@ -308,7 +291,7 @@ export function AppShell() {
             to="/duplicates"
             className={({ isActive }) =>
               `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-                isActive ? 'text-[#ccff00] font-semibold' : 'text-[var(--text-muted)]'
+                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
               }`
             }
           >
@@ -320,7 +303,7 @@ export function AppShell() {
             to="/map"
             className={({ isActive }) =>
               `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-                isActive ? 'text-[#ccff00] font-semibold' : 'text-[var(--text-muted)]'
+                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
               }`
             }
           >
@@ -331,10 +314,10 @@ export function AppShell() {
           {currentUser.role !== 'viewer' ? (
             <button
               onClick={() => navigate('/reports/new')}
-              className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-[#ccff00] font-semibold"
+              className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-rose-500 font-semibold"
             >
-              <div className="w-6 h-6 rounded-full bg-[#ccff00] text-black flex items-center justify-center mb-0.5 shadow-[0_0_10px_rgba(204,255,0,0.4)]">
-                <Plus className="w-4 h-4 text-black" strokeWidth={2.5} />
+              <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mb-0.5">
+                <Plus className="w-4 h-4 text-rose-400" strokeWidth={1.5} />
               </div>
               <span>Report</span>
             </button>

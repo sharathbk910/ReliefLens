@@ -6,22 +6,22 @@ export function ScoringExplainer() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mb-4 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden transition-all shadow-xl hover:border-[#ccff00]/30">
+    <div className="mb-4 surface-z1 border border-[var(--border-subtle)] rounded-2xl overflow-hidden transition-all shadow-sm">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.04] transition-colors"
+        className="w-full flex items-center justify-between p-3.5 text-left hover:bg-[var(--border-subtle)] transition-colors"
       >
-        <div className="flex flex-wrap items-center gap-2 mr-2">
-          <HelpCircle className="w-4 h-4 text-[#ccff00] shrink-0" />
-          <span className="text-xs font-bold text-white tracking-tight">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mr-2">
+          <HelpCircle className="w-4 h-4 text-teal-400 shrink-0" />
+          <span className="text-xs font-semibold text-[var(--text-primary)]">
             How Deterministic Incident Scoring Works (v{RULESET.version})
           </span>
-          <span className="hidden sm:inline text-[10px] text-[#ccff00] font-mono font-bold bg-[#ccff00]/10 border border-[#ccff00]/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+          <span className="hidden sm:inline text-[10px] text-teal-300 font-mono bg-teal-950/50 border border-teal-500/30 px-1.5 py-0.5 rounded">
             Auditable Ruleset
           </span>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-white/50 transition-transform duration-300 ${open ? 'rotate-180 text-[#ccff00]' : ''}`}
+          className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 

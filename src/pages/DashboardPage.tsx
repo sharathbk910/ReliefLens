@@ -86,7 +86,7 @@ export function DashboardPage() {
       />
 
       {/* Incidents Table + Spatial Map Preview (Full responsive layout, side-by-side on 2xl+ displays) */}
-      <div className="grid grid-cols-1 2xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 2xl:grid-cols-12 gap-5 items-start">
         <div className="2xl:col-span-8 space-y-4 min-w-0 w-full">
           <IncidentTable
             incidents={incidents}
