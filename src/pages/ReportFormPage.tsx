@@ -25,7 +25,7 @@ import { offlineSyncService } from '../lib/offlineSyncService.ts';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
-import type { VulnerabilityFlag, VoiceExtractionResult } from '../shared/types.ts';
+import type { VulnerabilityFlag, VoiceExtractionResult, PriorityTier } from '../shared/types.ts';
 import { VoiceRecorder } from '../components/VoiceRecorder.tsx';
 import { EditableExtractionPreview } from '../components/EditableExtractionPreview.tsx';
 import { CurrentLocationControl, type DetectedLocation } from '../components/CurrentLocationControl.tsx';
@@ -44,6 +44,47 @@ export function ReportFormPage() {
   const [detectedLocation, setDetectedLocation] = useState<DetectedLocation | null>(null);
   const [additionalOpen, setAdditionalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState<{
+    incidentId: string;
+    score: number;
+    tier: PriorityTier;
+    duplicatesCount: number;
+  } | null>(null);
+
+  const applyExtractionToForm = (extraction: VoiceExtractionResult) => {
+    // Populate the incident description automatically using the complaint's original wording.
+    // Do not require manual normalization or paraphrasing; preserve the original transcript and let users edit it if needed.
+    const originalWording = extraction.transcript || extraction.normalizedDescription || '';
+    setValue('description', originalWording);
+    setValue('original_transcript', originalWording);
+    setValue('incident_type', extraction.incidentType || 'flood');
+    setValue('location_text', extraction.locationText || '');
+    setValue('district', extraction.district || '');
+    if (typeof extraction.peopleAtRiskEstimate === 'number') {
+      setValue('people_at_risk_estimate', extraction.peopleAtRiskEstimate);
+    }
+    setValue('immediate_danger', Boolean(extraction.immediateDanger));
+    setValue('vulnerability_flags', extraction.vulnerabilityFlags || []);
+    setValue('detected_language', extraction.detectedLanguage || 'English');
+    setValue('normalized_description', extraction.normalizedDescription || originalWording);
+
+    if (extraction.latitude && extraction.longitude) {
+      setValue('latitude', extraction.latitude);
+      setValue('longitude', extraction.longitude);
+      setValue('location_precision', extraction.locationPrecision || 'approximate');
+      setValue('location_source', 'voice');
+      setDetectedLocation({
+        latitude: extraction.latitude,
+        longitude: extraction.longitude,
+        accuracy: 30,
+        capturedAt: new Date().toISOString(),
+        isConfirmedIncidentLocation: true,
+        district: extraction.district,
+        locationText: extraction.locationText,
+        placeName: extraction.district || extraction.locationText,
+      });
+    }
+  };
 
   // If navigated with prefilled voice extraction from EmergencyVoiceFAB
   useEffect(() => {
@@ -51,6 +92,7 @@ export function ReportFormPage() {
       ?.prefilledVoiceExtraction;
     if (prefilled) {
       setVoiceExtraction(prefilled);
+      applyExtractionToForm(prefilled);
       setActiveStep('review');
     }
   }, [location.state]);
@@ -164,28 +206,16 @@ export function ReportFormPage() {
 
   const handleExtractionSuccess = (extraction: VoiceExtractionResult) => {
     setVoiceExtraction(extraction);
+    applyExtractionToForm(extraction);
     setActiveStep('review');
+    toast.success(
+      'Voice Complaint Transcribed',
+      `Language: ${extraction.detectedLanguage || 'Detected'}. Spoken wording preserved for review.`
+    );
   };
 
   const handleApplyExtraction = (data: VoiceExtractionResult) => {
-    setValue('description', data.normalizedDescription || data.transcript);
-    setValue('incident_type', data.incidentType);
-    setValue('location_text', data.locationText || '');
-    setValue('district', data.district || '');
-    setValue('people_at_risk_estimate', data.peopleAtRiskEstimate);
-    setValue('immediate_danger', data.immediateDanger === true);
-    setValue('vulnerability_flags', data.vulnerabilityFlags);
-    setValue('original_transcript', data.transcript);
-    setValue('detected_language', data.detectedLanguage);
-    setValue('normalized_description', data.normalizedDescription);
-
-    if (data.latitude && data.longitude) {
-      setValue('latitude', data.latitude);
-      setValue('longitude', data.longitude);
-      setValue('location_precision', data.locationPrecision);
-      setValue('location_source', 'voice');
-    }
-
+    applyExtractionToForm(data);
     setVoiceExtraction(null);
     setActiveStep('location');
     toast.success(
@@ -200,6 +230,7 @@ export function ReportFormPage() {
   };
 
   const onSubmit = async (data: ReportIngestionInput) => {
+    if (isSubmitting || submissionResult) return;
     setIsSubmitting(true);
 
     // If client is currently offline, queue report locally
@@ -216,19 +247,24 @@ export function ReportFormPage() {
 
     try {
       const res = await dataService.ingestReport(data);
+      setSubmissionResult({
+        incidentId: res.incident_id,
+        score: res.effective_score,
+        tier: res.priority_tier,
+        duplicatesCount: res.duplicate_suggestions_count,
+      });
+
       toast.success(
-        'Report Ingested',
-        `Incident created with score ${res.effective_score} (${res.priority_tier.toUpperCase()}).`
+        'Incident Report Submitted & Scored',
+        `Score: ${res.effective_score} (${res.priority_tier.toUpperCase()}). Persisted to database.`
       );
 
       if (res.duplicate_suggestions_count > 0) {
         toast.warning(
-          'Potential Duplicate Detected',
-          `${res.duplicate_suggestions_count} potential duplicate report(s) flagged for review.`
+          'Potential Duplicate Flagged',
+          `${res.duplicate_suggestions_count} duplicate candidate(s) queued for coordinator triage.`
         );
       }
-
-      navigate(`/incidents/${res.incident_id}`);
     } catch (err: any) {
       // Check if failure is network related
       if (!navigator.onLine || err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
@@ -252,6 +288,102 @@ export function ReportFormPage() {
     { id: 'location', label: '3. Location' },
     { id: 'confirm', label: '4. Confirm' },
   ];
+
+  if (submissionResult) {
+    return (
+      <div className="w-full max-w-2xl mx-auto my-2 md:my-6 animate-spatial-enter">
+        <div className="surface-z2 rounded-2xl overflow-hidden shadow-2xl p-6 md:p-8 space-y-6 text-center border border-teal-500/40">
+          <div className="w-16 h-16 rounded-full bg-teal-950/60 border border-teal-500/50 flex items-center justify-center mx-auto text-teal-400 shadow-lg shadow-teal-950/50">
+            <CheckCircle2 className="w-9 h-9" strokeWidth={1.75} />
+          </div>
+
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold font-heading text-[var(--text-primary)]">
+              Incident Report Confirmed & Ingested
+            </h2>
+            <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
+              Your observation was verified, scored by deterministic triage algorithms, and synchronized with Supabase & local storage.
+            </p>
+          </div>
+
+          <div className="surface-z1 p-4 rounded-xl border border-[var(--border-subtle)] text-left space-y-3 max-w-lg mx-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+              <span className="text-xs text-[var(--text-muted)]">Incident ID:</span>
+              <span className="font-mono text-xs text-[var(--text-primary)] font-semibold select-all">
+                {submissionResult.incidentId}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+              <span className="text-xs text-[var(--text-muted)]">Calculated Priority:</span>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded text-xs font-bold uppercase bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                  {submissionResult.tier}
+                </span>
+                <span className="font-mono text-xs text-[var(--text-primary)] font-bold">
+                  Score: {submissionResult.score}/100
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+              <span className="text-xs text-[var(--text-muted)]">Recorded Location:</span>
+              <span className="text-xs font-medium text-[var(--text-primary)] truncate max-w-[240px]">
+                {watchLocationText || watchDistrict || (watchLat ? `${watchLat.toFixed(4)}, ${watchLng?.toFixed(4)}` : 'Location Recorded')}
+              </span>
+            </div>
+
+            {submissionResult.duplicatesCount > 0 && (
+              <div className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300 flex items-center justify-between">
+                <span>Duplicate candidates flagged:</span>
+                <span className="font-bold">{submissionResult.duplicatesCount}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={() => navigate(`/incidents/${submissionResult.incidentId}`)}
+              className="text-xs gap-1.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold"
+            >
+              <span>Inspect Incident Dossier</span>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={() => navigate('/map')}
+              className="text-xs gap-1.5 border-[var(--border-strong)] hover:bg-[var(--surface-2-solid)]"
+            >
+              <MapPin className="w-4 h-4 text-teal-400" />
+              <span>View on Geographic Map</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="md"
+              onClick={() => {
+                reset();
+                setSubmissionResult(null);
+                setVoiceExtraction(null);
+                setDetectedLocation(null);
+                setActiveStep('input');
+              }}
+              className="text-xs text-[var(--text-muted)] hover:text-white"
+            >
+              Submit Another Report
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-2xl mx-auto my-2 md:my-6 animate-spatial-enter">
@@ -286,7 +418,7 @@ export function ReportFormPage() {
                 onClick={() => setActiveStep(s.id)}
                 className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                   activeStep === s.id
-                    ? 'bg-rose-500 text-white shadow-sm'
+                    ? 'bg-teal-600 text-white shadow-sm'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -309,7 +441,7 @@ export function ReportFormPage() {
                     onClick={() => setReportingMode('voice')}
                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
                       reportingMode === 'voice'
-                        ? 'bg-rose-500 text-white shadow-sm'
+                        ? 'bg-teal-600 text-white shadow-sm'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -321,7 +453,7 @@ export function ReportFormPage() {
                     onClick={() => setReportingMode('manual')}
                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
                       reportingMode === 'manual'
-                        ? 'bg-rose-500 text-white shadow-sm'
+                        ? 'bg-teal-600 text-white shadow-sm'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -330,18 +462,10 @@ export function ReportFormPage() {
                   </button>
                 </div>
 
-                {reportingMode === 'voice' && !voiceExtraction && (
+                {reportingMode === 'voice' && (
                   <VoiceRecorder
                     onExtractionSuccess={handleExtractionSuccess}
                     onSwitchToManual={() => setReportingMode('manual')}
-                  />
-                )}
-
-                {reportingMode === 'voice' && voiceExtraction && (
-                  <EditableExtractionPreview
-                    extraction={voiceExtraction}
-                    onApply={handleApplyExtraction}
-                    onDiscard={handleDiscardExtraction}
                   />
                 )}
 
@@ -353,7 +477,7 @@ export function ReportFormPage() {
                       </label>
                       <select
                         {...register('incident_type')}
-                        className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-xs text-[var(--text-primary)] focus-visible:ring-1"
+                        className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-xs text-[var(--text-primary)] focus-visible:ring-1 focus-visible:ring-teal-500"
                       >
                         <option value="flood">Flood</option>
                         <option value="structure_collapse">Structure Collapse</option>
@@ -377,7 +501,7 @@ export function ReportFormPage() {
                         {...register('description')}
                         rows={4}
                         placeholder="Describe what occurred, immediate hazards, trapped persons, or critical needs..."
-                        className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg p-3 text-xs text-[var(--text-primary)] focus-visible:ring-1"
+                        className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg p-3 text-xs text-[var(--text-primary)] focus-visible:ring-1 focus-visible:ring-teal-500"
                       />
                       {errors.description && (
                         <p className="text-[11px] text-rose-500 mt-1">{errors.description.message}</p>
@@ -388,36 +512,66 @@ export function ReportFormPage() {
               </div>
             )}
 
-            {/* STEP 2: REVIEW (Editable Details & Hazards) */}
+            {/* STEP 2: REVIEW (Original wording transcript & hazard review) */}
             {activeStep === 'review' && (
               <div className="space-y-4 animate-spatial-enter">
                 {watchOriginalTranscript && (
-                  <div className="p-3 rounded-xl bg-[var(--surface-1-solid)] border border-rose-500/30 text-xs space-y-1">
+                  <div className="p-3 rounded-xl bg-[var(--surface-1-solid)] border border-teal-500/30 text-xs space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-rose-400 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" strokeWidth={1.5} />
+                      <span className="font-semibold text-teal-400 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-teal-400" strokeWidth={1.5} />
                         Spoken Language: {watchDetectedLanguage || 'Detected'}
                       </span>
-                      <span className="text-[10px] uppercase font-mono text-[var(--text-muted)]">Original Script</span>
+                      <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-teal-950/60 border border-teal-500/30 text-teal-300">
+                        Original Spoken Wording
+                      </span>
                     </div>
-                    <p className="text-[11px] text-[var(--text-secondary)] italic bg-[var(--border-subtle)] p-2 rounded">
+                    <p className="text-[11px] text-[var(--text-secondary)] italic bg-[var(--surface-2-solid)] p-2.5 rounded-lg border border-[var(--border-subtle)]">
                       "{watchOriginalTranscript}"
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                    Normalized Incident Description *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-[var(--text-primary)]">
+                      Incident Observation Description *
+                    </label>
+                    <span className="text-[10px] text-teal-400 font-mono">
+                      Original transcript preserved • Editable
+                    </span>
+                  </div>
                   <textarea
                     {...register('description')}
-                    rows={3}
-                    className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg p-3 text-xs text-[var(--text-primary)] focus-visible:ring-1"
+                    rows={4}
+                    placeholder="Original incident report transcript..."
+                    className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg p-3 text-xs text-[var(--text-primary)] focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                   {errors.description && (
                     <p className="text-[11px] text-rose-500 mt-1">{errors.description.message}</p>
                   )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
+                    Incident Classification *
+                  </label>
+                  <select
+                    {...register('incident_type')}
+                    className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-xs text-[var(--text-primary)] focus-visible:ring-1 focus-visible:ring-teal-500"
+                  >
+                    <option value="flood">Flood</option>
+                    <option value="structure_collapse">Structure Collapse</option>
+                    <option value="fire">Fire</option>
+                    <option value="medical_emergency">Medical Emergency</option>
+                    <option value="shelter_request">Shelter Request</option>
+                    <option value="water_shortage">Water Shortage</option>
+                    <option value="food_shortage">Food Shortage</option>
+                    <option value="power_outage">Power Outage</option>
+                    <option value="road_blocked">Road Blocked</option>
+                    <option value="hazardous_material">Hazardous Material</option>
+                    <option value="other">Other Emergency</option>
+                  </select>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -439,7 +593,7 @@ export function ReportFormPage() {
                       type="checkbox"
                       id="immediate_danger"
                       {...register('immediate_danger')}
-                      className="rounded border-[var(--border-strong)] text-rose-600 focus:ring-rose-500 w-4 h-4"
+                      className="rounded border-[var(--border-strong)] text-teal-600 focus:ring-teal-500 w-4 h-4"
                     />
                     <label htmlFor="immediate_danger" className="text-xs font-medium text-rose-400 cursor-pointer">
                       Immediate Threat to Life Reported
@@ -467,7 +621,7 @@ export function ReportFormPage() {
                         onClick={() => handleToggleFlag(f.id as any)}
                         className={`p-2 rounded-lg border text-left text-xs font-medium transition-colors ${
                           watchFlags.includes(f.id as any)
-                            ? 'bg-rose-500/15 border-rose-500 text-rose-300'
+                            ? 'bg-teal-500/15 border-teal-500 text-teal-300'
                             : 'bg-[var(--surface-1-solid)] border-[var(--border-subtle)] text-[var(--text-muted)]'
                         }`}
                       >
@@ -531,7 +685,7 @@ export function ReportFormPage() {
                 <div className="p-3.5 rounded-xl bg-[var(--surface-1-solid)] border border-[var(--border-subtle)] space-y-2 text-xs">
                   <div className="flex items-center justify-between pb-1.5 border-b border-[var(--border-subtle)]">
                     <span className="font-semibold text-[var(--text-primary)]">Incident Classification:</span>
-                    <span className="uppercase font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-rose-400">
+                    <span className="uppercase font-mono px-2 py-0.5 rounded bg-teal-950/50 border border-teal-500/30 text-teal-300 font-bold">
                       {watchIncidentType}
                     </span>
                   </div>
@@ -557,8 +711,8 @@ export function ReportFormPage() {
                   </div>
 
                   {watchDanger && (
-                    <div className="p-2 rounded bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-semibold flex items-center gap-1.5">
-                      <ShieldAlert className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+                    <div className="p-2.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 shrink-0 text-rose-400" strokeWidth={1.5} />
                       <span>Immediate Threat to Life Reported (Safety floor eligible)</span>
                     </div>
                   )}
@@ -571,7 +725,7 @@ export function ReportFormPage() {
             )}
           </div>
 
-          {/* Sticky Action Bar (Section D: Cancel and Confirm & Submit) */}
+          {/* Sticky Action Bar (Cancel, Previous, and Confirm & Submit) */}
           <div className="sticky bottom-0 p-3 md:p-4 bg-[var(--surface-2-solid)] border-t border-[var(--border-subtle)] flex items-center justify-between gap-2 shadow-lg">
             <Button
               type="button"
@@ -608,7 +762,7 @@ export function ReportFormPage() {
                     const nextStep = activeStep === 'input' ? 'review' : activeStep === 'review' ? 'location' : 'confirm';
                     setActiveStep(nextStep);
                   }}
-                  className="text-xs gap-1 bg-rose-600 hover:bg-rose-500"
+                  className="text-xs gap-1 bg-teal-600 hover:bg-teal-500 text-white"
                 >
                   <span>Next Step</span>
                   <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -619,7 +773,7 @@ export function ReportFormPage() {
                   variant="primary"
                   size="md"
                   isLoading={isSubmitting}
-                  className="text-xs gap-1.5 bg-rose-600 hover:bg-rose-500 shadow-md font-semibold"
+                  className="text-xs gap-1.5 bg-teal-600 hover:bg-teal-500 text-white shadow-md font-semibold"
                 >
                   <CheckCircle2 className="w-4 h-4" strokeWidth={1.5} />
                   <span>Confirm & Submit</span>

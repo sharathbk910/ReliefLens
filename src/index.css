@@ -6,67 +6,70 @@
     --font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    /* Theme: Dark (Default) */
-    --canvas: #090d16;
-    --canvas-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(30, 41, 59, 0.35) 0%, rgba(9, 13, 22, 1) 100%);
-    --surface-1: rgba(18, 25, 41, 0.78);
-    --surface-1-solid: #121929;
-    --surface-2: rgba(26, 36, 58, 0.88);
-    --surface-2-solid: #1a243a;
-    --surface-edge: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --surface-edge-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    /* Theme: Deep Navy & Teal (Default) */
+    --canvas: #060b17;
+    --canvas-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(15, 33, 64, 0.5) 0%, rgba(6, 11, 23, 1) 100%);
+    --surface-1: rgba(13, 26, 49, 0.82);
+    --surface-1-solid: #0d1a31;
+    --surface-2: rgba(18, 36, 68, 0.92);
+    --surface-2-solid: #122444;
+    --surface-edge: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    --surface-edge-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
-    --shadow-1: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
-    --shadow-2: 0 12px 36px -4px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+    --shadow-1: 0 4px 20px -2px rgba(2, 6, 17, 0.45), 0 2px 6px -1px rgba(2, 6, 17, 0.35);
+    --shadow-2: 0 12px 36px -4px rgba(2, 6, 17, 0.65), 0 4px 12px -2px rgba(2, 6, 17, 0.45);
 
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.15);
+    --border-subtle: rgba(148, 163, 184, 0.12);
+    --border-strong: rgba(45, 212, 191, 0.22);
 
-    --accent: #e11d48;
-    --accent-hover: #f43f5e;
-    --accent-subtle: rgba(225, 29, 72, 0.15);
+    /* Cohesive Teal Accents */
+    --accent: #0d9488;
+    --accent-hover: #14b8a6;
+    --accent-subtle: rgba(20, 184, 166, 0.16);
+    --accent-glow: 0 0 20px rgba(20, 184, 166, 0.25);
     
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --info: #3b82f6;
+    --info: #0284c7;
 
-    --focus-ring: #10b981;
+    --focus-ring: #14b8a6;
   }
 
   :root.light {
-    /* Theme: Light */
-    --canvas: #f6f8fa;
-    --canvas-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(226, 232, 240, 0.6) 0%, rgba(246, 248, 250, 1) 100%);
-    --surface-1: rgba(255, 255, 255, 0.82);
+    /* Theme: Crisp White with Navy & Teal */
+    --canvas: #f8fafc;
+    --canvas-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(204, 251, 241, 0.4) 0%, rgba(248, 250, 252, 1) 100%);
+    --surface-1: rgba(255, 255, 255, 0.94);
     --surface-1-solid: #ffffff;
-    --surface-2: rgba(255, 255, 255, 0.94);
-    --surface-2-solid: #ffffff;
-    --surface-edge: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    --surface-edge-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    --surface-2: rgba(241, 245, 249, 0.98);
+    --surface-2-solid: #f1f5f9;
+    --surface-edge: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --surface-edge-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
     --shadow-1: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 1px 3px 0 rgba(15, 23, 42, 0.04);
-    --shadow-2: 0 16px 36px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+    --shadow-2: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
+    --text-primary: #0a192f;
+    --text-secondary: #334155;
     --text-muted: #64748b;
     --border-subtle: rgba(15, 23, 42, 0.08);
-    --border-strong: rgba(15, 23, 42, 0.16);
+    --border-strong: rgba(13, 148, 136, 0.28);
 
-    --accent: #e11d48;
-    --accent-hover: #be123c;
-    --accent-subtle: rgba(225, 29, 72, 0.08);
+    --accent: #0f766e;
+    --accent-hover: #0d9488;
+    --accent-subtle: rgba(15, 118, 110, 0.1);
+    --accent-glow: 0 0 20px rgba(13, 148, 136, 0.15);
 
     --success: #059669;
     --warning: #d97706;
     --danger: #dc2626;
-    --info: #2563eb;
+    --info: #0284c7;
 
-    --focus-ring: #059669;
+    --focus-ring: #0d9488;
   }
 
   *, *::before, *::after {

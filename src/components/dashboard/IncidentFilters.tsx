@@ -37,23 +37,23 @@ export function IncidentFilters({
     filters.hasUncertainty;
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 mb-4 shadow-sm">
+    <div className="surface-z1 border border-[var(--border-subtle)] rounded-2xl p-3.5 mb-4 shadow-sm">
       {/* Compact Primary Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => onChange({ search: e.target.value })}
             placeholder="Search incident title, district, or description..."
-            className="w-full bg-slate-950 border border-slate-700/80 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-rose-500"
+            className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-teal-500"
           />
           {filters.search && (
             <button
               onClick={() => onChange({ search: '' })}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -64,7 +64,7 @@ export function IncidentFilters({
         <select
           value={filters.status}
           onChange={(e) => onChange({ status: e.target.value as any })}
-          className="bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-rose-500"
+          className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
         >
           <option value="all">Status: All</option>
           <option value="new">New</option>
@@ -79,7 +79,7 @@ export function IncidentFilters({
         <select
           value={filters.priorityTier}
           onChange={(e) => onChange({ priorityTier: e.target.value as any })}
-          className="bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-rose-500"
+          className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
         >
           <option value="all">Tier: All</option>
           <option value="critical">Critical (70–100)</option>
@@ -92,7 +92,7 @@ export function IncidentFilters({
         <select
           value={filters.incidentType}
           onChange={(e) => onChange({ incidentType: e.target.value as any })}
-          className="bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-rose-500"
+          className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
         >
           <option value="all">Type: All</option>
           <option value="flood">Flood</option>
@@ -109,8 +109,8 @@ export function IncidentFilters({
           onClick={() => onChange({ hasUncertainty: !filters.hasUncertainty })}
           className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
             filters.hasUncertainty
-              ? 'bg-amber-950/70 border-amber-500/50 text-amber-200'
-              : 'bg-slate-950 border-slate-700/80 text-slate-400 hover:text-slate-200'
+              ? 'bg-amber-950/50 border-amber-500/50 text-amber-200'
+              : 'bg-[var(--surface-1-solid)] border-[var(--border-strong)] text-[var(--text-muted)] hover:text-white'
           }`}
         >
           <span>⚠️ Uncertainty Only</span>
@@ -121,8 +121,8 @@ export function IncidentFilters({
           onClick={() => setPanelOpen(!panelOpen)}
           className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
             panelOpen || filters.district !== 'all'
-              ? 'bg-slate-800 border-slate-600 text-white'
-              : 'bg-slate-950 border-slate-700/80 text-slate-400 hover:text-slate-200'
+              ? 'bg-[var(--surface-2-solid)] border-teal-500/40 text-teal-300'
+              : 'bg-[var(--surface-1-solid)] border-[var(--border-strong)] text-[var(--text-muted)] hover:text-white'
           }`}
         >
           <Filter className="w-3.5 h-3.5" />
@@ -134,7 +134,7 @@ export function IncidentFilters({
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 px-2 py-1.5 rounded bg-rose-950/30 border border-rose-800/40"
+            className="flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 px-2 py-1.5 rounded-lg bg-rose-950/30 border border-rose-800/40"
           >
             <X className="w-3.5 h-3.5" />
             <span>Clear</span>
@@ -144,14 +144,14 @@ export function IncidentFilters({
 
       {/* Expandable Secondary Filter Panel */}
       {panelOpen && (
-        <div className="mt-3 pt-3 border-t border-slate-800 flex flex-wrap items-center gap-4 text-xs animate-slide-down">
+        <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-4 text-xs animate-slide-down">
           {/* District Filter */}
           <div className="flex items-center gap-2">
-            <span className="text-slate-400">District:</span>
+            <span className="text-[var(--text-muted)]">District:</span>
             <select
               value={filters.district}
               onChange={(e) => onChange({ district: e.target.value })}
-              className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200"
+              className="bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-teal-500"
             >
               <option value="all">All Districts</option>
               {districts.map((d) => (

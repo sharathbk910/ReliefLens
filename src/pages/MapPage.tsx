@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -16,10 +16,13 @@ import {
   X,
   Layers,
   Flame,
+  Crosshair,
+  Loader2,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
 import type { Incident, PriorityTier } from '../shared/types.ts';
 import { PriorityBadge, StatusBadge } from '../components/ui/Badge.tsx';
+import { useToast } from '../components/ui/Toast.tsx';
 
 function createCustomMarkerIcon(tier: PriorityTier) {
   const colors: Record<PriorityTier, string> = {
@@ -56,6 +59,36 @@ function createCustomMarkerIcon(tier: PriorityTier) {
   });
 }
 
+function createUserLocationIcon() {
+  return L.divIcon({
+    className: 'user-location-marker',
+    html: `
+      <div style="position: relative; width: 24px; height: 24px;">
+        <div style="
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: rgba(20, 184, 166, 0.4);
+          animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        "></div>
+        <div style="
+          position: relative;
+          width: 18px;
+          height: 18px;
+          margin: 3px;
+          border-radius: 50%;
+          background: #0d9488;
+          border: 3px solid #ffffff;
+          box-shadow: 0 0 10px rgba(13, 148, 136, 0.8), 0 2px 6px rgba(0,0,0,0.4);
+        "></div>
+      </div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
+  });
+}
+
 function getHeatCircleStyle(tier: PriorityTier) {
   const configs: Record<PriorityTier, { color: string; fillColor: string; radius: number; fillOpacity: number }> = {
     critical: { color: '#e11d48', fillColor: '#e11d48', radius: 1000, fillOpacity: 0.25 },
@@ -66,13 +99,119 @@ function getHeatCircleStyle(tier: PriorityTier) {
   return configs[tier] || configs.low;
 }
 
-// Map center controller
+// Automatically fits map bounds to actual incident marker coordinates
+function AutoFitBounds({ incidents }: { incidents: Incident[] }) {
+  const map = useMap();
+  const fittedRef = useRef(false);
+
+  useEffect(() => {
+    const valid = incidents.filter(
+      (i) =>
+        typeof i.latitude === 'number' &&
+        typeof i.longitude === 'number' &&
+        !isNaN(i.latitude) &&
+        !isNaN(i.longitude)
+    );
+    if (valid.length === 0) return;
+
+    if (!fittedRef.current) {
+      fittedRef.current = true;
+      if (valid.length === 1) {
+        map.setView([valid[0].latitude!, valid[0].longitude!], 13);
+      } else {
+        const bounds = L.latLngBounds(
+          valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
+        );
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+      }
+    }
+  }, [incidents, map]);
+
+  return null;
+}
+
+// Map center controller for selecting an incident
 function MapFlyTo({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
   useEffect(() => {
     map.flyTo([lat, lng], 14, { duration: 1.2 });
   }, [lat, lng, map]);
   return null;
+}
+
+// Floating target/crosshair Locate Me control like Google Maps
+function LocateMeControl({
+  userLocation,
+  setUserLocation,
+}: {
+  userLocation: { lat: number; lng: number; accuracy: number } | null;
+  setUserLocation: (loc: { lat: number; lng: number; accuracy: number } | null) => void;
+}) {
+  const map = useMap();
+  const toast = useToast();
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handleLocateMe = () => {
+    if (isLocating) return;
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      toast.error('Not Supported', 'Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        const loc = { lat: latitude, lng: longitude, accuracy: Math.round(accuracy) };
+        setUserLocation(loc);
+        map.flyTo([latitude, longitude], 15, { duration: 1.2 });
+        toast.success(
+          'Location Detected',
+          `Recentered to current GPS coordinates (±${loc.accuracy}m).`
+        );
+        setIsLocating(false);
+      },
+      (err) => {
+        setIsLocating(false);
+        if (err.code === 1) {
+          toast.error(
+            'Location Permission Denied',
+            'Please allow location access in your browser address bar to use Locate Me.'
+          );
+        } else {
+          toast.error('Location Unavailable', err.message || 'Unable to retrieve GPS coordinates.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
+    );
+  };
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: '24px',
+        right: '24px',
+        zIndex: 1000,
+        pointerEvents: 'auto',
+      }}
+    >
+      <button
+        type="button"
+        onClick={handleLocateMe}
+        disabled={isLocating}
+        title="Locate Me (Google Maps style)"
+        aria-label="Locate Me"
+        className="w-11 h-11 rounded-full bg-[var(--surface-1-solid)] hover:bg-[var(--surface-2-solid)] border-2 border-teal-500/60 hover:border-teal-400 text-teal-400 shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-teal-400"
+      >
+        {isLocating ? (
+          <Loader2 className="w-5 h-5 animate-spin text-teal-400" />
+        ) : (
+          <Crosshair className="w-5 h-5 text-teal-400 group-hover:rotate-45 transition-transform" />
+        )}
+      </button>
+    </div>
+  );
 }
 
 export function MapPage() {
@@ -82,6 +221,7 @@ export function MapPage() {
   const [selectedTier, setSelectedTier] = useState<PriorityTier | 'all'>('all');
   const [mapViewMode, setMapViewMode] = useState<'all' | 'pins' | 'heat'>('all');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
   
   // Mobile sheet detents: 'peek' | 'half' | 'full'
   const [mobileDetent, setMobileDetent] = useState<'peek' | 'half' | 'full'>('peek');
@@ -138,7 +278,7 @@ export function MapPage() {
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] min-h-[500px] rounded-2xl overflow-hidden surface-z1">
+    <div className="relative w-full h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] min-h-[500px] rounded-2xl overflow-hidden surface-z1 border border-[var(--border-subtle)]">
       {/* 1. Full-Bleed Map Canvas (Layer 0) */}
       <div className="absolute inset-0 z-0">
         {tileError ? (
@@ -170,6 +310,50 @@ export function MapPage() {
                 tileerror: () => setTileError(true),
               }}
             />
+
+            {/* Automatically adjust bounds to fit loaded incidents */}
+            <AutoFitBounds incidents={locatedIncidents} />
+
+            {/* Google Maps style floating Locate Me control */}
+            <LocateMeControl
+              userLocation={userLocation}
+              setUserLocation={setUserLocation}
+            />
+
+            {/* User Location Marker & Accuracy Radius */}
+            {userLocation && (
+              <>
+                <Marker
+                  position={[userLocation.lat, userLocation.lng]}
+                  icon={createUserLocationIcon()}
+                >
+                  <Popup>
+                    <div className="p-1 space-y-1 text-xs">
+                      <div className="flex items-center gap-1.5 text-teal-400 font-semibold">
+                        <Crosshair className="w-3.5 h-3.5" />
+                        <span>Your Current Position</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300">
+                        GPS Accuracy: ±{userLocation.accuracy} meters
+                      </p>
+                      <p className="font-mono text-[10px] text-slate-400">
+                        {userLocation.lat.toFixed(5)}°, {userLocation.lng.toFixed(5)}°
+                      </p>
+                    </div>
+                  </Popup>
+                </Marker>
+                <Circle
+                  center={[userLocation.lat, userLocation.lng]}
+                  radius={userLocation.accuracy}
+                  pathOptions={{
+                    color: '#0d9488',
+                    fillColor: '#14b8a6',
+                    fillOpacity: 0.18,
+                    weight: 1.5,
+                  }}
+                />
+              </>
+            )}
 
             {selectedIncident?.latitude && selectedIncident?.longitude && (
               <MapFlyTo lat={selectedIncident.latitude} lng={selectedIncident.longitude} />
@@ -219,7 +403,7 @@ export function MapPage() {
                       <div className="pt-1 border-t border-[var(--border-subtle)]">
                         <Link
                           to={`/incidents/${inc.id}`}
-                          className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 font-semibold"
+                          className="inline-flex items-center gap-1 text-xs text-teal-400 hover:text-teal-300 font-semibold"
                         >
                           <span>Open Details</span>
                           <ArrowRight className="w-3 h-3" strokeWidth={1.5} />

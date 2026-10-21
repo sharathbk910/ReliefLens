@@ -65,7 +65,7 @@ export function IncidentTable({
   }
 
   return (
-    <div className="surface-z1 overflow-hidden flex flex-col">
+    <div className="surface-z1 rounded-2xl border border-[var(--border-subtle)] overflow-hidden flex flex-col shadow-sm">
       {/* 1. Mobile Stacked Cards (< 768px - Section G) */}
       <div className="md:hidden divide-y divide-[var(--border-subtle)]">
         {incidents.map((incident) => (
@@ -88,7 +88,7 @@ export function IncidentTable({
 
             <div className="flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
               <span className="flex items-center gap-1 truncate max-w-[200px]">
-                <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" strokeWidth={1.5} />
+                <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0" strokeWidth={1.5} />
                 <span className="truncate">{incident.district || incident.location_text || 'No Location'}</span>
               </span>
               <span className="flex items-center gap-1 tabular-nums shrink-0 font-mono text-[10px]">
@@ -104,7 +104,7 @@ export function IncidentTable({
       <div className="hidden md:block table-scroll-container">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="bg-[var(--border-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium">
+            <tr className="bg-[var(--surface-1)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium">
               <th className="py-3 px-4">Priority & Score</th>
               <th className="py-3 px-4 min-w-[200px]">Incident Details</th>
               <th className="py-3 px-4">District / Location</th>
@@ -124,7 +124,7 @@ export function IncidentTable({
                 <tr
                   key={incident.id}
                   onClick={() => navigate(`/incidents/${incident.id}`)}
-                  className="hover:bg-[var(--border-subtle)] transition-colors cursor-pointer group"
+                  className="hover:bg-[var(--surface-2-solid)] transition-colors cursor-pointer group"
                 >
                   {/* Priority & Score */}
                   <td className="py-3.5 px-4 align-top">
@@ -134,12 +134,12 @@ export function IncidentTable({
                         score={incident.effective_score}
                       />
                       {hasFloorApplied && (
-                        <span className="text-[10px] text-amber-500 font-mono">
+                        <span className="text-[10px] text-amber-400 font-mono">
                           Floor Adjusted (45)
                         </span>
                       )}
                       {hasOverride && (
-                        <span className="text-[10px] text-rose-400 font-mono">
+                        <span className="text-[10px] text-teal-400 font-mono">
                           Manual Override
                         </span>
                       )}
@@ -148,11 +148,11 @@ export function IncidentTable({
 
                   {/* Title & Type */}
                   <td className="py-3.5 px-4 align-top">
-                    <div className="font-semibold text-[var(--text-primary)] group-hover:text-rose-400 transition-colors line-clamp-1">
+                    <div className="font-semibold text-[var(--text-primary)] group-hover:text-teal-300 transition-colors line-clamp-1">
                       {incident.title}
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-[11px] text-[var(--text-secondary)]">
-                      <span className="capitalize font-mono px-1 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)]">
+                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-[10px]">
                         {incident.incident_type}
                       </span>
                       <span className="flex items-center gap-1 tabular-nums text-[var(--text-muted)]">
@@ -165,7 +165,7 @@ export function IncidentTable({
                   {/* Location */}
                   <td className="py-3.5 px-4 align-top">
                     <div className="flex items-start gap-1 text-[var(--text-primary)]">
-                      <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" strokeWidth={1.5} />
+                      <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" strokeWidth={1.5} />
                       <div className="truncate max-w-[160px]">
                         <p className="font-medium text-[var(--text-primary)] truncate">
                           {incident.district || 'Unassigned District'}
@@ -215,7 +215,7 @@ export function IncidentTable({
 
                   {/* Action Link */}
                   <td className="py-3.5 px-4 align-top text-right">
-                    <span className="inline-flex items-center text-[var(--text-muted)] group-hover:text-rose-400 group-hover:translate-x-0.5 transition-all">
+                    <span className="inline-flex items-center text-[var(--text-muted)] group-hover:text-teal-400 group-hover:translate-x-0.5 transition-all">
                       <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                     </span>
                   </td>

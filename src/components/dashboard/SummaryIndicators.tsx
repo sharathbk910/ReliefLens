@@ -66,18 +66,18 @@ export function SummaryIndicators({
           key={ind.id}
           type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`text-left p-3.5 md:p-4 surface-z1 ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2`}
+          className={`text-left p-4 rounded-2xl surface-z1 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} transition-all duration-200 cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm hover:shadow-md hover:-translate-y-0.5`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            <span className="text-xs font-semibold text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
               {ind.label}
             </span>
-            <div className="p-1 rounded-md bg-[var(--border-subtle)] border border-[var(--border-subtle)]">
+            <div className="p-1.5 rounded-lg bg-[var(--surface-2-solid)] border border-[var(--border-subtle)] group-hover:border-teal-500/30 transition-colors">
               {ind.icon}
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl md:text-3xl font-bold font-heading tabular-nums ${ind.countColor}`}>
+            <span className={`text-2xl md:text-3xl font-extrabold font-heading tabular-nums ${ind.countColor}`}>
               {ind.count}
             </span>
           </div>
