@@ -658,6 +658,44 @@
   background: rgba(235, 252, 114, 0.5);
 }
 
+/* Internal Vertical Scroll for Incident Priority & Score Table */
+.table-body-scroll {
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.dark .table-body-scroll {
+  scrollbar-color: rgba(235, 252, 114, 0.25) transparent;
+}
+
+.table-body-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-body-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-body-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+.dark .table-body-scroll::-webkit-scrollbar-thumb {
+  background: rgba(235, 252, 114, 0.25);
+}
+
+.table-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+.dark .table-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(235, 252, 114, 0.5);
+}
+
 @media (max-width: 640px) {
   .slide-track {
     height: 48px;

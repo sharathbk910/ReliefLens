@@ -100,8 +100,8 @@ export function IncidentTable({
 
   return (
     <div className="surface-z1 rounded-2xl border border-[var(--border-subtle)] overflow-hidden flex flex-col shadow-sm">
-      {/* 1. Mobile Stacked Cards (< 768px - Section G) */}
-      <div className="md:hidden divide-y divide-[var(--border-subtle)]">
+      {/* 1. Mobile Stacked Cards (< 768px - Internal Scrollable List) */}
+      <div className="md:hidden divide-y divide-[var(--border-subtle)] max-h-[460px] overflow-y-auto">
         {incidents.map((incident) => {
           const isSelected = selectedIncidentId === incident.id;
           return (
@@ -154,8 +154,8 @@ export function IncidentTable({
         })}
       </div>
 
-      {/* 2. Desktop & Tablet Table (>= 768px - Spacious Layout, Zero Text Clipping, Clean Headers) */}
-      <div className="hidden md:block w-full max-w-full overflow-hidden">
+      {/* 2. Desktop & Tablet Table (>= 768px - Internal Scroll Container with Sticky Headers) */}
+      <div className="hidden md:block w-full max-w-full table-body-scroll relative">
         <table className="w-full text-left text-xs border-collapse table-fixed">
           <colgroup>
             <col style={{ width: '18%' }} className="w-[18%]" />
@@ -165,8 +165,8 @@ export function IncidentTable({
             <col style={{ width: '11%' }} className="w-[11%]" />
             <col style={{ width: '12%' }} className="w-[12%]" />
           </colgroup>
-          <thead className="sticky top-0 z-10">
-            <tr className="bg-[var(--surface-1-solid)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium select-none shadow-sm">
+          <thead className="sticky top-0 z-20 shadow-xs">
+            <tr className="bg-[var(--surface-1-solid)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium select-none shadow-xs">
               <th className="py-2.5 px-3 whitespace-nowrap text-[11px] font-mono uppercase tracking-wider bg-[var(--surface-1-solid)]">
                 Priority & Score
               </th>

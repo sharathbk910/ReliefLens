@@ -204,10 +204,10 @@ export function AppShell() {
 
       {/* Main Spatial Body */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) */}
+        {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) - Sticky Viewport Docked */}
         <aside
           aria-label="Primary Navigation"
-          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none rounded-xl"
+          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none rounded-xl sticky top-14 h-[calc(100vh-4.5rem)] self-start shadow-sm"
         >
           {/* Logo & Operational Status */}
           <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-center lg:justify-start">
