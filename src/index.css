@@ -184,7 +184,6 @@
   box-shadow: var(--shadow-2);
   border: 1px solid var(--border-strong);
   border-radius: 1rem;
-  position: relative;
 }
 
 @supports (backdrop-filter: blur(1px)) {

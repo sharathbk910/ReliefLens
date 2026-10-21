@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -28,11 +28,27 @@ import type { UserRole } from '../../shared/types.ts';
 
 export function AppShell() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const userDropdownRef = useRef<HTMLDivElement | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const currentUser = dataService.getCurrentUser();
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+        setUserDropdownOpen(false);
+      }
+    }
+    if (userDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userDropdownOpen]);
 
   // Initialize theme from system or saved preference
   useEffect(() => {
@@ -105,7 +121,7 @@ export function AppShell() {
     <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
       {/* 1. Tactical Operational Topbar & Emergency Response Strip (Sticky / Fixed at top) */}
       <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-[var(--tactical-border,rgba(244,243,232,0.1))] bg-[#12130f]/95 backdrop-blur-md text-xs select-none shadow-md">
-        <div className="flex items-center gap-2.5 max-w-7xl mx-auto w-full">
+        <div className="flex items-center justify-between gap-2.5 max-w-7xl mx-auto w-full flex-nowrap min-w-0">
           <div className="md:hidden shrink-0">
             <AppLogo size="xs" showText={false} />
           </div>
@@ -116,7 +132,7 @@ export function AppShell() {
             </span>
           </div>
 
-          <div className="ml-auto flex items-center gap-2 shrink-0">
+          <div className="ml-auto flex items-center gap-2 shrink-0 flex-nowrap">
             {/* Prominent Emergency Action Button (from Inversa sample) */}
             <button
               onClick={() => navigate('/reports/new')}
@@ -142,7 +158,7 @@ export function AppShell() {
             )}
 
             {/* FIXED LOGGED-IN DETAILS PILL & PERSONA SWITCHER */}
-            <div className="relative">
+            <div className="relative shrink-0" ref={userDropdownRef}>
               <button
                 type="button"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -165,7 +181,7 @@ export function AppShell() {
 
               {/* Persona Switcher Dropdown Popover */}
               {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 surface-z2 border border-[var(--border-strong)] rounded-xl p-2 z-50 animate-spatial-enter shadow-2xl bg-[#141611]/98">
+                <div className="!absolute right-0 top-full mt-1.5 w-60 z-[100] shadow-2xl bg-[#141611]/98 backdrop-blur-xl border border-[var(--border-strong)] rounded-xl p-2.5 animate-spatial-enter select-auto">
                   <div className="px-2 py-1.5 border-b border-[var(--border-subtle)] mb-1">
                     <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] font-bold">
                       CURRENTLY LOGGED IN:
