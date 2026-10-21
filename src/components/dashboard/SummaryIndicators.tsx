@@ -22,9 +22,9 @@ export function SummaryIndicators({
       label: 'Open Incidents',
       count: openIncidents,
       desc: 'Active crisis situations in progress',
-      icon: <FolderOpen className="w-4 h-4 text-blue-400" strokeWidth={1.5} />,
-      border: 'hover:border-blue-500/40',
-      countColor: 'text-blue-400',
+      icon: <FolderOpen className="w-4 h-4 text-sky-600 dark:text-blue-400" strokeWidth={1.5} />,
+      border: 'hover:border-sky-500/50',
+      countColor: 'text-sky-700 dark:text-blue-400',
       stagger: 'stagger-1',
     },
     {
@@ -32,9 +32,9 @@ export function SummaryIndicators({
       label: 'Critical Danger',
       count: criticalHigh,
       desc: 'Trapped victims & life-threatening risk',
-      icon: <AlertCircle className="w-4 h-4 text-rose-500" strokeWidth={1.5} />,
-      border: 'hover:border-rose-500/40',
-      countColor: 'text-rose-500',
+      icon: <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-500" strokeWidth={1.5} />,
+      border: 'hover:border-rose-500/50',
+      countColor: 'text-rose-600 dark:text-rose-500',
       stagger: 'stagger-2',
     },
     {
@@ -42,9 +42,9 @@ export function SummaryIndicators({
       label: 'Needs Verification',
       count: unresolvedUncertainty,
       desc: 'Awaiting exact location or field check',
-      icon: <AlertTriangle className="w-4 h-4 text-amber-500" strokeWidth={1.5} />,
-      border: 'hover:border-amber-500/40',
-      countColor: 'text-amber-500',
+      icon: <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500" strokeWidth={1.5} />,
+      border: 'hover:border-amber-500/50',
+      countColor: 'text-amber-700 dark:text-amber-400',
       stagger: 'stagger-3',
     },
     {
@@ -52,9 +52,9 @@ export function SummaryIndicators({
       label: 'Linked Duplicates',
       count: pendingDuplicates,
       desc: 'Merged reports to prevent wasted aid',
-      icon: <CopyCheck className="w-4 h-4 text-[var(--text-secondary)]" strokeWidth={1.5} />,
-      border: 'hover:border-[var(--border-strong)]',
-      countColor: 'text-[var(--text-primary)]',
+      icon: <CopyCheck className="w-4 h-4 text-slate-700 dark:text-[var(--text-secondary)]" strokeWidth={1.5} />,
+      border: 'hover:border-slate-400 dark:hover:border-[var(--border-strong)]',
+      countColor: 'text-slate-900 dark:text-[var(--text-primary)]',
       stagger: 'stagger-4',
     },
   ];
@@ -66,7 +66,7 @@ export function SummaryIndicators({
           key={ind.id}
           type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`text-left p-3 sm:p-3.5 md:p-4 rounded-xl corner-cross surface-z1 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} tactical-card-interactive cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm relative`}
+          className={`text-left p-3 sm:p-3.5 md:p-4 rounded-xl corner-cross surface-z1 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} tactical-card-interactive cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm relative transition-all`}
         >
           <div className="corner-bracket cross-tl"></div>
           <div className="corner-bracket cross-tr"></div>
@@ -77,7 +77,7 @@ export function SummaryIndicators({
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors truncate pr-1">
               {ind.label}
             </span>
-            <div className="p-1 sm:p-1.5 rounded-lg bg-black/40 border border-white/5 group-hover:border-[#EBFC72]/40 transition-colors shrink-0">
+            <div className="p-1 sm:p-1.5 rounded-lg bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/5 group-hover:border-teal-500/40 dark:group-hover:border-[#EBFC72]/40 transition-colors shrink-0">
               {ind.icon}
             </div>
           </div>
@@ -86,7 +86,7 @@ export function SummaryIndicators({
               {ind.count}
             </span>
           </div>
-          <p className="text-xs font-mono text-[var(--text-muted)] mt-1 line-clamp-2 leading-snug">
+          <p className="text-xs font-mono text-[var(--text-secondary)] mt-1 line-clamp-2 leading-snug">
             {ind.desc}
           </p>
         </button>

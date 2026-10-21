@@ -115,7 +115,9 @@ export function IncidentTable({
                 }
               }}
               className={`p-3 sm:p-3.5 hover:bg-[var(--border-subtle)] transition-colors cursor-pointer space-y-2 ${
-                isSelected ? 'bg-[#EBFC72]/10 border-l-4 border-l-[#EBFC72]' : ''
+                isSelected
+                  ? 'bg-teal-50/80 dark:bg-[#EBFC72]/10 border-l-4 border-l-teal-600 dark:border-l-[#EBFC72]'
+                  : ''
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-1.5">
@@ -132,16 +134,16 @@ export function IncidentTable({
 
               <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1 border-t border-[var(--border-subtle)]/40 text-[11px] text-[var(--text-secondary)]">
                 <span className="flex items-center gap-1 truncate max-w-[170px] sm:max-w-[220px]">
-                  <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0" strokeWidth={1.5} />
+                  <MapPin className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" strokeWidth={1.5} />
                   <span className="truncate">{incident.district || incident.location_text || 'No Location'}</span>
                 </span>
                 <div className="flex items-center gap-2 shrink-0">
                   {getDistanceText(incident.latitude, incident.longitude) && (
-                    <span className="text-[10px] text-teal-400 font-mono font-medium">
+                    <span className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-medium">
                       📍 {getDistanceText(incident.latitude, incident.longitude)}
                     </span>
                   )}
-                  <span className="flex items-center gap-1 tabular-nums font-mono text-[10px]">
+                  <span className="flex items-center gap-1 tabular-nums font-mono text-[10px] text-[var(--text-secondary)]">
                     <Clock className="w-3 h-3 text-[var(--text-muted)]" strokeWidth={1.5} />
                     {formatTimeAgo(incident.last_reported_at)}
                   </span>
@@ -209,8 +211,8 @@ export function IncidentTable({
                   }}
                   className={`transition-colors cursor-pointer group ${priorityBorder} ${
                     isSelected
-                      ? 'bg-[#EBFC72]/10 hover:bg-[#EBFC72]/15 shadow-[inset_3px_0_0_0_#EBFC72]'
-                      : 'hover:bg-[var(--surface-2-solid)]'
+                      ? 'bg-teal-50/70 hover:bg-teal-100/60 shadow-[inset_3px_0_0_0_#0d9488] dark:bg-[#EBFC72]/10 dark:hover:bg-[#EBFC72]/15 dark:shadow-[inset_3px_0_0_0_#EBFC72]'
+                      : 'hover:bg-slate-50 dark:hover:bg-[var(--surface-2-solid)]'
                   }`}
                 >
                   {/* Priority & Score */}
@@ -221,17 +223,17 @@ export function IncidentTable({
                         score={incident.effective_score}
                       />
                       {hasFloorApplied && (
-                        <span className="text-[10px] text-amber-400 font-mono whitespace-nowrap">
+                        <span className="text-[10px] text-amber-800 dark:text-amber-400 font-mono whitespace-nowrap">
                           Floor Adjusted (45)
                         </span>
                       )}
                       {hasOverride && (
-                        <span className="text-[10px] text-teal-400 font-mono whitespace-nowrap">
+                        <span className="text-[10px] text-teal-800 dark:text-teal-400 font-mono whitespace-nowrap">
                           Manual Override
                         </span>
                       )}
                       {isSelected && (
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#EBFC72] font-bold">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-teal-800 dark:text-[#EBFC72] font-bold">
                           ● TARGETED IN HUD
                         </span>
                       )}
@@ -241,13 +243,13 @@ export function IncidentTable({
                   {/* Title & Type & Uncertainty */}
                   <td className="py-2.5 px-3 align-top overflow-hidden">
                     <div
-                      className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-teal-300 transition-colors line-clamp-2 leading-snug"
+                      className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors line-clamp-2 leading-snug"
                       title={incident.title}
                     >
                       {incident.title}
                     </div>
                     <div className="flex items-center gap-1.5 mt-1 text-[10px] text-[var(--text-secondary)] flex-wrap">
-                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 whitespace-nowrap shrink-0">
+                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-500/20 whitespace-nowrap shrink-0 font-medium">
                         {incident.incident_type}
                       </span>
                       <span className="flex items-center gap-0.5 tabular-nums text-[var(--text-muted)] whitespace-nowrap">
@@ -272,7 +274,7 @@ export function IncidentTable({
                         {incident.location_text || 'No text location'}
                       </p>
                       {getDistanceText(incident.latitude, incident.longitude) && (
-                        <span className="text-[10px] text-teal-400 font-mono font-medium block truncate mt-0.5">
+                        <span className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-medium block truncate mt-0.5">
                           📍 {getDistanceText(incident.latitude, incident.longitude)}
                         </span>
                       )}
@@ -282,7 +284,7 @@ export function IncidentTable({
                   {/* Report Count */}
                   <td className="py-2.5 px-2 align-top text-center whitespace-nowrap overflow-hidden">
                     <span
-                      className="inline-flex items-center justify-center px-2 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono text-xs font-bold tabular-nums"
+                      className="inline-flex items-center justify-center px-2 py-0.5 rounded bg-slate-100 dark:bg-[var(--border-subtle)] text-slate-800 dark:text-[var(--text-primary)] font-mono text-xs font-bold tabular-nums border border-slate-200 dark:border-transparent"
                       title={`${incident.report_count} reports (${incident.distinct_channel_count} channels)`}
                     >
                       {incident.report_count}

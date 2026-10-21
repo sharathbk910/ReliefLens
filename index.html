@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="light">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +11,7 @@
     <meta name="keywords" content="ResQWave, emergency rescue, disaster response, flood relief, emergency dispatch, search and rescue, crisis response, emergency triage, humanitarian action, multilingual emergency reporting" />
     <meta name="author" content="ResQWave Emergency Coordination Network" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <meta name="theme-color" content="#0284c7" />
+    <meta name="theme-color" content="#090e17" />
     <link rel="canonical" href="https://resqwave.org/" />
 
     <!-- Open Graph / Facebook -->
@@ -76,8 +76,34 @@
       ]
     }
     </script>
+    <!-- Inline script to enforce dark mode automatically on load -->
+    <script>
+      (function() {
+        try {
+          var migrated = localStorage.getItem('resqwave-dark-default-v2');
+          if (!migrated) {
+            localStorage.setItem('resqwave-dark-default-v2', 'true');
+            localStorage.setItem('resqwave-theme-mode', 'dark');
+            localStorage.setItem('resqwave-theme', 'dark');
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          } else {
+            var mode = localStorage.getItem('resqwave-theme-mode');
+            if (mode === 'light') {
+              document.documentElement.classList.remove('dark');
+              document.documentElement.classList.add('light');
+            } else {
+              document.documentElement.classList.add('dark');
+              document.documentElement.classList.remove('light');
+            }
+          }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-teal-500/20 selection:text-teal-900">
+  <body class="bg-slate-50 text-slate-900 dark:bg-[#090e17] dark:text-slate-100 antialiased font-sans selection:bg-teal-500/20 selection:text-teal-900 dark:selection:text-teal-200 transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

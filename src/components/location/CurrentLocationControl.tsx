@@ -272,7 +272,7 @@ export function CurrentLocationControl({
                     value={manualLat}
                     onChange={(e) => setManualLat(e.target.value)}
                     placeholder="Latitude (e.g. 37.7749)"
-                    className="bg-[var(--surface-2-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-[var(--text-muted)] font-mono"
+                    className="bg-[var(--surface-2-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-[var(--text-muted)] font-mono"
                   />
                   <input
                     type="number"
@@ -280,14 +280,14 @@ export function CurrentLocationControl({
                     value={manualLng}
                     onChange={(e) => setManualLng(e.target.value)}
                     placeholder="Longitude (e.g. -122.4194)"
-                    className="bg-[var(--surface-2-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-[var(--text-muted)] font-mono"
+                    className="bg-[var(--surface-2-solid)] border border-[var(--border-strong)] rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-[var(--text-muted)] font-mono"
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={handleApplyManualCoords}
-                    className="text-xs col-span-2 sm:col-span-1 border-teal-500/40 text-teal-300 hover:bg-teal-950/30"
+                    className="text-xs col-span-2 sm:col-span-1 border-teal-500/40 text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-950/30"
                   >
                     Set Location
                   </Button>

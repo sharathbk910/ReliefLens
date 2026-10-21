@@ -31,7 +31,20 @@ import type { UserRole } from '../../shared/types.ts';
 export function AppShell() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const userDropdownRef = useRef<HTMLDivElement | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const migrated = localStorage.getItem('resqwave-dark-default-v2');
+      if (!migrated) {
+        localStorage.setItem('resqwave-dark-default-v2', 'true');
+        localStorage.setItem('resqwave-theme-mode', 'dark');
+        localStorage.setItem('resqwave-theme', 'dark');
+        return 'dark';
+      }
+      const saved = localStorage.getItem('resqwave-theme-mode');
+      return saved === 'light' ? 'light' : 'dark';
+    }
+    return 'dark';
+  });
   const currentUser = dataService.getCurrentUser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,23 +65,21 @@ export function AppShell() {
     };
   }, [userDropdownOpen]);
 
-  // Initialize theme from saved preference (defaults to clean modern light theme)
+  // Sync theme with HTML class
   useEffect(() => {
-    const saved = localStorage.getItem('resqwave-theme-mode');
-    if (saved === 'dark') {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    } else {
-      setTheme('light');
+    if (theme === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     }
-  }, []);
+  }, [theme]);
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
+    localStorage.setItem('resqwave-dark-default-v2', 'true');
     localStorage.setItem('resqwave-theme-mode', next);
     localStorage.setItem('resqwave-theme', next);
     if (next === 'light') {

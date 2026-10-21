@@ -6,26 +6,26 @@ export function EmergencyHelplineWidget() {
   const [activeTab, setActiveTab] = useState<'hotlines' | 'guide' | 'safety'>('hotlines');
 
   const hotlines = [
-    { number: '112', label: 'All-in-One National Emergency', desc: 'Police, Disaster, Search & Rescue', color: 'text-rose-400', bg: 'bg-rose-500/10 border-rose-500/30' },
-    { number: '108', label: 'Disaster Ambulance & Medical', desc: 'Critical Injury, Paramedics, Oxygen', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
-    { number: '101', label: 'Fire & Structural Rescue', desc: 'Trapped in rubble, Fire hazard, Collapse', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/30' },
-    { number: '1070', label: 'State Disaster Management', desc: 'Flood relief, Evacuation, Safe shelter info', color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30' },
+    { number: '112', label: 'All-in-One National Emergency', desc: 'Police, Disaster, Search & Rescue', color: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50/80 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30' },
+    { number: '108', label: 'Disaster Ambulance & Medical', desc: 'Critical Injury, Paramedics, Oxygen', color: 'text-amber-800 dark:text-amber-400', bg: 'bg-amber-50/80 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30' },
+    { number: '101', label: 'Fire & Structural Rescue', desc: 'Trapped in rubble, Fire hazard, Collapse', color: 'text-orange-800 dark:text-orange-400', bg: 'bg-orange-50/80 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/30' },
+    { number: '1070', label: 'State Disaster Management', desc: 'Flood relief, Evacuation, Safe shelter info', color: 'text-teal-800 dark:text-teal-400', bg: 'bg-teal-50/80 dark:bg-teal-500/10 border-teal-200 dark:border-teal-500/30' },
   ];
 
   const safetyTips = [
     {
       type: 'Flood & Rising Water',
-      icon: <Droplets className="w-4 h-4 text-blue-400" />,
+      icon: <Droplets className="w-4 h-4 text-blue-500 dark:text-blue-400" />,
       tips: ['Move immediately to higher ground', 'Turn off electricity at the main breaker', 'Never drive or walk through moving water'],
     },
     {
       type: 'Fire & Smoke Hazard',
-      icon: <Flame className="w-4 h-4 text-orange-400" />,
+      icon: <Flame className="w-4 h-4 text-orange-500 dark:text-orange-400" />,
       tips: ['Crawl low under smoke to avoid toxic fumes', 'Feel doors with back of hand before opening', 'Signal your location from an open window'],
     },
     {
       type: 'Earthquake & Collapse',
-      icon: <AlertTriangle className="w-4 h-4 text-amber-400" />,
+      icon: <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />,
       tips: ['Drop, Cover, and Hold On under sturdy furniture', 'Stay clear of exterior walls and windows', 'If trapped, tap on a pipe or wall to signal rescuers'],
     },
   ];
@@ -40,21 +40,21 @@ export function EmergencyHelplineWidget() {
 
   return (
     <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-3.5 sm:p-4 space-y-3.5 shadow-sm text-xs">
-      {/* Header with Segmented Switch (Responsive wrap prevents narrow column squeeze) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-[var(--border-subtle)]">
-        <div className="flex items-center gap-2 min-w-0">
-          <LifeBuoy className="w-4 h-4 text-[#EBFC72] shrink-0" />
-          <h2 className="font-bold text-[var(--text-primary)] font-heading text-xs sm:text-sm whitespace-normal">
+      {/* Header with Segmented Switch (Clean stacked layout prevents narrow column title squeeze) */}
+      <div className="flex flex-col gap-2.5 pb-2.5 border-b border-[var(--border-subtle)]">
+        <div className="flex items-center gap-2">
+          <LifeBuoy className="w-4 h-4 text-rose-500 shrink-0" />
+          <h2 className="font-bold text-[var(--text-primary)] font-heading text-xs sm:text-sm whitespace-nowrap">
             Emergency Help & Helplines
           </h2>
         </div>
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto shrink-0">
+        <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 w-full">
           <button
             type="button"
             onClick={() => setActiveTab('hotlines')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
+            className={`py-1 px-1 rounded-lg text-xs font-mono text-center whitespace-nowrap transition-all border cursor-pointer ${
               activeTab === 'hotlines'
-                ? 'bg-white dark:bg-slate-700 text-sky-700 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-600 shadow-xs'
+                ? 'bg-white dark:bg-slate-700 text-sky-800 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-600 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border-transparent'
             }`}
           >
@@ -63,9 +63,9 @@ export function EmergencyHelplineWidget() {
           <button
             type="button"
             onClick={() => setActiveTab('guide')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
+            className={`py-1 px-1 rounded-lg text-xs font-mono text-center whitespace-nowrap transition-all border cursor-pointer ${
               activeTab === 'guide'
-                ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 font-bold border-teal-300 dark:border-teal-600 shadow-xs'
+                ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 font-bold border-teal-300 dark:border-teal-600 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border-transparent'
             }`}
           >
@@ -74,9 +74,9 @@ export function EmergencyHelplineWidget() {
           <button
             type="button"
             onClick={() => setActiveTab('safety')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all border cursor-pointer ${
+            className={`py-1 px-1 rounded-lg text-xs font-mono text-center whitespace-nowrap transition-all border cursor-pointer ${
               activeTab === 'safety'
-                ? 'bg-white dark:bg-slate-700 text-rose-700 dark:text-rose-300 font-bold border-rose-300 dark:border-rose-600 shadow-xs'
+                ? 'bg-white dark:bg-slate-700 text-rose-800 dark:text-rose-300 font-bold border-rose-300 dark:border-rose-600 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border-transparent'
             }`}
           >
@@ -88,7 +88,7 @@ export function EmergencyHelplineWidget() {
       {/* Tab 1: Emergency Helplines */}
       {activeTab === 'hotlines' && (
         <div className="space-y-2 animate-fade-in">
-          <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Need urgent assistance? Tap any hotline below to dial immediately from your phone or mobile device:
           </p>
           <div className="grid grid-cols-1 gap-2">
@@ -106,7 +106,7 @@ export function EmergencyHelplineWidget() {
                       {hl.label}
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-normal">
+                  <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-normal">
                     {hl.desc}
                   </p>
                 </div>
@@ -115,12 +115,12 @@ export function EmergencyHelplineWidget() {
                     type="button"
                     onClick={() => copyToClipboard(hl.number)}
                     title="Copy phone number"
-                    className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-600 hover:text-slate-900 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
+                    className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 hover:text-slate-900 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
                   >
                     {copiedNumber === hl.number ? (
                       <Check className="w-3.5 h-3.5 text-emerald-500" />
                     ) : (
-                      <span className="text-xs font-mono px-1">COPY</span>
+                      <span className="text-xs font-mono font-medium px-1">COPY</span>
                     )}
                   </button>
                   <a
@@ -140,32 +140,32 @@ export function EmergencyHelplineWidget() {
       {/* Tab 2: Plain English How-It-Works Guide */}
       {activeTab === 'guide' && (
         <div className="space-y-2.5 animate-fade-in text-[11px]">
-          <div className="p-2.5 rounded-lg bg-black/30 border border-teal-500/20 space-y-1.5">
-            <div className="flex items-center gap-2 text-teal-300 font-bold">
-              <span className="w-5 h-5 rounded-full bg-teal-500/20 flex items-center justify-center text-xs">1</span>
+          <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-black/30 border border-teal-200 dark:border-teal-500/20 space-y-1.5">
+            <div className="flex items-center gap-2 text-teal-800 dark:text-teal-300 font-bold">
+              <span className="w-5 h-5 rounded-full bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center text-xs">1</span>
               <span>Report in Plain Language or Voice</span>
             </div>
-            <p className="text-[var(--text-muted)] pl-7">
+            <p className="text-[var(--text-secondary)] pl-7">
               Speak or type what you see in any language (Hindi, Kannada, Tamil, English). GPS coordinates are automatically pinned.
             </p>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-black/30 border border-amber-500/20 space-y-1.5">
-            <div className="flex items-center gap-2 text-amber-300 font-bold">
-              <span className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-xs">2</span>
+          <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-black/30 border border-amber-200 dark:border-amber-500/20 space-y-1.5">
+            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold">
+              <span className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-xs">2</span>
               <span>Automated Life-Safety Triage</span>
             </div>
-            <p className="text-[var(--text-muted)] pl-7">
+            <p className="text-[var(--text-secondary)] pl-7">
               Emergencies with trapped individuals, infants, or elderly victims are automatically prioritized to the top of the queue.
             </p>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-black/30 border border-rose-500/20 space-y-1.5">
-            <div className="flex items-center gap-2 text-rose-300 font-bold">
-              <span className="w-5 h-5 rounded-full bg-rose-500/20 flex items-center justify-center text-xs">3</span>
+          <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-black/30 border border-rose-200 dark:border-rose-500/20 space-y-1.5">
+            <div className="flex items-center gap-2 text-rose-800 dark:text-rose-300 font-bold">
+              <span className="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-500/20 flex items-center justify-center text-xs">3</span>
               <span>Fast Field Dispatch & Live Tracking</span>
             </div>
-            <p className="text-[var(--text-muted)] pl-7">
+            <p className="text-[var(--text-secondary)] pl-7">
               Boats, rescue helicopters, and ambulances are deployed with coordinates. Duplicate reports are linked to avoid wasted aid.
             </p>
           </div>
@@ -176,12 +176,12 @@ export function EmergencyHelplineWidget() {
       {activeTab === 'safety' && (
         <div className="space-y-2 animate-fade-in">
           {safetyTips.map((tip) => (
-            <div key={tip.type} className="p-2.5 rounded-lg bg-black/30 border border-[var(--border-subtle)] space-y-1">
+            <div key={tip.type} className="p-2.5 rounded-lg bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-[var(--border-subtle)] space-y-1">
               <div className="flex items-center gap-1.5 font-semibold text-[var(--text-primary)] text-[11px]">
                 {tip.icon}
                 <span>{tip.type}</span>
               </div>
-              <ul className="pl-5 list-disc text-[10px] text-[var(--text-muted)] space-y-0.5">
+              <ul className="pl-5 list-disc text-[10px] text-[var(--text-secondary)] space-y-0.5">
                 {tip.tips.map((t, i) => (
                   <li key={i}>{t}</li>
                 ))}

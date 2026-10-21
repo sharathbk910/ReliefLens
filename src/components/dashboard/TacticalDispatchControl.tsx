@@ -77,15 +77,15 @@ export function TacticalDispatchControl({
     return (
       <div className="surface-z1 border border-[var(--border-subtle)] rounded-lg py-2 px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--text-secondary)] select-none">
         <div className="flex items-center gap-2 min-w-0">
-          <Truck className="w-4 h-4 text-amber-400 shrink-0" />
-          <span className="font-mono text-xs font-semibold text-amber-300 shrink-0">
+          <Truck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span className="font-mono text-xs font-bold text-amber-800 dark:text-amber-300 shrink-0">
             Rescue Dispatch:
           </span>
-          <span className="font-mono text-xs text-[var(--text-muted)] truncate">
+          <span className="font-mono text-xs text-[var(--text-secondary)] truncate">
             Tap any incident below to deploy rescue units
           </span>
         </div>
-        <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-[var(--border-subtle)] text-amber-400/80 uppercase shrink-0 self-start sm:self-auto">
+        <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-amber-100 dark:bg-[var(--border-subtle)] text-amber-900 dark:text-amber-400/80 uppercase shrink-0 self-start sm:self-auto border border-amber-300 dark:border-transparent">
           Standby Mode
         </span>
       </div>
@@ -93,7 +93,7 @@ export function TacticalDispatchControl({
   }
 
   return (
-    <div className="relative surface-z2 border border-amber-400/30 rounded-xl p-2.5 sm:p-3 shadow-md shadow-amber-950/10 space-y-2 animate-fade-in select-none">
+    <div className="relative surface-z2 border border-amber-400/40 rounded-xl p-2.5 sm:p-3 shadow-md shadow-amber-950/10 space-y-2 animate-fade-in select-none">
       <div className="corner-bracket cross-tl"></div>
       <div className="corner-bracket cross-tr"></div>
       <div className="corner-bracket cross-bl"></div>
@@ -103,17 +103,17 @@ export function TacticalDispatchControl({
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square"></span>
-            <span className="font-mono text-xs text-amber-300 font-bold tracking-wide">
+            <span className="font-mono text-xs text-amber-800 dark:text-amber-300 font-bold tracking-wide">
               Rescue Mission Failsafe HUD
             </span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold uppercase">
+            <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30 font-bold uppercase">
               {selectedIncident.priority_tier.toUpperCase()} ({selectedIncident.effective_score}/100)
             </span>
           </div>
           <h3 className="font-heading font-bold text-xs sm:text-sm text-[var(--text-primary)] line-clamp-1 leading-snug">
             {selectedIncident.title}
           </h3>
-          <p className="text-xs text-[var(--text-muted)] font-mono truncate">
+          <p className="text-xs text-[var(--text-secondary)] font-mono truncate">
             {selectedIncident.district} • {selectedIncident.location_text || 'Coordinates Verified'}
           </p>
         </div>
@@ -121,7 +121,7 @@ export function TacticalDispatchControl({
         {/* Action Controls & Collapse Toggle */}
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1.5">
-            <label htmlFor="unit-select" className="text-xs font-mono text-[var(--text-muted)] font-semibold shrink-0">
+            <label htmlFor="unit-select" className="text-xs font-mono text-slate-700 dark:text-[var(--text-muted)] font-semibold shrink-0">
               Unit:
             </label>
             <select
@@ -129,7 +129,7 @@ export function TacticalDispatchControl({
               value={selectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value)}
               disabled={isDeploying || deployedSuccess}
-              className="bg-[var(--surface-1-solid)] border border-amber-400/50 rounded-lg px-2 py-1 text-xs font-mono text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
+              className="bg-white dark:bg-[var(--surface-1-solid)] border border-amber-400 dark:border-amber-400/50 rounded-lg px-2 py-1 text-xs font-mono text-slate-800 dark:text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer shadow-xs"
             >
               {units.map((u) => (
                 <option key={u.id} value={u.id}>
@@ -140,7 +140,7 @@ export function TacticalDispatchControl({
           </div>
           <Link
             to={`/incidents/${selectedIncident.id}`}
-            className="px-2.5 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-xs text-teal-300 hover:text-teal-200 transition-colors flex items-center gap-1 font-mono font-medium"
+            className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 border border-teal-300 dark:border-teal-500/30 text-xs text-teal-800 dark:text-teal-300 hover:text-teal-900 dark:hover:text-teal-200 transition-colors flex items-center gap-1 font-mono font-medium"
             title="Open complete incident dossier with verification and override history"
           >
             <span>Dossier</span>
@@ -149,7 +149,7 @@ export function TacticalDispatchControl({
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer"
+            className="p-1 px-2 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--border-subtle)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             title={isCollapsed ? 'Expand Dispatch Controls' : 'Minimize HUD to scan incident table'}
           >
             {isCollapsed ? 'Expand HUD' : 'Collapse'}
