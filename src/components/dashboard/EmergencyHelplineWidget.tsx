@@ -39,7 +39,7 @@ export function EmergencyHelplineWidget() {
   };
 
   return (
-    <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-3.5 sm:p-4 space-y-3.5 shadow-sm text-xs bg-[#141611]/95">
+    <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-3.5 sm:p-4 space-y-3.5 shadow-sm text-xs">
       {/* Header with Segmented Switch (Responsive wrap prevents narrow column squeeze) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2 min-w-0">

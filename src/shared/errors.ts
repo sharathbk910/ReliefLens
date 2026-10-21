@@ -1,5 +1,5 @@
 /**
- * ReliefLens Standardized Error Classes
+ * ResQWave Standardized Error Classes
  * Provides structured, typed error handling across services, hooks, and UI components.
  */
 

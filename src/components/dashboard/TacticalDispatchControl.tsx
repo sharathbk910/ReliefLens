@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Truck, Check, AlertTriangle, Radio } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldCheck, Truck, Check, AlertTriangle, Radio, ExternalLink } from 'lucide-react';
 import type { Incident } from '../../shared/types.ts';
 import { useToast } from '../ui/Toast.tsx';
 import { dataService } from '../../lib/dataService.ts';
@@ -137,6 +138,14 @@ export function TacticalDispatchControl({
               ))}
             </select>
           </div>
+          <Link
+            to={`/incidents/${selectedIncident.id}`}
+            className="px-2.5 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-xs text-teal-300 hover:text-teal-200 transition-colors flex items-center gap-1 font-mono font-medium"
+            title="Open complete incident dossier with verification and override history"
+          >
+            <span>Dossier</span>
+            <ExternalLink className="w-3 h-3" />
+          </Link>
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}

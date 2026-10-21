@@ -150,20 +150,7 @@ export function ReportFormPage() {
   }, [location.state]);
 
   const currentUser = dataService.getCurrentUser();
-  if (currentUser.role === 'viewer') {
-    return (
-      <div className="surface-z2 p-8 text-center rounded-2xl max-w-lg mx-auto my-8">
-        <AlertOctagon className="w-8 h-8 text-rose-500 mx-auto mb-2" strokeWidth={1.5} />
-        <h2 className="text-base font-bold text-[var(--text-primary)]">Access Restricted</h2>
-        <p className="text-xs text-[var(--text-muted)] mt-1">
-          Viewer accounts have read-only privileges and cannot ingest new reports.
-        </p>
-        <Link to="/dashboard" className="mt-4 inline-block text-xs text-rose-400 hover:underline">
-          Return to Dashboard
-        </Link>
-      </div>
-    );
-  }
+
 
   const {
     register,
@@ -365,6 +352,21 @@ export function ReportFormPage() {
     { id: 'confirm', label: '4. Confirm', shortLabel: '4. Submit' },
   ];
 
+  if (currentUser.role === 'viewer') {
+    return (
+      <div className="surface-z2 border border-[var(--border-subtle)] p-8 text-center rounded-2xl max-w-lg mx-auto my-8 space-y-2">
+        <AlertOctagon className="w-8 h-8 text-rose-500 mx-auto mb-2" strokeWidth={1.5} />
+        <h2 className="text-base font-bold text-[var(--text-primary)]">Access Restricted</h2>
+        <p className="text-xs text-[var(--text-muted)] mt-1">
+          Viewer accounts have read-only privileges and cannot ingest new reports.
+        </p>
+        <Link to="/dashboard" className="mt-4 inline-block text-xs text-rose-400 hover:underline">
+          Return to Dashboard
+        </Link>
+      </div>
+    );
+  }
+
   if (submissionResult) {
     return (
       <div className="w-full max-w-2xl mx-auto my-2 md:my-6 animate-spatial-enter">
@@ -464,7 +466,7 @@ export function ReportFormPage() {
   return (
     <div className="w-full max-w-2xl mx-auto my-2 md:my-6 animate-spatial-enter">
       {/* Presentation: Centered Sheet (Corner Cross Tactical Aesthetic) */}
-      <div className="corner-cross bg-[#141611]/95 border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-2xl flex flex-col min-h-[580px]">
+      <div className="corner-cross surface-z2 border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-2xl flex flex-col min-h-[580px]">
         {/* Header with Close / Cancel */}
         <div className="p-4 md:p-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
           <div>

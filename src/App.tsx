@@ -32,6 +32,7 @@ export function App() {
         const urlParams = new URLSearchParams(window.location.search);
         const geminiKey = urlParams.get('gemini_key');
         if (geminiKey && geminiKey.trim()) {
+          localStorage.setItem('resqwave_gemini_key', geminiKey.trim());
           localStorage.setItem('relieflens_gemini_key', geminiKey.trim());
           urlParams.delete('gemini_key');
           const newSearch = urlParams.toString();

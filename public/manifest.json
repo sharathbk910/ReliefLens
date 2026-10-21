@@ -1,8 +1,13 @@
 {
-  "short_name": "ReliefLens",
-  "name": "ReliefLens — Emergency Response & Rescue Coordination",
-  "description": "Transparent emergency incident coordination, deterministic priority scoring, and human-in-the-loop disaster response.",
+  "short_name": "ResQWave",
+  "name": "ResQWave — Connecting Emergencies to Action",
+  "description": "Connecting Emergencies to Action — Modern humanitarian emergency response and rapid incident dispatch coordination.",
   "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
     {
       "src": "/logo.png",
       "type": "image/png",
@@ -11,8 +16,8 @@
     }
   ],
   "start_url": "/",
-  "background_color": "#0B0F12",
-  "theme_color": "#0B0F12",
+  "background_color": "#ffffff",
+  "theme_color": "#0284c7",
   "display": "standalone",
   "orientation": "portrait"
 }

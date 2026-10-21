@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ReliefLens Uncaught Component Error:', error, errorInfo);
+    console.error('ResQWave Uncaught Component Error:', error, errorInfo);
   }
 
   handleReset = () => {

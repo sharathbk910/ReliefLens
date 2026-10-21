@@ -109,7 +109,7 @@ export function AuthCallback() {
             </div>
             <h2 className="text-base font-semibold text-emerald-300">Authentication Successful</h2>
             <p className="text-xs text-slate-400">
-              Welcome to ReliefLens. Redirecting to your dashboard...
+              Welcome to ResQWave. Redirecting to your dashboard...
             </p>
           </div>
         )}

@@ -56,7 +56,7 @@ export function DispatchExportModal({
     link.setAttribute('href', url);
     link.setAttribute(
       'download',
-      `ReliefLens_Dispatch_Manifest_${new Date().toISOString().slice(0, 10)}.csv`
+      `ResQWave_Dispatch_Manifest_${new Date().toISOString().slice(0, 10)}.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -121,7 +121,7 @@ export function DispatchExportModal({
           <div className="mb-4 pb-4 border-b border-[var(--border-subtle)] print:border-black flex justify-between items-start">
             <div>
               <h2 className="text-base font-bold font-heading text-[var(--text-primary)] print:text-black">
-                ReliefLens Emergency Operations — Dispatch Manifest
+                ResQWave Emergency Operations — Dispatch Manifest
               </h2>
               <p className="text-xs text-[var(--text-muted)] print:text-gray-700 mt-0.5">
                 Generated: {new Date().toLocaleString()} • Priority-sorted for field crew deployment

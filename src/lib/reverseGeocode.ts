@@ -16,7 +16,7 @@ export async function reverseGeocodeCoordinates(
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'ReliefLens-Emergency-Coordination/1.0',
+        'User-Agent': 'ResQWave-Emergency-Coordination/1.0',
       },
     });
 

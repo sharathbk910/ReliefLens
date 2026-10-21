@@ -1,5 +1,5 @@
 /**
- * ReliefLens Centralized Environment & App Configuration
+ * ResQWave Centralized Environment & App Configuration
  * Validates, types, and separates environment configuration from application logic.
  */
 
@@ -47,12 +47,12 @@ const isSupabaseConfigured = Boolean(
 
 const clientGeminiKey =
   typeof window !== 'undefined'
-    ? localStorage.getItem('relieflens_gemini_key') || import.meta.env.VITE_GEMINI_API_KEY || ''
+    ? localStorage.getItem('resqwave_gemini_key') || localStorage.getItem('relieflens_gemini_key') || import.meta.env.VITE_GEMINI_API_KEY || ''
     : import.meta.env.VITE_GEMINI_API_KEY || '';
 
 export const config: Config = {
   app: {
-    name: 'ReliefLens',
+    name: 'ResQWave',
     version: '1.0.0',
     isProduction: Boolean(import.meta.env.PROD),
     isDevelopment: Boolean(import.meta.env.DEV),

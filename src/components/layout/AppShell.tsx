@@ -50,25 +50,30 @@ export function AppShell() {
     };
   }, [userDropdownOpen]);
 
-  // Initialize theme from system or saved preference
+  // Initialize theme from system or saved preference (defaults to clean modern light theme)
   useEffect(() => {
-    const saved = localStorage.getItem('relieflens-theme');
-    if (saved === 'light' || (!saved && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+    const saved = localStorage.getItem('resqwave-theme') || localStorage.getItem('relieflens-theme');
+    if (saved === 'dark') {
+      setTheme('dark');
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
       setTheme('light');
       document.documentElement.classList.add('light');
-    } else {
-      setTheme('dark');
-      document.documentElement.classList.remove('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
+    localStorage.setItem('resqwave-theme', next);
     localStorage.setItem('relieflens-theme', next);
     if (next === 'light') {
       document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     } else {
+      document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
     }
   };
@@ -119,8 +124,8 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
-      {/* 1. Tactical Operational Topbar & Emergency Response Strip (Sticky / Fixed at top) */}
-      <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-[var(--tactical-border,rgba(244,243,232,0.1))] bg-[#12130f]/95 backdrop-blur-md text-xs select-none shadow-md">
+      {/* 1. Operational Topbar & Emergency Response Strip */}
+      <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-[var(--border-subtle)] bg-[var(--surface-1-solid)]/95 backdrop-blur-md text-xs select-none shadow-sm">
         <div className="flex items-center justify-between gap-2.5 max-w-7xl mx-auto w-full flex-nowrap min-w-0">
           <div className="md:hidden shrink-0">
             <AppLogo size="xs" showText={false} />
@@ -157,7 +162,7 @@ export function AppShell() {
 
               {/* Persona Switcher Dropdown Popover */}
               {userDropdownOpen && (
-                <div className="!absolute right-0 top-full mt-1.5 w-60 z-[100] shadow-2xl bg-[#141611]/98 backdrop-blur-xl border border-[var(--border-strong)] rounded-xl p-2.5 animate-spatial-enter select-auto">
+                <div className="!absolute right-0 top-full mt-1.5 w-60 z-[100] shadow-xl bg-[var(--surface-1-solid)] backdrop-blur-xl border border-[var(--border-strong)] rounded-xl p-2.5 animate-spatial-enter select-auto">
                   <div className="px-2 py-1.5 border-b border-[var(--border-subtle)] mb-1">
                     <p className="text-xs font-mono text-[var(--text-muted)] font-medium">
                       Currently logged in:
@@ -321,7 +326,7 @@ export function AppShell() {
           </div>
 
           {/* User Account / Active Identity Display in Sidebar Bottom (Clean status, no duplicate dropdown) */}
-          <div className="mt-auto bg-[#141611]/98 p-2.5 border-t border-[var(--border-subtle)] rounded-b-xl">
+          <div className="mt-auto bg-[var(--surface-1-solid)] p-2.5 border-t border-[var(--border-subtle)] rounded-b-xl">
             <div
               className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-[var(--surface-1-solid)] border border-[var(--border-subtle)]"
               title={`Logged in as ${currentUser.display_name}. Use top-right profile to change persona.`}

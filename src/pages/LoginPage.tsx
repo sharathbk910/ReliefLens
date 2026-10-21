@@ -19,6 +19,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase.ts';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
+import { AppLogo } from '../components/common/AppLogo.tsx';
 import type { UserRole } from '../shared/types.ts';
 
 export function LoginPage() {
@@ -157,20 +158,18 @@ export function LoginPage() {
     <div className="min-h-screen bg-[var(--canvas)] flex items-center justify-center p-4 font-sans text-[var(--text-primary)] selection:bg-rose-500/30">
       <div className="max-w-md w-full space-y-5 animate-spatial-enter">
         {/* Brand Header */}
-        <div className="text-center space-y-3">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-2xl overflow-hidden bg-white/95 border-2 border-teal-500/40 shadow-xl shadow-teal-950/40 p-1 transition-transform duration-300 hover:scale-105">
-            <img
-              src="/logo.png"
-              alt="ReliefLens Logo"
-              className="w-full h-full object-cover object-[center_20%] rounded-xl"
-            />
+        <div className="text-center space-y-2">
+          <div className="flex justify-center mb-1">
+            <AppLogo size="xl" showText={false} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold font-heading tracking-tight bg-gradient-to-r from-blue-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
-              ReliefLens
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-heading tracking-tight flex items-center justify-center gap-0.5">
+              <span className="text-[#0284c7]">Res</span>
+              <span className="text-[#ea580c]">Q</span>
+              <span className="text-[#0d9488]">Wave</span>
             </h1>
-            <p className="text-xs text-[var(--text-secondary)] mt-1">
-              Transparent Emergency Response Coordination After Disasters
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+              Connecting Emergencies to Action
             </p>
           </div>
         </div>
@@ -422,7 +421,7 @@ export function LoginPage() {
 
         {/* Informative Footer */}
         <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-          ReliefLens Prototype Edition • Transparent Emergency Incident Response
+          ResQWave • Connecting Emergencies to Action • Incident Coordination Platform
         </p>
       </div>
     </div>

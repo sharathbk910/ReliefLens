@@ -66,8 +66,7 @@ export function IncidentDetailPage() {
     try {
       const data = await dataService.getIncidentById(id);
       if (!data.incident) {
-        toast.error('Incident Not Found', `ID ${id} does not exist.`);
-        navigate('/dashboard');
+        setIncident(null);
         return;
       }
       setIncident(data.incident);
@@ -193,10 +192,27 @@ export function IncidentDetailPage() {
     }
   };
 
-  if (isLoading || !incident) {
+  if (isLoading) {
     return (
       <div className="p-8 text-center text-slate-400 animate-pulse">
-        <p className="text-sm">Loading incident details and scoring factors...</p>
+        <p className="text-sm font-medium">Loading incident details and scoring factors...</p>
+      </div>
+    );
+  }
+
+  if (!incident) {
+    return (
+      <div className="surface-z1 border border-[var(--border-subtle)] p-8 text-center rounded-2xl max-w-lg mx-auto my-8 space-y-3">
+        <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto" strokeWidth={1.5} />
+        <h2 className="text-base font-bold text-[var(--text-primary)]">Incident Not Found</h2>
+        <p className="text-xs text-[var(--text-muted)]">
+          The requested incident record was not found or may have been merged into another incident.
+        </p>
+        <div className="pt-2">
+          <Button onClick={() => navigate('/dashboard')} variant="primary" size="sm">
+            Return to Dashboard
+          </Button>
+        </div>
       </div>
     );
   }
@@ -228,7 +244,7 @@ export function IncidentDetailPage() {
       </div>
 
       {/* Incident Header (Tactical Inversa Aesthetic) */}
-      <div className="corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] rounded-xl p-5 shadow-sm">
+      <div className="corner-cross surface-z1 border border-[var(--border-subtle)] rounded-xl p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-2">

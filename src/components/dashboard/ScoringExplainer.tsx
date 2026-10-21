@@ -34,7 +34,7 @@ export function ScoringExplainer() {
         <div className="p-4 pt-1 border-t border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] space-y-3 animate-slide-down">
           <div className="flex items-center justify-between">
             <p className="text-[var(--text-muted)] text-[11px] leading-relaxed">
-              ReliefLens uses zero opaque "black-box" AI for life-or-death triage. Scores from 0 to 100 are generated through deterministic mathematical weighting with human coordinator sign-off:
+              ResQWave uses zero opaque "black-box" AI for life-or-death triage. Scores from 0 to 100 are generated through deterministic mathematical weighting with human coordinator sign-off:
             </p>
             <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-[#EBFC72] bg-[#EBFC72]/10 px-2 py-0.5 rounded">
               <Sparkles className="w-3 h-3" /> HUMAN CHIEF IN THE LOOP

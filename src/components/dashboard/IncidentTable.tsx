@@ -298,7 +298,17 @@ export function IncidentTable({
                   <td className="py-2.5 px-3 align-top whitespace-nowrap overflow-hidden">
                     <div className="flex items-center justify-between gap-1">
                       <VerificationBadge level={incident.verification_level} compact={true} />
-                      <ChevronRight className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:text-teal-400 transition-colors shrink-0" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/incidents/${incident.id}`);
+                        }}
+                        title="Open full incident dossier"
+                        className="p-1 rounded hover:bg-teal-500/20 hover:text-teal-300 text-[var(--text-muted)] transition-colors cursor-pointer"
+                      >
+                        <ChevronRight className="w-4 h-4 shrink-0" />
+                      </button>
                     </div>
                   </td>
                 </tr>

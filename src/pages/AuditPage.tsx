@@ -29,23 +29,11 @@ export function AuditPage() {
   const navigate = useNavigate();
   const currentUser = dataService.getCurrentUser();
 
-  // Role Protection: Only Admins can view audit logs (Section 4.9 & 11.7)
-  if (currentUser.role !== 'admin') {
-    return (
-      <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-xl max-w-lg mx-auto">
-        <ShieldAlert className="w-8 h-8 text-rose-500 mx-auto mb-2" />
-        <h2 className="text-base font-bold text-white">Administrator Access Required</h2>
-        <p className="text-xs text-slate-400 mt-1">
-          The audit history log is restricted to authorized administrative personnel.
-        </p>
-        <Link to="/dashboard" className="mt-4 inline-block text-xs text-rose-400 hover:underline">
-          Return to Dashboard
-        </Link>
-      </div>
-    );
-  }
-
   const loadLogs = useCallback(async () => {
+    if (currentUser.role !== 'admin') {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
       const data = await dataService.getAuditLogs();
@@ -55,11 +43,27 @@ export function AuditPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, currentUser.role]);
 
   useEffect(() => {
     loadLogs();
   }, [loadLogs]);
+
+  // Role Protection: Only Admins can view audit logs (Section 4.9 & 11.7)
+  if (currentUser.role !== 'admin') {
+    return (
+      <div className="surface-z1 border border-[var(--border-subtle)] p-8 text-center rounded-2xl max-w-lg mx-auto my-8 space-y-2">
+        <ShieldAlert className="w-8 h-8 text-rose-500 mx-auto mb-2" strokeWidth={1.5} />
+        <h2 className="text-base font-bold text-white">Administrator Access Required</h2>
+        <p className="text-xs text-[var(--text-muted)] mt-1">
+          The audit history log is restricted to authorized administrative personnel.
+        </p>
+        <Link to="/dashboard" className="mt-4 inline-block text-xs text-rose-400 hover:underline">
+          Return to Dashboard
+        </Link>
+      </div>
+    );
+  }
 
   // Admin Batch Rescore (Section 12.6)
   const handleBatchRescore = async () => {

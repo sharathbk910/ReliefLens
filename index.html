@@ -1,44 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Primary SEO Meta Tags -->
-    <title>RELIEFLENS — Emergency Rescue Help, Flood Relief & Disaster Response Platform</title>
-    <meta name="title" content="RELIEFLENS — Emergency Rescue Help, Flood Relief & Disaster Response Platform" />
-    <meta name="description" content="ReliefLens is a transparent emergency rescue coordination and disaster response platform. Real-time incident triage, live flood & rescue map, transparent priority scoring, multilingual voice reporting, and deterministic duplicate detection." />
-    <meta name="keywords" content="emergency, emergency rescue, disaster response, flood relief, 911 emergency help, emergency dispatch, search and rescue, disaster incident management, crisis response, emergency triage, flood map, disaster relief lens, emergency reporting, emergency rescue team, water rescue, emergency hotline" />
-    <meta name="author" content="ReliefLens Emergency Response Network" />
+    <title>ResQWave — Connecting Emergencies to Action</title>
+    <meta name="title" content="ResQWave — Connecting Emergencies to Action" />
+    <meta name="description" content="ResQWave is a modern, transparent emergency rescue coordination and disaster response platform. Real-time incident triage, live disaster maps, multilingual voice reporting, and deterministic duplicate detection." />
+    <meta name="keywords" content="ResQWave, emergency rescue, disaster response, flood relief, emergency dispatch, search and rescue, crisis response, emergency triage, humanitarian action, multilingual emergency reporting" />
+    <meta name="author" content="ResQWave Emergency Coordination Network" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <meta name="theme-color" content="#0B0F12" />
-    <link rel="canonical" href="https://relief-lens.vercel.app/" />
+    <meta name="theme-color" content="#0284c7" />
+    <link rel="canonical" href="https://resqwave.org/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://relief-lens.vercel.app/" />
-    <meta property="og:site_name" content="ReliefLens Emergency Network" />
-    <meta property="og:title" content="RELIEFLENS — Emergency Rescue Help, Flood Relief & Disaster Response" />
-    <meta property="og:description" content="Trapped in a disaster? We coordinate rescue for you. Transparent emergency help prioritization, live situational disaster map, and human-in-the-loop dispatch." />
-    <meta property="og:image" content="https://relief-lens.vercel.app/logo.png" />
+    <meta property="og:url" content="https://resqwave.org/" />
+    <meta property="og:site_name" content="ResQWave" />
+    <meta property="og:title" content="ResQWave — Connecting Emergencies to Action" />
+    <meta property="og:description" content="Trapped or coordinating crisis response? ResQWave connects emergency calls directly to rapid rescue action with transparent, explainable triage." />
+    <meta property="og:image" content="/logo.png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
-    <meta property="og:image:alt" content="ReliefLens Emergency Rescue and Disaster Response Logo" />
+    <meta property="og:image:alt" content="ResQWave Emergency Response Logo" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://relief-lens.vercel.app/" />
-    <meta property="twitter:title" content="RELIEFLENS — Emergency Rescue Help & Disaster Response" />
-    <meta property="twitter:description" content="Emergency rescue coordination platform. Clear explanations, fair help prioritization, and human rescue chiefs always in control." />
-    <meta property="twitter:image" content="https://relief-lens.vercel.app/logo.png" />
+    <meta property="twitter:url" content="https://resqwave.org/" />
+    <meta property="twitter:title" content="ResQWave — Connecting Emergencies to Action" />
+    <meta property="twitter:description" content="Modern humanitarian disaster response and rapid emergency dispatch coordination platform." />
+    <meta property="twitter:image" content="/logo.png" />
 
     <!-- Icons & Manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Google Fonts: Inter, Outfit, & JetBrains Mono (Standardized 3-tier typography) -->
+    <!-- Google Fonts: Inter, Outfit, & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -46,45 +47,38 @@
     <!-- Leaflet CSS for maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-    <!-- Schema.org JSON-LD Structured Data for Emergency Search Indexing -->
+    <!-- Schema.org JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
           "@type": "EmergencyService",
-          "@id": "https://relief-lens.vercel.app/#organization",
-          "name": "ReliefLens Emergency Response Network",
-          "alternateName": "ReliefLens",
-          "url": "https://relief-lens.vercel.app/",
-          "logo": "https://relief-lens.vercel.app/logo.png",
-          "image": "https://relief-lens.vercel.app/logo.png",
+          "@id": "https://resqwave.org/#organization",
+          "name": "ResQWave Emergency Coordination Network",
+          "alternateName": "ResQWave",
+          "slogan": "Connecting Emergencies to Action",
+          "url": "https://resqwave.org/",
+          "logo": "https://resqwave.org/logo.png",
+          "image": "https://resqwave.org/logo.png",
           "description": "Transparent emergency incident coordination, deterministic priority scoring, and human-in-the-loop disaster response dispatch.",
           "serviceType": "Emergency Rescue and Disaster Incident Response",
           "areaServed": "Global",
-          "availableLanguage": ["English", "Kannada", "Hindi", "Tamil", "Telugu"],
-          "telephone": "911",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://relief-lens.vercel.app/?search={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
+          "availableLanguage": ["English", "Kannada", "Hindi", "Tamil", "Telugu", "Spanish"],
+          "telephone": "911"
         },
         {
           "@type": "WebSite",
-          "@id": "https://relief-lens.vercel.app/#website",
-          "url": "https://relief-lens.vercel.app/",
-          "name": "ReliefLens Emergency Rescue Platform",
-          "description": "Public emergency response coordination platform for floods, earthquakes, and humanitarian crises.",
-          "publisher": {
-            "@id": "https://relief-lens.vercel.app/#organization"
-          }
+          "@id": "https://resqwave.org/#website",
+          "url": "https://resqwave.org/",
+          "name": "ResQWave",
+          "description": "Connecting Emergencies to Action — Modern humanitarian emergency dispatch coordination."
         }
       ]
     }
     </script>
   </head>
-  <body class="bg-[#0B0F12] text-slate-100 antialiased font-sans selection:bg-rose-500/30 selection:text-rose-200">
+  <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-teal-500/20 selection:text-teal-900">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -408,10 +408,10 @@ export function DashboardMapPreview({
       </div>
 
       {/* Map Area */}
-      <div className="flex-1 relative bg-[#0B0F12]">
+      <div className="flex-1 relative bg-[var(--canvas)]">
         {isLoading && locatedIncidents.length === 0 && (
           <div className="absolute inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141611] border border-teal-500/30 text-teal-300 font-mono text-xs shadow-xl">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-1-solid)] border border-teal-500/30 text-teal-600 dark:text-teal-300 font-mono text-xs shadow-xl">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
               <span>Loading incident coordinates...</span>
             </div>

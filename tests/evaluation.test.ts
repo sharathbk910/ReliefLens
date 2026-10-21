@@ -34,7 +34,7 @@ function calculateSpearmanCorrelation(x: number[], y: number[]): number {
   return parseFloat(spearman.toFixed(4));
 }
 
-describe('ReliefLens Prototype Dataset Evaluation (Section 15.4)', () => {
+describe('ResQWave Prototype Dataset Evaluation (Section 15.4)', () => {
   it('evaluates duplicate detection precision, recall, and Spearman rank correlation', () => {
     const dataset = generateSeedDataset();
     const { reports, labeledPairs, incidents } = dataset;

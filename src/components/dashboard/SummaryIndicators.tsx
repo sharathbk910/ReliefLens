@@ -66,7 +66,7 @@ export function SummaryIndicators({
           key={ind.id}
           type="button"
           onClick={() => onFilterClick && onFilterClick(ind.id)}
-          className={`text-left p-3 sm:p-3.5 md:p-4 rounded-xl corner-cross bg-[#141611]/90 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} tactical-card-interactive cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm relative`}
+          className={`text-left p-3 sm:p-3.5 md:p-4 rounded-xl corner-cross surface-z1 border border-[var(--border-subtle)] ${ind.border} ${ind.stagger} tactical-card-interactive cursor-pointer overflow-hidden group focus-visible:ring-2 shadow-sm relative`}
         >
           <div className="corner-bracket cross-tl"></div>
           <div className="corner-bracket cross-tr"></div>

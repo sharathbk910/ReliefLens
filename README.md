@@ -1,8 +1,9 @@
-# ReliefLens
+# ResQWave
 
-> **Transparent Emergency Response Coordination & Incident Prioritization**
+> **Connecting Emergencies to Action**
+> *Transparent Disaster Response Coordination & Rapid Incident Prioritization*
 
-ReliefLens is a web-based disaster incident coordination application designed for emergency coordinators. It organizes fragmented incoming reports into structured, explainable, and human-reviewed incident records.
+ResQWave is a modern, transparent disaster incident coordination platform designed for emergency responders and coordinators. It organizes fragmented incoming calls, voice reports, and field observations into structured, explainable, and human-reviewed incident records.
 
 ---
 
@@ -77,7 +78,7 @@ cp .env.example .env
 ```bash
 npm run dev
 ```
-Open `http://localhost:3000`.
+Open `http://localhost:5173`.
 
 ### 4. Run Test Suite & Evaluation
 ```bash
@@ -102,4 +103,4 @@ On `/login`, click any persona to test role-based access:
 
 ## Prototype Safety Disclaimer
 
-*Prototype — ReliefLens supports emergency coordination decisions but is not an official emergency-service system. Do not use it as the sole source for emergency decisions.*
+*Prototype — ResQWave supports emergency coordination decisions but is not an official emergency-service system. Do not use it as the sole source for emergency decisions.*
