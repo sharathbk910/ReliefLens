@@ -15,6 +15,13 @@ export const incidentTypeEnum = z.enum([
   'landslide',
   'fire',
   'medical',
+  'medical_emergency',
+  'structure_collapse',
+  'water_shortage',
+  'food_shortage',
+  'power_outage',
+  'road_blocked',
+  'hazardous_material',
   'shelter_request',
   'other',
 ]);
@@ -30,6 +37,9 @@ export const vulnerabilityFlagEnum = z.enum([
   'elderly_present',
   'medical_dependency',
   'isolated_remote',
+  'trapped_individuals',
+  'disability_support_needed',
+  'hospital_or_school_affected',
 ]);
 
 export const incidentStatusEnum = z.enum([
@@ -62,7 +72,7 @@ export const reportIngestionSchema = z
     description: z
       .string()
       .trim()
-      .min(10, { message: 'Description must be at least 10 characters long.' })
+      .min(1, { message: 'Incident observation description is required.' })
       .max(5000, { message: 'Description must not exceed 5,000 characters.' }),
     reported_at: z
       .string()
@@ -92,26 +102,19 @@ export const reportIngestionSchema = z
       .max(100, { message: 'District must be under 100 characters.' })
       .nullable()
       .optional(),
-    latitude: z
-      .number()
-      .min(-90)
-      .max(90)
-      .nullable()
-      .optional(),
-    longitude: z
-      .number()
-      .min(-180)
-      .max(180)
-      .nullable()
-      .optional(),
+    latitude: z.preprocess(
+      (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val)) ? null : Number(val)),
+      z.number().min(-90).max(90).nullable().optional()
+    ),
+    longitude: z.preprocess(
+      (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val)) ? null : Number(val)),
+      z.number().min(-180).max(180).nullable().optional()
+    ),
     location_precision: locationPrecisionEnum,
-    people_at_risk_estimate: z
-      .number()
-      .int()
-      .min(0, { message: 'Estimate must be 0 or greater.' })
-      .max(100000, { message: 'Estimate must be under 100,000.' })
-      .nullable()
-      .optional(),
+    people_at_risk_estimate: z.preprocess(
+      (val) => (val === '' || val === null || val === undefined || (typeof val === 'number' && isNaN(val)) ? null : Number(val)),
+      z.number().int().min(0, { message: 'Estimate must be 0 or greater.' }).max(100000).nullable().optional()
+    ),
     immediate_danger: z.boolean().default(false),
     vulnerability_flags: z.array(vulnerabilityFlagEnum).default([]),
     external_reference: z
@@ -154,31 +157,18 @@ export const reportIngestionSchema = z
   .refine(
     (data) => {
       if (data.location_precision === 'exact') {
-        const hasLat = typeof data.latitude === 'number';
-        const hasLng = typeof data.longitude === 'number';
-        return hasLat && hasLng;
+        return (
+          typeof data.latitude === 'number' &&
+          !isNaN(data.latitude) &&
+          typeof data.longitude === 'number' &&
+          !isNaN(data.longitude)
+        );
       }
       return true;
     },
     {
       message: 'Exact location precision requires valid coordinates.',
-      path: ['location_precision'],
-    }
-  )
-  .refine(
-    (data) => {
-      const hasCoords =
-        typeof data.latitude === 'number' && typeof data.longitude === 'number';
-      const hasText = Boolean(data.location_text && data.location_text.trim());
-      if (!hasCoords && !hasText) {
-        return data.location_precision === 'unknown';
-      }
-      return true;
-    },
-    {
-      message:
-        'If neither coordinates nor location description are available, precision must be "unknown".',
-      path: ['location_precision'],
+      path: ['latitude'],
     }
   );
 

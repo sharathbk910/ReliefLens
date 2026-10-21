@@ -256,7 +256,9 @@ export function AppShell() {
         {/* 3. Main Content Canvas */}
         <main
           id="main-content"
-          className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 md:pb-6"
+          className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${
+            location.pathname === '/reports/new' ? 'pb-4 md:pb-6' : 'pb-20 md:pb-6'
+          }`}
         >
           <div className="flex-1 p-3 md:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-page-enter">
             <Outlet />
@@ -265,67 +267,69 @@ export function AppShell() {
       </div>
 
       {/* 4. Mobile Floating Bottom Dock (Section D - 4 or fewer items, safe area padding) */}
-      <nav
-        aria-label="Mobile Navigation Dock"
-        className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl"
-        style={{ paddingBottom: 'calc(0.375rem + env(safe-area-inset-bottom, 0px))' }}
-      >
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-              isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
-            }`
-          }
+      {location.pathname !== '/reports/new' && (
+        <nav
+          aria-label="Mobile Navigation Dock"
+          className="md:hidden fixed bottom-2 left-2 right-2 z-50 surface-z2 px-2 py-1.5 flex items-center justify-around shadow-2xl"
+          style={{ paddingBottom: 'calc(0.375rem + env(safe-area-inset-bottom, 0px))' }}
         >
-          <LayoutDashboard className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
-          <span>Dashboard</span>
-        </NavLink>
-
-        <NavLink
-          to="/duplicates"
-          className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-              isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
-            }`
-          }
-        >
-          <CopyCheck className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
-          <span>Duplicates</span>
-        </NavLink>
-
-        <NavLink
-          to="/map"
-          className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
-              isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
-            }`
-          }
-        >
-          <MapPin className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
-          <span>Map</span>
-        </NavLink>
-
-        {currentUser.role !== 'viewer' ? (
-          <button
-            onClick={() => navigate('/reports/new')}
-            className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-rose-500 font-semibold"
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
+                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+              }`
+            }
           >
-            <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mb-0.5">
-              <Plus className="w-4 h-4 text-rose-400" strokeWidth={1.5} />
-            </div>
-            <span>Report</span>
-          </button>
-        ) : (
-          <button
-            onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-            className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-[var(--text-muted)]"
+            <LayoutDashboard className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+            <span>Dashboard</span>
+          </NavLink>
+
+          <NavLink
+            to="/duplicates"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
+                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+              }`
+            }
           >
-            <User className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
-            <span>Role</span>
-          </button>
-        )}
-      </nav>
+            <CopyCheck className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+            <span>Duplicates</span>
+          </NavLink>
+
+          <NavLink
+            to="/map"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] transition-colors ${
+                isActive ? 'text-rose-400 font-semibold' : 'text-[var(--text-muted)]'
+              }`
+            }
+          >
+            <MapPin className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+            <span>Map</span>
+          </NavLink>
+
+          {currentUser.role !== 'viewer' ? (
+            <button
+              onClick={() => navigate('/reports/new')}
+              className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-rose-500 font-semibold"
+            >
+              <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mb-0.5">
+                <Plus className="w-4 h-4 text-rose-400" strokeWidth={1.5} />
+              </div>
+              <span>Report</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] text-[var(--text-muted)]"
+            >
+              <User className="w-5 h-5 mb-0.5" strokeWidth={1.5} />
+              <span>Role</span>
+            </button>
+          )}
+        </nav>
+      )}
 
       {/* 5. Persistent Emergency Quick Voice Action Button */}
       {currentUser.role !== 'viewer' && <EmergencyVoiceFAB />}

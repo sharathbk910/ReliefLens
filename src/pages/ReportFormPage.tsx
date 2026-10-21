@@ -229,9 +229,33 @@ export function ReportFormPage() {
     setReportingMode('manual');
   };
 
+  const onInvalid = (fieldErrors: any) => {
+    console.warn('Report form validation errors:', fieldErrors);
+    const errorKeys = Object.keys(fieldErrors);
+    if (errorKeys.length > 0) {
+      const firstKey = errorKeys[0];
+      const errorObj = fieldErrors[firstKey];
+      const message = errorObj?.message || `Please check the ${firstKey.replace(/_/g, ' ')} field.`;
+      toast.error('Cannot Submit Report', message);
+
+      if (['description', 'incident_type', 'people_at_risk_estimate', 'vulnerability_flags'].includes(firstKey)) {
+        setActiveStep('review');
+      } else if (['latitude', 'longitude', 'location_text', 'district', 'location_precision'].includes(firstKey)) {
+        setActiveStep('location');
+      } else {
+        setActiveStep('input');
+      }
+    }
+  };
+
   const onSubmit = async (data: ReportIngestionInput) => {
     if (isSubmitting || submissionResult) return;
     setIsSubmitting(true);
+
+    // Ensure reported_at is valid timestamp
+    if (!data.reported_at) {
+      data.reported_at = new Date().toISOString();
+    }
 
     // If client is currently offline, queue report locally
     if (!offlineSyncService.isOnline()) {
@@ -282,11 +306,11 @@ export function ReportFormPage() {
     }
   };
 
-  const steps: { id: FormStep; label: string }[] = [
-    { id: 'input', label: '1. Input' },
-    { id: 'review', label: '2. Review' },
-    { id: 'location', label: '3. Location' },
-    { id: 'confirm', label: '4. Confirm' },
+  const steps: { id: FormStep; label: string; shortLabel: string }[] = [
+    { id: 'input', label: '1. Input', shortLabel: '1. Input' },
+    { id: 'review', label: '2. Review', shortLabel: '2. Review' },
+    { id: 'location', label: '3. Location', shortLabel: '3. Loc' },
+    { id: 'confirm', label: '4. Confirm', shortLabel: '4. Submit' },
   ];
 
   if (submissionResult) {
@@ -416,20 +440,21 @@ export function ReportFormPage() {
                 key={s.id}
                 type="button"
                 onClick={() => setActiveStep(s.id)}
-                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`py-1.5 px-1 sm:px-2 rounded-lg text-xs font-semibold transition-all truncate text-center ${
                   activeStep === s.id
                     ? 'bg-teal-600 text-white shadow-sm'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                {s.label}
+                <span className="hidden sm:inline">{s.label}</span>
+                <span className="sm:hidden">{s.shortLabel}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Form Body (Scrollable with max-height 90dvh safeguard) */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col justify-between overflow-y-auto">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="flex-1 flex flex-col justify-between overflow-y-auto">
           <div className="p-4 md:p-6 space-y-4">
             {/* STEP 1: INPUT */}
             {activeStep === 'input' && (
@@ -716,6 +741,22 @@ export function ReportFormPage() {
                       <span>Immediate Threat to Life Reported (Safety floor eligible)</span>
                     </div>
                   )}
+
+                  {!watchDescription?.trim() && (
+                    <div className="p-3 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <AlertOctagon className="w-4 h-4 text-amber-400 shrink-0" strokeWidth={1.5} />
+                        <span>Incident description is missing. Please provide details before submitting.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveStep('review')}
+                        className="text-teal-400 hover:text-teal-300 font-semibold underline text-xs shrink-0"
+                      >
+                        Add Now
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-3 rounded-lg bg-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)]">
@@ -726,13 +767,13 @@ export function ReportFormPage() {
           </div>
 
           {/* Sticky Action Bar (Cancel, Previous, and Confirm & Submit) */}
-          <div className="sticky bottom-0 p-3 md:p-4 bg-[var(--surface-2-solid)] border-t border-[var(--border-subtle)] flex items-center justify-between gap-2 shadow-lg">
+          <div className="sticky bottom-0 p-3 md:p-4 bg-[var(--surface-2-solid)] border-t border-[var(--border-subtle)] flex items-center justify-between gap-2 shadow-lg z-20">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => navigate('/dashboard')}
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] min-h-[38px] px-3 touch-manipulation"
             >
               Cancel
             </Button>
@@ -747,7 +788,7 @@ export function ReportFormPage() {
                     const prevStep = activeStep === 'confirm' ? 'location' : activeStep === 'location' ? 'review' : 'input';
                     setActiveStep(prevStep);
                   }}
-                  className="text-xs"
+                  className="text-xs min-h-[38px] px-3 touch-manipulation"
                 >
                   Previous
                 </Button>
@@ -762,7 +803,7 @@ export function ReportFormPage() {
                     const nextStep = activeStep === 'input' ? 'review' : activeStep === 'review' ? 'location' : 'confirm';
                     setActiveStep(nextStep);
                   }}
-                  className="text-xs gap-1 bg-teal-600 hover:bg-teal-500 text-white"
+                  className="text-xs gap-1 bg-teal-600 hover:bg-teal-500 text-white min-h-[38px] px-3.5 touch-manipulation"
                 >
                   <span>Next Step</span>
                   <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -773,7 +814,8 @@ export function ReportFormPage() {
                   variant="primary"
                   size="md"
                   isLoading={isSubmitting}
-                  className="text-xs gap-1.5 bg-teal-600 hover:bg-teal-500 text-white shadow-md font-semibold"
+                  onClick={handleSubmit(onSubmit, onInvalid)}
+                  className="text-xs sm:text-sm py-2 px-3 sm:px-4 gap-1.5 bg-teal-600 hover:bg-teal-500 text-white shadow-md font-semibold min-h-[40px] touch-manipulation"
                 >
                   <CheckCircle2 className="w-4 h-4" strokeWidth={1.5} />
                   <span>Confirm & Submit</span>

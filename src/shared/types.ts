@@ -14,6 +14,13 @@ export type IncidentType =
   | 'landslide'
   | 'fire'
   | 'medical'
+  | 'medical_emergency'
+  | 'structure_collapse'
+  | 'water_shortage'
+  | 'food_shortage'
+  | 'power_outage'
+  | 'road_blocked'
+  | 'hazardous_material'
   | 'shelter_request'
   | 'other';
 
@@ -41,7 +48,10 @@ export type VulnerabilityFlag =
   | 'children_present'
   | 'elderly_present'
   | 'medical_dependency'
-  | 'isolated_remote';
+  | 'isolated_remote'
+  | 'trapped_individuals'
+  | 'disability_support_needed'
+  | 'hospital_or_school_affected';
 
 export type UncertaintyFlag =
   | 'no_coordinates'
