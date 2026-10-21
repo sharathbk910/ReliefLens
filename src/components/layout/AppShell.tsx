@@ -50,9 +50,9 @@ export function AppShell() {
     };
   }, [userDropdownOpen]);
 
-  // Initialize theme from system or saved preference (defaults to clean modern light theme)
+  // Initialize theme from saved preference (defaults to clean modern light theme)
   useEffect(() => {
-    const saved = localStorage.getItem('resqwave-theme') || localStorage.getItem('relieflens-theme');
+    const saved = localStorage.getItem('resqwave-theme');
     if (saved === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
