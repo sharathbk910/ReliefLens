@@ -742,7 +742,17 @@ export const dataService = {
     // Save to Supabase when configured
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('incidents').insert({
+        let supabaseUserId: string | null = null;
+        try {
+          const { data: authData } = await supabase.auth.getUser();
+          if (authData?.user?.id) {
+            supabaseUserId = authData.user.id;
+          }
+        } catch {
+          // Anonymous citizen reporter or demo profile
+        }
+
+        const { error: incError } = await supabase.from('incidents').insert({
           id: incident.id,
           title: incident.title,
           incident_type: incident.incident_type,
@@ -754,7 +764,7 @@ export const dataService = {
           location_precision: incident.location_precision,
           location_source: incident.location_source,
           location_accuracy: incident.location_accuracy,
-          user_confirmed_incident_location: incident.user_confirmed_incident_location,
+          detected_language: incident.detected_language ?? null,
           people_at_risk_estimate: incident.people_at_risk_estimate,
           vulnerability_flags: incident.vulnerability_flags,
           first_reported_at: incident.first_reported_at,
@@ -768,38 +778,45 @@ export const dataService = {
           score_breakdown: incident.score_breakdown,
           ruleset_version: incident.ruleset_version,
           uncertainty_flags: incident.uncertainty_flags,
-          created_by: incident.created_by,
+          created_by: supabaseUserId,
           created_at: incident.created_at,
           updated_at: incident.updated_at,
         });
 
-        await supabase.from('reports').insert({
-          id: initialReport.id,
-          incident_id: initialReport.incident_id,
-          channel: initialReport.channel,
-          incident_type: initialReport.incident_type,
-          external_reference: initialReport.external_reference,
-          description: initialReport.description,
-          reported_at: initialReport.reported_at,
-          received_at: initialReport.received_at,
-          location_text: initialReport.location_text,
-          district: initialReport.district,
-          latitude: initialReport.latitude,
-          longitude: initialReport.longitude,
-          location_precision: initialReport.location_precision,
-          people_at_risk_estimate: initialReport.people_at_risk_estimate,
-          immediate_danger: initialReport.immediate_danger,
-          vulnerability_flags: initialReport.vulnerability_flags,
-          original_transcript: initialReport.original_transcript,
-          detected_language: initialReport.detected_language,
-          normalized_description: initialReport.normalized_description,
-          location_source: initialReport.location_source,
-          location_accuracy: initialReport.location_accuracy,
-          location_captured_at: initialReport.location_captured_at,
-          user_confirmed_incident_location: initialReport.user_confirmed_incident_location,
-          created_by: initialReport.created_by,
-          created_at: initialReport.created_at,
-        });
+        if (incError) {
+          console.warn('Supabase incidents sync notice (relying on local storage fallback):', incError.message);
+        } else {
+          const { error: repError } = await supabase.from('reports').insert({
+            id: initialReport.id,
+            incident_id: initialReport.incident_id,
+            channel: initialReport.channel,
+            incident_type: initialReport.incident_type,
+            external_reference: initialReport.external_reference,
+            description: initialReport.description,
+            reported_at: initialReport.reported_at,
+            received_at: initialReport.received_at,
+            location_text: initialReport.location_text,
+            district: initialReport.district,
+            latitude: initialReport.latitude,
+            longitude: initialReport.longitude,
+            location_precision: initialReport.location_precision,
+            people_at_risk_estimate: initialReport.people_at_risk_estimate,
+            immediate_danger: initialReport.immediate_danger,
+            vulnerability_flags: initialReport.vulnerability_flags,
+            original_transcript: initialReport.original_transcript ?? null,
+            detected_language: initialReport.detected_language ?? null,
+            normalized_description: initialReport.normalized_description ?? null,
+            location_source: initialReport.location_source ?? null,
+            location_accuracy: initialReport.location_accuracy ?? null,
+            location_captured_at: initialReport.location_captured_at ?? null,
+            user_confirmed_incident_location: initialReport.user_confirmed_incident_location ?? true,
+            created_by: supabaseUserId,
+            created_at: initialReport.created_at,
+          });
+          if (repError) {
+            console.warn('Supabase reports sync notice (relying on local storage fallback):', repError.message);
+          }
+        }
       } catch (sbErr) {
         console.warn('Supabase database sync failed, using localDB storage fallback:', sbErr);
       }

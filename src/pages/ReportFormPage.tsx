@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodSafeResolver } from '../lib/zodResolver.ts';
 import {
   ArrowLeft,
   AlertOctagon,
@@ -173,7 +173,7 @@ export function ReportFormPage() {
     reset,
     formState: { errors },
   } = useForm<ReportIngestionInput>({
-    resolver: zodResolver(reportIngestionSchema),
+    resolver: zodSafeResolver(reportIngestionSchema),
     defaultValues: {
       channel: 'phone_call',
       incident_type: 'flood',
@@ -875,7 +875,6 @@ export function ReportFormPage() {
                   variant="primary"
                   size="md"
                   isLoading={isSubmitting}
-                  onClick={handleSubmit(onSubmit, onInvalid)}
                   className="text-xs sm:text-sm py-2 px-3 sm:px-4 gap-1.5 bg-teal-600 hover:bg-teal-500 text-white shadow-md font-semibold min-h-[40px] touch-manipulation"
                 >
                   <CheckCircle2 className="w-4 h-4" strokeWidth={1.5} />

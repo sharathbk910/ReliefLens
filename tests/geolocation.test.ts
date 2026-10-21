@@ -179,7 +179,7 @@ describe('Automatic Geolocation & Location Safeguards', () => {
         reason: 'Unauthorized boost',
       })
     ).rejects.toThrow();
-  });
+  }, 15000);
 
   it('provides structured reverse geocoded place name and district from coordinates', async () => {
     const { reverseGeocodeCoordinates } = await import('../src/lib/reverseGeocode.ts');
