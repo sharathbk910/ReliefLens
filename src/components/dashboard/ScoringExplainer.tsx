@@ -7,34 +7,28 @@ export function ScoringExplainer() {
 
   return (
     <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl overflow-hidden transition-all shadow-sm">
-      <div className="w-full flex items-center justify-between px-3.5 py-2 gap-2">
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex items-center gap-2 text-left group flex-1 cursor-pointer"
-        >
-          <Cpu className="w-3.5 h-3.5 text-[#EBFC72] shrink-0" />
-          <span className="text-xs font-mono font-semibold text-[var(--text-secondary)] group-hover:text-white transition-colors">
-            Scoring Formula:
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between px-3.5 py-2.5 text-left group cursor-pointer hover:bg-[var(--surface-2-solid)] transition-colors gap-2"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Cpu className="w-4 h-4 text-amber-400 shrink-0" />
+          <span className="text-xs font-semibold text-[var(--text-primary)]">
+            Triage Scoring Formula
           </span>
-          <div className="hidden sm:flex items-center gap-1.5 font-mono text-[10px] text-[var(--text-muted)]">
-            <span className="text-rose-400">Danger 30%</span>
-            <span>+</span>
-            <span className="text-amber-400">People 25%</span>
-            <span>+</span>
-            <span className="text-sky-400">Freshness 20%</span>
-            <span>+</span>
-            <span className="text-purple-400">Vulnerability 15%</span>
-            <span>+</span>
-            <span className="text-[#EBFC72]">Confidence 10%</span>
-          </div>
-          <span className="text-[10px] font-mono text-teal-400 ml-auto sm:ml-2 flex items-center gap-1">
-            {open ? 'Hide Formula' : 'How It Works'}
-            <ChevronDown
-              className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
-            />
+          <span className="hidden sm:inline text-xs text-[var(--text-muted)] truncate">
+            (Danger 30% • People 25% • Freshness 20% • Vulnerability 15% • Confidence 10%)
           </span>
-        </button>
-      </div>
+        </div>
+        <span className="text-xs font-mono text-[var(--text-secondary)] group-hover:text-white flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-[var(--border-subtle)] group-hover:bg-[var(--border-strong)] transition-colors border border-[var(--border-subtle)]">
+          <span>{open ? 'Hide Formula' : 'How It Works'}</span>
+          <ChevronDown
+            className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          />
+        </span>
+      </button>
 
       {open && (
         <div className="p-4 pt-1 border-t border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] space-y-3 animate-slide-down">

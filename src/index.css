@@ -468,15 +468,16 @@
 /* Slide-to-Confirm Dispatch Control */
 .slide-track {
   position: relative;
-  height: 42px;
-  background: #181914;
-  border: 1.5px solid rgba(235, 252, 114, 0.4);
+  height: 44px;
+  background: #141611;
+  border: 1.5px solid rgba(235, 252, 114, 0.45);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 .slide-label {
   font-family: var(--font-mono);
@@ -501,9 +502,45 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  cursor: ew-resize;
+  opacity: 1;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: grab;
   z-index: 3;
+}
+.slide-range:active {
+  cursor: grabbing;
+}
+.slide-range::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 100%;
+}
+.slide-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 42px;
+  height: 36px;
+  margin-top: 3px;
+  background: linear-gradient(180deg, #ffffff 0%, #ebfc72 100%);
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.slide-range::-webkit-slider-thumb:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 12px rgba(235, 252, 114, 0.8);
+}
+.slide-range::-moz-range-thumb {
+  width: 42px;
+  height: 36px;
+  background: linear-gradient(180deg, #ffffff 0%, #ebfc72 100%);
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  cursor: grab;
 }
 
 /* Tactical Emergency UI/UX Visual Enhancements */

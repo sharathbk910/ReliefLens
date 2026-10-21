@@ -74,10 +74,10 @@ export function SummaryIndicators({
           <div className="corner-bracket cross-br"></div>
 
           <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors truncate pr-1">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors truncate pr-1">
               {ind.label}
             </span>
-            <div className="p-1 sm:p-1.5 rounded-md bg-black/40 border border-white/5 group-hover:border-[#EBFC72]/40 transition-colors shrink-0">
+            <div className="p-1 sm:p-1.5 rounded-lg bg-black/40 border border-white/5 group-hover:border-[#EBFC72]/40 transition-colors shrink-0">
               {ind.icon}
             </div>
           </div>
@@ -86,7 +86,7 @@ export function SummaryIndicators({
               {ind.count}
             </span>
           </div>
-          <p className="text-[10px] sm:text-[11px] font-mono text-[var(--text-muted)] mt-0.5 sm:mt-1 truncate">
+          <p className="text-xs font-mono text-[var(--text-muted)] mt-1 line-clamp-2 leading-snug">
             {ind.desc}
           </p>
         </button>

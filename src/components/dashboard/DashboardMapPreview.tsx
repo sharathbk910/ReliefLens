@@ -312,7 +312,7 @@ export function DashboardMapPreview({
       <div className="p-2.5 sm:p-3.5 border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2 bg-[var(--surface-1)]">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400 shrink-0" strokeWidth={1.5} />
-          <h3 className="text-xs font-semibold text-[var(--text-primary)] font-mono uppercase tracking-wider truncate">
+          <h3 className="text-xs font-semibold text-[var(--text-primary)] font-mono truncate">
             Spatial Distribution
           </h3>
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums shrink-0">

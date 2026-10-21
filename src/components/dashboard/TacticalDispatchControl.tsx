@@ -100,17 +100,17 @@ export function TacticalDispatchControl({
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square"></span>
-            <span className="font-mono text-[10px] text-amber-300 font-bold uppercase tracking-wider">
-              RESCUE MISSION FAILSAFE HUD
+            <span className="font-mono text-xs text-amber-300 font-bold uppercase tracking-wide">
+              Rescue Mission Failsafe HUD
             </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-700 font-bold uppercase">
+            <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-700 font-bold uppercase">
               {selectedIncident.priority_tier.toUpperCase()} ({selectedIncident.effective_score}/100)
             </span>
           </div>
-          <h3 className="font-heading font-bold text-sm text-[var(--text-primary)] truncate">
+          <h3 className="font-heading font-bold text-sm text-[var(--text-primary)] line-clamp-2 leading-snug">
             {selectedIncident.title}
           </h3>
-          <p className="text-[11px] text-[var(--text-muted)] font-mono truncate">
+          <p className="text-xs text-[var(--text-muted)] font-mono truncate">
             {selectedIncident.district} • {selectedIncident.location_text || 'Coordinates Verified'}
           </p>
         </div>

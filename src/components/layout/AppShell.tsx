@@ -133,15 +133,15 @@ export function AppShell() {
           </div>
 
           <div className="ml-auto flex items-center gap-2 shrink-0 flex-nowrap">
-            {/* Prominent Emergency Action Button (from Inversa sample) */}
+            {/* Compact Header Quick Report Link (Hero banner below serves as primary emergency CTA) */}
             <button
               onClick={() => navigate('/reports/new')}
-              className="px-2 sm:px-3 py-1 rounded-md bg-rose-950/80 hover:bg-rose-900 border border-rose-600/80 text-rose-200 hover:text-white font-mono text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-md shadow-rose-950/50 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
-              title="Report an immediate disaster emergency"
+              className="px-2.5 py-1.5 rounded-lg bg-[var(--surface-2-solid)] hover:bg-rose-500/15 border border-[var(--border-strong)] hover:border-rose-500/50 text-[var(--text-secondary)] hover:text-rose-300 font-mono text-xs font-semibold tracking-wide flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              title="Submit a disaster emergency report"
             >
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-              <span className="hidden sm:inline">🚨 CALL FOR HELP NOW</span>
-              <span className="sm:hidden">🚨 SOS HELP</span>
+              <span className="w-2 h-2 rounded-full bg-rose-500" />
+              <span className="hidden sm:inline">Emergency Report</span>
+              <span className="sm:hidden">Report</span>
             </button>
 
             {/* Quick Multilingual Voice Action Button */}
@@ -149,7 +149,7 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new CustomEvent('open-emergency-voice-modal'))}
-                className="px-2 sm:px-2.5 py-1 rounded-md bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/40 text-amber-300 hover:text-white font-mono text-[11px] font-bold tracking-wide flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                className="px-2.5 py-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/40 text-amber-300 hover:text-white font-mono text-xs font-semibold tracking-wide flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
                 title="Quick Multilingual Voice Emergency Report"
               >
                 <Mic className="w-3.5 h-3.5 text-[#EBFC72]" />
@@ -162,17 +162,17 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] border border-amber-400/40 hover:border-amber-400 transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--surface-2-solid)] hover:bg-[var(--border-subtle)] border border-amber-400/40 hover:border-amber-400 transition-all cursor-pointer shadow-sm"
                 title={`Logged in as ${currentUser.display_name} (${currentUser.role}). Tap to switch persona.`}
               >
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-[10px] sm:text-xs font-bold text-amber-300 shrink-0">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-xs font-bold text-amber-300 shrink-0">
                   {currentUser.display_name.charAt(0)}
                 </div>
                 <div className="text-left hidden sm:block max-w-[100px] md:max-w-[130px] truncate">
-                  <p className="text-[11px] font-bold text-[var(--text-primary)] truncate leading-tight">
+                  <p className="text-xs font-bold text-[var(--text-primary)] truncate leading-tight">
                     {currentUser.display_name}
                   </p>
-                  <p className="text-[9px] uppercase font-mono text-amber-400 font-bold leading-none">
+                  <p className="text-[10px] uppercase font-mono text-amber-400 font-bold leading-none">
                     {currentUser.role}
                   </p>
                 </div>
@@ -183,19 +183,19 @@ export function AppShell() {
               {userDropdownOpen && (
                 <div className="!absolute right-0 top-full mt-1.5 w-60 z-[100] shadow-2xl bg-[#141611]/98 backdrop-blur-xl border border-[var(--border-strong)] rounded-xl p-2.5 animate-spatial-enter select-auto">
                   <div className="px-2 py-1.5 border-b border-[var(--border-subtle)] mb-1">
-                    <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] font-bold">
-                      CURRENTLY LOGGED IN:
+                    <p className="text-xs font-mono text-[var(--text-muted)] font-medium">
+                      Currently logged in:
                     </p>
                     <p className="text-xs font-bold text-[var(--text-primary)] truncate">
                       {currentUser.display_name}
                     </p>
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-amber-400/20 text-amber-300 mt-0.5 border border-amber-400/30">
-                      ROLE: {currentUser.role}
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-400/20 text-amber-300 mt-1 border border-amber-400/30">
+                      Role: {currentUser.role}
                     </span>
                   </div>
 
-                  <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] px-2 py-1">
-                    SWITCH ACTIVE PERSONA:
+                  <p className="text-xs font-mono text-[var(--text-muted)] px-2 py-1">
+                    Switch active persona:
                   </p>
                   {(['admin', 'coordinator', 'reporter', 'viewer'] as UserRole[]).map((r) => (
                     <button
@@ -222,7 +222,7 @@ export function AppShell() {
             <button
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
+              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? (
@@ -234,7 +234,7 @@ export function AppShell() {
             <button
               onClick={handleResetData}
               title="Reset simulated scenario data"
-              className="hidden lg:flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/10 font-mono transition-colors"
+              className="hidden lg:flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/30 hover:bg-amber-500/10 font-mono transition-colors"
             >
               <RefreshCw className="w-3 h-3" strokeWidth={1.5} />
               <span>Reset Data</span>
@@ -251,7 +251,7 @@ export function AppShell() {
         {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) */}
         <aside
           aria-label="Primary Navigation"
-          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none"
+          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none rounded-xl"
         >
           {/* Logo & Operational Status */}
           <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-center lg:justify-start">
@@ -259,13 +259,13 @@ export function AppShell() {
             <AppLogo size="md" showText={true} className="hidden lg:flex" />
           </div>
 
-          {/* New Report Primary Action */}
+          {/* New Report Primary Action (Unified styling matching hero emergency button) */}
           <div className="p-2.5">
             {currentUser.role !== 'viewer' ? (
               <Button
                 variant="primary"
                 size="md"
-                className="w-full justify-center lg:justify-start shadow-md shadow-rose-950/40 px-2.5 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-mono font-bold tracking-wide border border-rose-400/40"
+                className="w-full justify-center lg:justify-start shadow-md shadow-rose-950/40 px-2.5 bg-rose-600 hover:bg-rose-500 text-white font-mono font-bold tracking-wide border border-rose-500 rounded-lg"
                 leftIcon={<Plus className="w-4 h-4 shrink-0" strokeWidth={2} />}
                 onClick={() => navigate('/reports/new')}
                 title="Create New Emergency Report"
@@ -278,7 +278,7 @@ export function AppShell() {
                 className="p-2 rounded-lg bg-[var(--border-subtle)] text-xs text-[var(--text-muted)] text-center flex items-center justify-center font-mono"
               >
                 <Lock className="w-4 h-4" strokeWidth={1.5} />
-                <span className="hidden lg:inline ml-1.5 text-[11px]">Read-Only</span>
+                <span className="hidden lg:inline ml-1.5 text-xs">Read-Only</span>
               </div>
             )}
           </div>
@@ -304,88 +304,61 @@ export function AppShell() {
             ))}
           </nav>
 
-          {/* Quick Crisis Hotline Card in Sidebar (fills empty sidebar space on Desktop) */}
-          <div className="hidden lg:block mx-2.5 mb-2 p-2.5 rounded-xl bg-black/40 border border-rose-500/25 space-y-1.5 select-none">
+          {/* Quick Crisis Hotline Card in Sidebar */}
+          <div className="hidden lg:block mx-2.5 mb-2 p-2.5 rounded-xl bg-black/40 border border-rose-500/25 space-y-2 select-none">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold uppercase text-rose-300 flex items-center gap-1">
+              <span className="text-xs font-mono font-semibold text-rose-300 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-                24/7 CRISIS DIAL
+                24/7 Crisis Helpline
               </span>
-              <span className="text-[9px] font-mono text-[var(--text-muted)]">TOLL-FREE</span>
+              <span className="text-[10px] font-mono text-[var(--text-muted)]">TOLL-FREE</span>
             </div>
             <div className="grid grid-cols-3 gap-1 pt-0.5">
               <a
                 href="tel:112"
-                className="p-1 rounded bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-center font-mono font-bold text-[11px] text-rose-200 hover:text-white transition-colors"
+                className="p-1 rounded bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-center font-mono font-bold text-xs text-rose-200 hover:text-white transition-colors"
                 title="Dial 112 National Emergency"
               >
                 112
               </a>
               <a
                 href="tel:108"
-                className="p-1 rounded bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-center font-mono font-bold text-[11px] text-amber-200 hover:text-white transition-colors"
+                className="p-1 rounded bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 text-center font-mono font-bold text-xs text-amber-200 hover:text-white transition-colors"
                 title="Dial 108 Disaster Ambulance"
               >
                 108
               </a>
               <a
                 href="tel:101"
-                className="p-1 rounded bg-orange-950/60 hover:bg-orange-900 border border-orange-500/30 text-center font-mono font-bold text-[11px] text-orange-200 hover:text-white transition-colors"
+                className="p-1 rounded bg-orange-950/60 hover:bg-orange-900 border border-orange-500/30 text-center font-mono font-bold text-xs text-orange-200 hover:text-white transition-colors"
                 title="Dial 101 Fire & Rescue"
               >
                 101
               </a>
             </div>
-            <p className="text-[9px] text-[var(--text-muted)] leading-tight text-center">
+            <p className="text-xs text-[var(--text-muted)] leading-normal text-center">
               Direct live emergency response line
             </p>
           </div>
 
-          {/* User Account / Role Switcher Popover (Pinned to bottom of sidebar) */}
-          <div className="mt-auto sticky bottom-0 bg-[#141611]/98 p-2.5 border-t border-[var(--border-subtle)] relative z-20">
-            <button
-              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              aria-label="User Account and Persona Menu"
-              className="w-full flex items-center justify-between p-1.5 lg:p-2 rounded-lg hover:bg-[var(--border-subtle)] transition-colors border border-transparent hover:border-[var(--border-subtle)]"
+          {/* User Account / Active Identity Display in Sidebar Bottom (Clean status, no duplicate dropdown) */}
+          <div className="mt-auto bg-[#141611]/98 p-2.5 border-t border-[var(--border-subtle)] rounded-b-xl">
+            <div
+              className="w-full flex items-center gap-2 p-1.5 rounded-lg bg-[var(--surface-1-solid)] border border-[var(--border-subtle)]"
+              title={`Logged in as ${currentUser.display_name}. Use top-right profile to change persona.`}
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-[var(--border-subtle)] border border-[var(--border-strong)] flex items-center justify-center text-xs font-semibold text-rose-400 shrink-0">
-                  {currentUser.display_name.charAt(0)}
-                </div>
-                <div className="hidden lg:block text-left truncate min-w-0">
-                  <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
-                    {currentUser.display_name}
-                  </p>
-                  <p className="text-[10px] uppercase font-mono text-[var(--text-muted)]">
-                    {currentUser.role}
-                  </p>
-                </div>
+              <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xs font-bold text-amber-300 shrink-0">
+                {currentUser.display_name.charAt(0)}
               </div>
-              <ChevronDown className="hidden lg:block w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" strokeWidth={1.5} />
-            </button>
-
-            {/* Role Switcher Menu */}
-            {userDropdownOpen && (
-              <div className="absolute bottom-16 left-2 right-2 md:left-full md:bottom-2 md:ml-2 md:w-56 md:right-auto lg:left-2 lg:ml-0 lg:w-56 lg:bottom-16 surface-z2 p-2 z-50 animate-spatial-enter shadow-2xl">
-                <p className="text-[10px] uppercase font-mono text-[var(--text-muted)] px-2 py-1">
-                  Active Persona:
+              <div className="hidden lg:block text-left truncate min-w-0">
+                <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
+                  {currentUser.display_name}
                 </p>
-                {(['admin', 'coordinator', 'reporter', 'viewer'] as UserRole[]).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => handleRoleChange(r)}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs flex items-center justify-between transition-colors ${
-                      currentUser.role === r
-                        ? 'bg-rose-500/15 text-rose-400 font-semibold border border-rose-500/30'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
-                    }`}
-                  >
-                    <span className="capitalize">{r}</span>
-                    {currentUser.role === r && <UserCheck className="w-3.5 h-3.5 text-rose-400" strokeWidth={1.5} />}
-                  </button>
-                ))}
+                <p className="text-[10px] uppercase font-mono text-amber-400 font-bold">
+                  {currentUser.role}
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </aside>
 
