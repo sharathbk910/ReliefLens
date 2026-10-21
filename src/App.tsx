@@ -23,6 +23,25 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const geminiKey = urlParams.get('gemini_key');
+        if (geminiKey && geminiKey.trim()) {
+          localStorage.setItem('relieflens_gemini_key', geminiKey.trim());
+          urlParams.delete('gemini_key');
+          const newSearch = urlParams.toString();
+          const newUrl =
+            window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash;
+          window.history.replaceState({}, '', newUrl);
+        }
+      } catch (e) {
+        console.warn('Failed to parse URL params for gemini_key', e);
+      }
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>

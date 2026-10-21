@@ -50,6 +50,12 @@ export function VoiceRecorder({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [hasGeminiKey] = useState(() => {
+    return (
+      Boolean(typeof window !== 'undefined' && localStorage.getItem('relieflens_gemini_key')) ||
+      Boolean(import.meta.env.VITE_GEMINI_API_KEY)
+    );
+  });
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -278,9 +284,16 @@ export function VoiceRecorder({
           <div>
             <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
               Multilingual Voice Reporting
-              <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30">
-                AI Powered
-              </Badge>
+              {hasGeminiKey ? (
+                <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 flex items-center gap-1 font-mono">
+                  <Sparkles className="w-2.5 h-2.5" />
+                  Gemini 2.5 Flash
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-[10px] text-amber-400 border-amber-500/30 font-mono">
+                  AI Fallback
+                </Badge>
+              )}
             </h3>
             <p className="text-xs text-slate-400">
               Speak in any language (e.g. Kannada, Hindi, English, Tamil, Telugu). Gemini detects speech automatically.

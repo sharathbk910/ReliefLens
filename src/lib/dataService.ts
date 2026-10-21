@@ -960,8 +960,10 @@ export const dataService = {
       }
     }
 
-    // 2. Direct Gemini API call if VITE_GEMINI_API_KEY is configured
-    const clientGeminiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    // 2. Direct Gemini API call if configured in browser localStorage or environment
+    const clientGeminiKey =
+      (typeof window !== 'undefined' ? localStorage.getItem('relieflens_gemini_key') : null) ||
+      import.meta.env.VITE_GEMINI_API_KEY;
     if (clientGeminiKey && typeof clientGeminiKey === 'string' && clientGeminiKey.trim() !== '') {
       try {
         return await callGeminiDirectly(audioBase64, mimeType, clientGeminiKey.trim());
