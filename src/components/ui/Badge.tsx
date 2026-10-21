@@ -73,43 +73,49 @@ export function PriorityBadge({ tier, score }: { tier: PriorityTier; score?: num
   );
 }
 
-export function StatusBadge({ status }: { status: IncidentStatus }) {
-  const styles: Record<IncidentStatus, { bg: string; text: string; border: string; label: string }> = {
+export function StatusBadge({ status, compact = false }: { status: IncidentStatus; compact?: boolean }) {
+  const styles: Record<IncidentStatus, { bg: string; text: string; border: string; label: string; compactLabel: string }> = {
     new: {
       bg: 'bg-emerald-500/10',
       text: 'text-emerald-300',
       border: 'border-emerald-500/30',
       label: 'NEW',
+      compactLabel: 'NEW',
     },
     under_review: {
       bg: 'bg-indigo-500/10',
       text: 'text-indigo-300',
       border: 'border-indigo-500/30',
       label: 'UNDER REVIEW',
+      compactLabel: 'REVIEW',
     },
     confirmed: {
       bg: 'bg-cyan-500/10',
       text: 'text-cyan-300',
       border: 'border-cyan-500/30',
       label: 'CONFIRMED',
+      compactLabel: 'CONFIRMED',
     },
     resolved: {
       bg: 'bg-slate-800/50',
       text: 'text-slate-400',
       border: 'border-slate-700/50',
       label: 'RESOLVED',
+      compactLabel: 'RESOLVED',
     },
     dismissed: {
       bg: 'bg-neutral-800/50',
       text: 'text-neutral-400',
       border: 'border-neutral-700/50',
       label: 'DISMISSED',
+      compactLabel: 'DISMISSED',
     },
     merged: {
       bg: 'bg-purple-500/10',
       text: 'text-purple-300',
       border: 'border-purple-500/30',
       label: 'MERGED',
+      compactLabel: 'MERGED',
     },
   };
 
@@ -117,20 +123,21 @@ export function StatusBadge({ status }: { status: IncidentStatus }) {
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border}`}
+      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border}`}
     >
-      {style.label}
+      {compact ? style.compactLabel : style.label}
     </span>
   );
 }
 
-export function VerificationBadge({ level }: { level: VerificationLevel }) {
-  const styles: Record<VerificationLevel, { text: string; border: string; bg: string; label: string; tooltip: string }> = {
+export function VerificationBadge({ level, compact = false }: { level: VerificationLevel; compact?: boolean }) {
+  const styles: Record<VerificationLevel, { text: string; border: string; bg: string; label: string; compactLabel: string; tooltip: string }> = {
     coordinator_verified: {
       text: 'text-teal-300',
       border: 'border-teal-500/30',
       bg: 'bg-teal-500/10',
       label: 'Coordinator Verified',
+      compactLabel: 'Coord Verified',
       tooltip: 'Directly verified on site or radio by emergency response coordinator.',
     },
     corroborated: {
@@ -138,6 +145,7 @@ export function VerificationBadge({ level }: { level: VerificationLevel }) {
       border: 'border-sky-500/30',
       bg: 'bg-sky-500/10',
       label: 'Corroborated',
+      compactLabel: 'Corroborated',
       tooltip: 'Corroborated by independent citizen reports across multiple communication channels.',
     },
     partially_corroborated: {
@@ -145,6 +153,7 @@ export function VerificationBadge({ level }: { level: VerificationLevel }) {
       border: 'border-amber-500/30',
       bg: 'bg-amber-500/10',
       label: 'Partially Verified',
+      compactLabel: 'Partially Verif',
       tooltip: 'Partially matched with existing reports but awaiting additional field evidence.',
     },
     unverified: {
@@ -152,6 +161,7 @@ export function VerificationBadge({ level }: { level: VerificationLevel }) {
       border: 'border-slate-700/50',
       bg: 'bg-slate-800/40',
       label: 'Unverified',
+      compactLabel: 'Unverified',
       tooltip: 'Single preliminary report pending verification.',
     },
   };
@@ -161,60 +171,67 @@ export function VerificationBadge({ level }: { level: VerificationLevel }) {
   return (
     <span
       title={style.tooltip}
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border}`}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border}`}
     >
-      {style.label}
+      {compact ? style.compactLabel : style.label}
     </span>
   );
 }
 
-export function UncertaintyBadge({ flag }: { flag: UncertaintyFlag }) {
-  const meta: Record<UncertaintyFlag, { label: string; tooltip: string; severe?: boolean }> = {
+export function UncertaintyBadge({ flag, compact = false }: { flag: UncertaintyFlag; compact?: boolean }) {
+  const meta: Record<UncertaintyFlag, { label: string; compactLabel: string; tooltip: string; severe?: boolean }> = {
     no_coordinates: {
       label: 'No GPS Coords',
+      compactLabel: 'No GPS',
       tooltip: 'No associated report contains verified latitude/longitude coordinates.',
     },
     location_precision_unknown: {
       label: 'Unknown Precision',
+      compactLabel: 'Approx Loc',
       tooltip: 'Location description precision is approximate or unknown.',
     },
     single_source: {
       label: 'Single Source',
+      compactLabel: '1 Source',
       tooltip: 'Information originates from only one communication channel.',
     },
     people_at_risk_unknown: {
       label: 'Unknown People at Risk',
+      compactLabel: 'Unknown Pop',
       tooltip: 'No casualty or impacted headcount estimate has been provided.',
     },
     conflicting_people_estimates: {
       label: 'Conflicting Estimates',
+      compactLabel: 'Conflict Est',
       tooltip: 'Reported casualties or people at risk vary by 4x or more.',
       severe: true,
     },
     stale_over_12h: {
       label: 'Stale (>12h)',
+      compactLabel: '>12h Old',
       tooltip: 'Latest incoming report is older than 12 hours.',
       severe: true,
     },
     unverified_high_danger: {
       label: 'Unverified High Danger',
+      compactLabel: 'High Danger',
       tooltip: 'Immediate danger reported without multi-source or coordinator verification.',
       severe: true,
     },
   };
 
-  const info = meta[flag] || { label: flag, tooltip: flag };
+  const info = meta[flag] || { label: flag, compactLabel: flag, tooltip: flag };
 
   return (
     <span
       title={info.tooltip}
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-mono tracking-wide border whitespace-nowrap shrink-0 select-none ${
+      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wide border whitespace-nowrap shrink-0 select-none ${
         info.severe
           ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
           : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
       }`}
     >
-      ⚠️ {info.label}
+      ⚠️ {compact ? info.compactLabel : info.label}
     </span>
   );
 }
