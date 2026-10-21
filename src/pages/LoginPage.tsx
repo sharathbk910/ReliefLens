@@ -157,16 +157,22 @@ export function LoginPage() {
     <div className="min-h-screen bg-[var(--canvas)] flex items-center justify-center p-4 font-sans text-[var(--text-primary)] selection:bg-rose-500/30">
       <div className="max-w-md w-full space-y-5 animate-spatial-enter">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-500 shadow-lg shadow-rose-950/20">
-            <Radio className="w-6 h-6" strokeWidth={1.5} />
+        <div className="text-center space-y-3">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-2xl overflow-hidden bg-white/95 border-2 border-teal-500/40 shadow-xl shadow-teal-950/40 p-1 transition-transform duration-300 hover:scale-105">
+            <img
+              src="/logo.png"
+              alt="ReliefLens Logo"
+              className="w-full h-full object-cover object-[center_20%] rounded-xl"
+            />
           </div>
-          <h1 className="text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight">
-            ReliefLens
-          </h1>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Transparent Emergency Response Coordination & Incident Prioritization
-          </p>
+          <div>
+            <h1 className="text-2xl font-bold font-heading tracking-tight bg-gradient-to-r from-blue-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+              ReliefLens
+            </h1>
+            <p className="text-xs text-[var(--text-secondary)] mt-1">
+              Transparent Emergency Response Coordination After Disasters
+            </p>
+          </div>
         </div>
 
         {/* Quick Demo Personas (Section 11 Role Model) */}

@@ -22,6 +22,7 @@ import { Button } from '../ui/Button.tsx';
 import { useToast } from '../ui/Toast.tsx';
 import { EmergencyVoiceFAB } from '../emergency/EmergencyVoiceFAB.tsx';
 import { OfflineBanner } from '../offline/OfflineBanner.tsx';
+import { AppLogo } from '../common/AppLogo.tsx';
 import type { UserRole } from '../../shared/types.ts';
 
 export function AppShell() {
@@ -104,6 +105,9 @@ export function AppShell() {
       {/* 1. Mandatory Safety Disclaimer Banner (Spatial Topbar) */}
       <header className="z-40 px-3 md:px-6 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--surface-1)] backdrop-blur-md text-xs flex items-center justify-between">
         <div className="flex items-center gap-2 max-w-7xl mx-auto w-full">
+          <div className="md:hidden shrink-0">
+            <AppLogo size="xs" showText={false} />
+          </div>
           <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" strokeWidth={1.5} />
           <span className="leading-tight text-[var(--text-secondary)] text-[10px] sm:text-xs truncate sm:whitespace-normal">
             <strong className="text-[var(--text-primary)] font-semibold">Prototype:</strong> <span className="hidden sm:inline">ReliefLens provides decision support for emergency coordination.</span> Not for 911 dispatch.
@@ -145,19 +149,9 @@ export function AppShell() {
           className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none"
         >
           {/* Logo & Operational Status */}
-          <div className="p-3.5 border-b border-[var(--border-subtle)] flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0 shadow-sm">
-              <Radio className="w-4 h-4" strokeWidth={1.5} />
-            </div>
-            <div className="hidden lg:block min-w-0">
-              <div className="font-bold text-[var(--text-primary)] text-sm tracking-tight font-heading flex items-center gap-1.5">
-                <span>ReliefLens</span>
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
-                  v1.0
-                </span>
-              </div>
-              <p className="text-[10px] text-[var(--text-muted)] truncate">Crisis Coordination</p>
-            </div>
+          <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-center lg:justify-start">
+            <AppLogo size="md" showText={false} className="lg:hidden" />
+            <AppLogo size="md" showText={true} className="hidden lg:flex" />
           </div>
 
           {/* New Report Primary Action */}
