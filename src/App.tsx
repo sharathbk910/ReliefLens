@@ -14,6 +14,7 @@ import { AuditPage } from './pages/AuditPage.tsx';
 import { NotFoundPage } from './pages/NotFoundPage.tsx';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
+import { dataService } from './lib/dataService.ts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +52,10 @@ export function App() {
               localStorage.setItem('relieflens_user_lat', latitude.toString());
               localStorage.setItem('relieflens_user_lng', longitude.toString());
               localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
+              const relocated = dataService.checkAndAnchorToNearby(latitude, longitude);
+              if (relocated) {
+                queryClient.invalidateQueries();
+              }
             },
             (err) => {
               console.warn('Automatic location detection notice on website open:', err.message);

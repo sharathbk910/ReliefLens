@@ -41,19 +41,124 @@ interface LocalDB {
   currentUserId: string;
 }
 
+function shiftDBCoordinates(db: LocalDB, targetLat: number, targetLng: number): LocalDB {
+  const firstWithCoords = db.incidents.find(
+    (i): i is Incident & { latitude: number; longitude: number } =>
+      typeof i.latitude === 'number' && typeof i.longitude === 'number' && !isNaN(i.latitude) && !isNaN(i.longitude)
+  );
+  const currentBaseLat = firstWithCoords?.latitude ?? 12.9716;
+  const currentBaseLng = firstWithCoords?.longitude ?? 77.5946;
+  const dLat = targetLat - currentBaseLat;
+  const dLng = targetLng - currentBaseLng;
+
+  db.incidents = db.incidents.map((inc) => {
+    if (typeof inc.latitude !== 'number' || typeof inc.longitude !== 'number' || isNaN(inc.latitude)) {
+      return inc;
+    }
+    return {
+      ...inc,
+      latitude: Number((inc.latitude + dLat).toFixed(6)),
+      longitude: Number((inc.longitude + dLng).toFixed(6)),
+    };
+  });
+
+  db.reports = db.reports.map((rep) => {
+    if (typeof rep.latitude !== 'number' || typeof rep.longitude !== 'number' || isNaN(rep.latitude)) {
+      return rep;
+    }
+    return {
+      ...rep,
+      latitude: Number((rep.latitude + dLat).toFixed(6)),
+      longitude: Number((rep.longitude + dLng).toFixed(6)),
+    };
+  });
+
+  db.duplicateCandidates = db.duplicateCandidates.map((cand) => {
+    const updatedCandidate: DuplicateCandidate = {
+      ...cand,
+      report_a: cand.report_a
+        ? {
+            ...cand.report_a,
+            latitude:
+              typeof cand.report_a.latitude === 'number'
+                ? Number((cand.report_a.latitude + dLat).toFixed(6))
+                : cand.report_a.latitude,
+            longitude:
+              typeof cand.report_a.longitude === 'number'
+                ? Number((cand.report_a.longitude + dLng).toFixed(6))
+                : cand.report_a.longitude,
+          }
+        : undefined,
+      report_b: cand.report_b
+        ? {
+            ...cand.report_b,
+            latitude:
+              typeof cand.report_b.latitude === 'number'
+                ? Number((cand.report_b.latitude + dLat).toFixed(6))
+                : cand.report_b.latitude,
+            longitude:
+              typeof cand.report_b.longitude === 'number'
+                ? Number((cand.report_b.longitude + dLng).toFixed(6))
+                : cand.report_b.longitude,
+          }
+        : undefined,
+    };
+    return updatedCandidate;
+  });
+
+  saveDB(db);
+  return db;
+}
+
 function loadInitialDB(): LocalDB {
   if (typeof window !== 'undefined') {
     const raw = localStorage.getItem(STORAGE_KEY);
+    const savedLat = localStorage.getItem('relieflens_user_lat');
+    const savedLng = localStorage.getItem('relieflens_user_lng');
+
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed: LocalDB = JSON.parse(raw);
+        if (parsed.incidents && parsed.incidents.length > 0) {
+          const first = parsed.incidents[0];
+          // If cached DB is still in old California coordinates (lat > 35 && lng < -120), relocate to user GPS or regional center!
+          const isOldUSCoords =
+            first?.latitude && first.latitude > 35 && first.longitude && first.longitude < -120;
+          if (isOldUSCoords) {
+            const targetLat = savedLat ? parseFloat(savedLat) : 12.9716;
+            const targetLng = savedLng ? parseFloat(savedLng) : 77.5946;
+            return shiftDBCoordinates(parsed, targetLat, targetLng);
+          }
+          return parsed;
+        }
       } catch (e) {
         console.error('Failed to parse cached local DB', e);
       }
     }
+
+    if (savedLat && savedLng) {
+      const seed = generateSeedDataset({
+        baseLat: parseFloat(savedLat),
+        baseLng: parseFloat(savedLng),
+      });
+      const db: LocalDB = {
+        profiles: seed.profiles,
+        incidents: seed.incidents,
+        reports: seed.reports,
+        contacts: seed.contacts,
+        duplicateCandidates: seed.duplicateCandidates,
+        auditLogs: seed.auditLogs,
+        currentUserId: seed.profiles[1].id,
+      };
+      saveDB(db);
+      return db;
+    }
   }
 
-  const seed = generateSeedDataset();
+  // Default regional coordinates (Bengaluru / Regional Emergency Coordination Center)
+  const defaultLat = 12.9716;
+  const defaultLng = 77.5946;
+  const seed = generateSeedDataset({ baseLat: defaultLat, baseLng: defaultLng });
   const db: LocalDB = {
     profiles: seed.profiles,
     incidents: seed.incidents,
@@ -206,16 +311,27 @@ Extract structured incident information into valid JSON with these fields:
 }
 
 function getFallbackVoiceExtraction(): VoiceExtractionResult {
+  let fallbackLat = 12.9716;
+  let fallbackLng = 77.5946;
+  if (typeof window !== 'undefined') {
+    const savedLat = localStorage.getItem('relieflens_user_lat');
+    const savedLng = localStorage.getItem('relieflens_user_lng');
+    if (savedLat && savedLng) {
+      fallbackLat = parseFloat(savedLat);
+      fallbackLng = parseFloat(savedLng);
+    }
+  }
+
   return {
     transcript: 'Severe water inflow and rising flood levels near the bridge. Multiple families require evacuation assistance.',
     detectedLanguage: 'English (Emergency Fallback)',
     normalizedDescription: 'Flash flooding observed near river crossing. Water levels exceeding safety barrier with families stranded nearby.',
     title: 'Flash Flood Near Bridge Crossing',
     incidentType: 'flood',
-    locationText: 'Central Bridge & 5th Avenue',
-    district: 'Riverdale Basin',
-    latitude: 37.7749,
-    longitude: -122.4194,
+    locationText: 'Central Bridge & Main Bypass Road',
+    district: 'River Valley Sector',
+    latitude: fallbackLat,
+    longitude: fallbackLng,
     locationPrecision: 'approximate',
     peopleAtRiskEstimate: 6,
     immediateDanger: true,
@@ -228,12 +344,55 @@ function getFallbackVoiceExtraction(): VoiceExtractionResult {
 }
 
 export const dataService = {
+  // Anchor all reports and incidents to target location (e.g. user GPS)
+  anchorToUserLocation(targetLat: number, targetLng: number): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('relieflens_user_lat', targetLat.toString());
+      localStorage.setItem('relieflens_user_lng', targetLng.toString());
+    }
+    localDB = shiftDBCoordinates(localDB, targetLat, targetLng);
+    notifyIncidentChange();
+  },
+
+  // Check if current dataset is far (>40km or California coords) from user location, and if so, auto-anchor
+  checkAndAnchorToNearby(targetLat: number, targetLng: number): boolean {
+    if (
+      typeof targetLat !== 'number' ||
+      typeof targetLng !== 'number' ||
+      isNaN(targetLat) ||
+      isNaN(targetLng)
+    ) {
+      return false;
+    }
+    const firstWithCoords = localDB.incidents.find(
+      (i): i is Incident & { latitude: number; longitude: number } =>
+        typeof i.latitude === 'number' && typeof i.longitude === 'number' && !isNaN(i.latitude) && !isNaN(i.longitude)
+    );
+    if (!firstWithCoords) {
+      this.anchorToUserLocation(targetLat, targetLng);
+      return true;
+    }
+    const distMeters = calculateHaversineMeters(
+      targetLat,
+      targetLng,
+      firstWithCoords.latitude,
+      firstWithCoords.longitude
+    );
+    // If reports are more than 40km away from user, or in old California coords, automatically re-anchor them around user's location
+    if (distMeters > 40000 || (firstWithCoords.latitude > 35 && firstWithCoords.longitude < -120)) {
+      this.anchorToUserLocation(targetLat, targetLng);
+      return true;
+    }
+    return false;
+  },
+
   // Reset seed data
   resetSeedData(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(STORAGE_KEY);
     }
     localDB = loadInitialDB();
+    notifyIncidentChange();
   },
 
   // Auth & Roles

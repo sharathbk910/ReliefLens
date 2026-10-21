@@ -66,7 +66,7 @@ export const config: Config = {
     tileUrl:
       import.meta.env.VITE_MAP_TILE_URL ||
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    defaultCenter: [37.7749, -122.4194],
+    defaultCenter: [12.9716, 77.5946],
     defaultZoom: 12,
   },
   ai: {

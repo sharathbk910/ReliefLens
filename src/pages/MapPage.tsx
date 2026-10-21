@@ -199,6 +199,10 @@ function LocateMeControl({
         const { latitude, longitude, accuracy } = pos.coords;
         const loc = { lat: latitude, lng: longitude, accuracy: Math.round(accuracy) };
         setUserLocation(loc);
+        localStorage.setItem('relieflens_user_lat', latitude.toString());
+        localStorage.setItem('relieflens_user_lng', longitude.toString());
+        localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
+        dataService.checkAndAnchorToNearby(latitude, longitude);
         map.flyTo([latitude, longitude], 15, { duration: 1.2 });
         toast.success(
           'Location Detected',

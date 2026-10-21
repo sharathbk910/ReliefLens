@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-21T11:18:15.313Z",
+  "timestamp": "2026-10-21T11:37:09.223Z",
   "dataset_size": {
     "total_reports": 65,
     "total_incidents": 65,
@@ -20,7 +20,7 @@
           "reportAIndex": 25,
           "reportBIndex": 26,
           "isDuplicate": true,
-          "notes": "East Side Elementary shelter station water shortage"
+          "notes": "East Side Primary shelter station water shortage"
         },
         "score": 0.538,
         "reasons": [

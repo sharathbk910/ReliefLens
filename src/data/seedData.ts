@@ -45,8 +45,15 @@ export interface LabeledPair {
 }
 
 // 60+ Simulated Reports Generator
-export function generateSeedDataset() {
+export function generateSeedDataset(options?: {
+  baseLat?: number;
+  baseLng?: number;
+}) {
   const baseTime = new Date('2026-10-20T10:00:00Z').getTime();
+  const targetBaseLat = options?.baseLat ?? 37.7749;
+  const targetBaseLng = options?.baseLng ?? -122.4194;
+  const deltaLat = targetBaseLat - 37.7749;
+  const deltaLng = targetBaseLng - (-122.4194);
 
   // Raw report specs
   const rawReportSpecs = [
@@ -65,7 +72,7 @@ export function generateSeedDataset() {
       risk: 16,
       danger: true,
       flags: ['children_present', 'elderly_present'] as const,
-      contact: { name: 'David Miller', phone: '+1-555-0101' },
+      contact: { name: 'David Rao', phone: '+91-98450-0101' },
     },
     {
       group: 'inc_1_dup', // Target duplicate for Report 0
@@ -81,7 +88,7 @@ export function generateSeedDataset() {
       risk: 15,
       danger: true,
       flags: ['children_present'] as const,
-      contact: { name: 'Clara Hayes', phone: '+1-555-0102' },
+      contact: { name: 'Clara Hayes', phone: '+91-98450-0102' },
     },
     {
       group: 'inc_1_dup2', // Another duplicate for Report 0
@@ -119,9 +126,9 @@ export function generateSeedDataset() {
       group: 'inc_2',
       channel: 'phone_call' as const,
       type: 'fire' as const,
-      desc: 'Massive transformer fire spreading to adjacent warehouse on 12th St. Heavy black smoke, building partially collapsed, workers trapped inside.',
+      desc: 'Massive transformer fire spreading to adjacent warehouse on Industrial Main Road. Heavy black smoke, building partially collapsed, workers trapped inside.',
       minutesAgo: 35,
-      loc: '450 East 12th Street, Midtown Logistics Yard',
+      loc: '450 Industrial Main Road, Logistics Yard',
       dist: 'Midtown Industrial',
       lat: 37.7610,
       lng: -122.3950,
@@ -129,15 +136,15 @@ export function generateSeedDataset() {
       risk: 25,
       danger: true,
       flags: ['medical_dependency'] as const,
-      contact: { name: 'Shift Supervisor Alex Ray', phone: '+1-555-0201' },
+      contact: { name: 'Shift Supervisor Alex Ray', phone: '+91-98450-0201' },
     },
     {
       group: 'inc_2_dup', // Duplicate for Report 4
       channel: 'social_media' as const,
       type: 'fire' as const,
-      desc: 'Heavy blaze and fire spreading across 12th street industrial warehouse. Collapsed concrete wall, emergency crews needed immediately.',
+      desc: 'Heavy blaze and fire spreading across Industrial Main Road warehouse. Collapsed concrete wall, emergency crews needed immediately.',
       minutesAgo: 25,
-      loc: '12th St and Logistics Yard',
+      loc: 'Industrial Main Road and Logistics Yard',
       dist: 'Midtown Industrial',
       lat: 37.7612,
       lng: -122.3948,
@@ -169,7 +176,7 @@ export function generateSeedDataset() {
       type: 'landslide' as const,
       desc: 'Extensive mudslide collapsed mountain ridge road. Two vehicles submerged under debris, passengers trapped and screaming.',
       minutesAgo: 80,
-      loc: 'Northern Ridge Pass Highway 101 KM 42',
+      loc: 'Northern Ridge Pass Highway Bypass KM 42',
       dist: 'Northern Ridge',
       lat: 37.8200,
       lng: -122.4800,
@@ -182,9 +189,9 @@ export function generateSeedDataset() {
       group: 'inc_3_dup', // Duplicate for Report 7
       channel: 'sms' as const,
       type: 'landslide' as const,
-      desc: 'Major landslide at Highway 101 KM 42 near Northern Ridge pass. Cars trapped in debris, road completely cut off.',
+      desc: 'Major landslide at Highway Bypass KM 42 near Northern Ridge pass. Cars trapped in debris, road completely cut off.',
       minutesAgo: 65,
-      loc: 'Highway 101 KM 42 ridge road',
+      loc: 'Highway Bypass KM 42 ridge road',
       dist: 'Northern Ridge',
       lat: 37.8205,
       lng: -122.4810,
@@ -216,7 +223,7 @@ export function generateSeedDataset() {
       type: 'medical' as const,
       desc: 'Ceiling collapsed at elderly care center after tremor. Multiple residents bleeding, unconscious, urgent ambulances requested.',
       minutesAgo: 110,
-      loc: 'Sunnyvale Elder Home, 88 Pine Street',
+      loc: 'Shanti Elder Home, 88 Pine Cross',
       dist: 'South Sector',
       lat: 37.7200,
       lng: -122.4500,
@@ -224,15 +231,15 @@ export function generateSeedDataset() {
       risk: 4, // Estimate 4
       danger: true,
       flags: ['elderly_present', 'medical_dependency'] as const,
-      contact: { name: 'Nurse Brenda Vance', phone: '+1-555-0301' },
+      contact: { name: 'Nurse Brenda Fernandes', phone: '+91-98450-0301' },
     },
     {
       group: 'inc_4_dup', // Duplicate with conflicting estimate (25 people at risk => 25/4 = 6.25x ratio)
       channel: 'field_volunteer' as const,
       type: 'medical' as const,
-      desc: 'Structural collapse at Sunnyvale Elder Care on Pine St. Approximately 25 elderly persons trapped or bleeding inside.',
+      desc: 'Structural collapse at Shanti Elder Care on Pine Cross. Approximately 25 elderly persons trapped or bleeding inside.',
       minutesAgo: 90,
-      loc: '88 Pine Street Care Center',
+      loc: '88 Pine Cross Care Center',
       dist: 'South Sector',
       lat: 37.7202,
       lng: -122.4497,
@@ -247,9 +254,9 @@ export function generateSeedDataset() {
       group: 'inc_5',
       channel: 'field_volunteer' as const,
       type: 'shelter_request' as const,
-      desc: 'Over 120 displaced flood victims arrived at Downtown Civic Pavilion. Urgent need for cots, blankets, clean water, and infant formula.',
+      desc: 'Over 120 displaced flood victims arrived at Downtown Relief Pavilion. Urgent need for cots, blankets, clean water, and infant formula.',
       minutesAgo: 180,
-      loc: 'Downtown Civic Pavilion, 500 Market Plaza',
+      loc: 'Downtown Relief Pavilion, 500 Market Chowk',
       dist: 'Downtown Core',
       lat: 37.7890,
       lng: -122.4010,
@@ -262,9 +269,9 @@ export function generateSeedDataset() {
       group: 'inc_5_dup', // Duplicate for Report 12
       channel: 'sms' as const,
       type: 'shelter_request' as const,
-      desc: 'Shelter request at Civic Pavilion on Market Plaza. 100+ evacuated people need potable water, hygiene kits, and baby supplies.',
+      desc: 'Shelter request at Relief Pavilion on Market Chowk. 100+ evacuated people need potable water, hygiene kits, and baby supplies.',
       minutesAgo: 160,
-      loc: 'Civic Pavilion Market Plaza',
+      loc: 'Relief Pavilion Market Chowk',
       dist: 'Downtown Core',
       lat: 37.7893,
       lng: -122.4012,
@@ -279,9 +286,9 @@ export function generateSeedDataset() {
       group: 'inc_6',
       channel: 'sensor' as const,
       type: 'other' as const,
-      desc: 'Hazardous gas concentration sensor alarm triggered near Pier 39 fuel storage facility following storm surge impact.',
+      desc: 'Hazardous gas concentration sensor alarm triggered near Port Terminal 3 fuel storage facility following storm surge impact.',
       minutesAgo: 40,
-      loc: 'Pier 39 Marine Fuel Depot',
+      loc: 'Port Terminal 3 Marine Fuel Depot',
       dist: 'Harbour District',
       lat: 37.8080,
       lng: -122.4098,
@@ -294,9 +301,9 @@ export function generateSeedDataset() {
       group: 'inc_6_dup', // Duplicate for Report 14
       channel: 'phone_call' as const,
       type: 'other' as const,
-      desc: 'Pungent chemical gas smell and hissing pipe at Pier 39 fuel tanks. Immediate danger of fire spreading if ignited.',
+      desc: 'Pungent chemical gas smell and hissing pipe at Port Terminal 3 fuel tanks. Immediate danger of fire spreading if ignited.',
       minutesAgo: 30,
-      loc: 'Pier 39 Fuel Storage Terminal',
+      loc: 'Port Terminal 3 Fuel Storage Terminal',
       dist: 'Harbour District',
       lat: 37.8082,
       lng: -122.4095,
@@ -304,7 +311,7 @@ export function generateSeedDataset() {
       risk: 10,
       danger: true,
       flags: [] as const,
-      contact: { name: 'Port Guard Martinez', phone: '+1-555-0401' },
+      contact: { name: 'Port Officer Suresh', phone: '+91-98450-0401' },
     },
 
     // --- INCIDENT GROUP 7: Westside Substation Outage & Oxygen Patients (MEDIUM - MEDICAL DEPENDENCY)
@@ -314,7 +321,7 @@ export function generateSeedDataset() {
       type: 'medical' as const,
       desc: 'Power cut off to residential apartments. 3 homebound patients on powered oxygen concentrators running out of battery backup.',
       minutesAgo: 70,
-      loc: 'Grandview Apartments, 1200 Sunset Blvd',
+      loc: 'Grandview Residency, 1200 Sunset Ring Road',
       dist: 'Westside Heights',
       lat: 37.7500,
       lng: -122.4800,
@@ -322,15 +329,15 @@ export function generateSeedDataset() {
       risk: 3,
       danger: true,
       flags: ['medical_dependency', 'elderly_present'] as const,
-      contact: { name: 'Dr. Gregory House', phone: '+1-555-0501' },
+      contact: { name: 'Dr. Anand Kumar', phone: '+91-98450-0501' },
     },
     {
       group: 'inc_7_dup', // Duplicate for Report 16
       channel: 'sms' as const,
       type: 'medical' as const,
-      desc: 'Sunset Blvd Grandview Apts has no power. Oxygen concentrators dying, elderly patients need emergency generators or transport.',
+      desc: 'Sunset Ring Road Grandview Residency has no power. Oxygen concentrators dying, elderly patients need emergency generators or transport.',
       minutesAgo: 55,
-      loc: '1200 Sunset Blvd Grandview Apts',
+      loc: '1200 Sunset Ring Road Grandview Residency',
       dist: 'Westside Heights',
       lat: 37.7502,
       lng: -122.4805,
@@ -364,7 +371,7 @@ export function generateSeedDataset() {
       type: 'flood' as const,
       desc: 'Valley Creek overflowed concrete culvert. Bridge submerged under 3 feet of water, two cars stranded.',
       minutesAgo: 60,
-      loc: 'Old Valley Bridge, County Road 4',
+      loc: 'Old Valley Bridge, Main Canal Road',
       dist: 'Valley Basin',
       lat: 37.7350,
       lng: -122.3850,
@@ -377,9 +384,9 @@ export function generateSeedDataset() {
       group: 'inc_9_dup', // Duplicate for Report 19
       channel: 'phone_call' as const,
       type: 'flood' as const,
-      desc: 'Bridge submerged at County Road 4 Valley Creek. Motorists stranded on car roofs in rising water.',
+      desc: 'Bridge submerged at Main Canal Road Valley Creek. Motorists stranded on car roofs in rising water.',
       minutesAgo: 48,
-      loc: 'County Road 4 Valley Creek Bridge',
+      loc: 'Main Canal Road Valley Creek Bridge',
       dist: 'Valley Basin',
       lat: 37.7353,
       lng: -122.3848,
@@ -428,7 +435,7 @@ export function generateSeedDataset() {
       type: 'medical' as const,
       desc: 'Clinic basement flooded, backup batteries submerged. 8 bedridden dialysis patients need immediate evacuation transport.',
       minutesAgo: 75,
-      loc: 'Foothills Community Clinic, 900 Alpine Way',
+      loc: 'Foothills Community Clinic, 900 Hillside Road',
       dist: 'Northern Ridge',
       lat: 37.8150,
       lng: -122.4600,
@@ -441,9 +448,9 @@ export function generateSeedDataset() {
       group: 'inc_11_dup', // Duplicate for Report 23
       channel: 'field_volunteer' as const,
       type: 'medical' as const,
-      desc: 'Urgent medical evacuation needed at Foothills Clinic Alpine Way. Dialysis patients trapped by flooded basement.',
+      desc: 'Urgent medical evacuation needed at Foothills Clinic Hillside Road. Dialysis patients trapped by flooded basement.',
       minutesAgo: 50,
-      loc: 'Alpine Way Foothills Clinic',
+      loc: 'Hillside Road Foothills Clinic',
       dist: 'Northern Ridge',
       lat: 37.8152,
       lng: -122.4598,
@@ -460,7 +467,7 @@ export function generateSeedDataset() {
       type: 'shelter_request' as const,
       desc: 'Elementary school gymnasium converted to temporary reception. 85 neighborhood residents sheltering, shortage of cots and potable water.',
       minutesAgo: 210,
-      loc: 'East Side Elementary School, 310 Oak Street',
+      loc: 'East Side Primary School, 310 Lake Road',
       dist: 'East River Basin',
       lat: 37.7700,
       lng: -122.4100,
@@ -475,7 +482,7 @@ export function generateSeedDataset() {
       type: 'shelter_request' as const,
       desc: 'East Side Elementary shelter station holding 90 people. Urgent need for drinking water and blankets.',
       minutesAgo: 190,
-      loc: 'Oak Street Elementary Gymnasium',
+      loc: 'Lake Road Primary School Gymnasium',
       dist: 'East River Basin',
       lat: 37.7704,
       lng: -122.4102,
@@ -587,9 +594,9 @@ export function generateSeedDataset() {
       group: 'inc_16',
       channel: 'social_media' as const,
       type: 'flood' as const,
-      desc: 'Water knee deep on Chestnut Street near elementary school. Parents carrying children across flooded intersections.',
+      desc: 'Water knee deep on Lake Road near primary school. Parents carrying children across flooded intersections.',
       minutesAgo: 120,
-      loc: 'Chestnut Street & 18th Avenue',
+      loc: 'Lake Road & 18th Cross',
       dist: 'Westside Heights',
       lat: 37.7600,
       lng: -122.4700,
@@ -604,7 +611,7 @@ export function generateSeedDataset() {
       type: 'medical' as const,
       desc: 'Elderly gentleman collapsed on sidewalk in shock, hypothermia symptoms, conscious but confused.',
       minutesAgo: 30,
-      loc: 'Corner of 6th & Mission',
+      loc: 'Corner of 6th Cross & Main Road',
       dist: 'Downtown Core',
       lat: 37.7810,
       lng: -122.4080,
@@ -617,9 +624,9 @@ export function generateSeedDataset() {
       group: 'inc_18',
       channel: 'sms' as const,
       type: 'shelter_request' as const,
-      desc: 'Church basement ready to accept 40 evacuees. Requesting volunteer intake staff and meal deliveries.',
+      desc: 'Community center basement ready to accept 40 evacuees. Requesting volunteer intake staff and meal deliveries.',
       minutesAgo: 320,
-      loc: 'Grace Community Church, 220 Maple St',
+      loc: 'Community Relief Center, 220 Station Road',
       dist: 'East River Basin',
       lat: 37.7780,
       lng: -122.4150,
@@ -768,6 +775,9 @@ export function generateSeedDataset() {
     const incidentId = `b0000000-0000-4000-8000-${String(idx + 1).padStart(12, '0')}`;
     const reportedAt = new Date(baseTime - spec.minutesAgo * 60 * 1000).toISOString();
 
+    const finalLat = spec.lat !== null ? Number((spec.lat + deltaLat).toFixed(6)) : null;
+    const finalLng = spec.lng !== null ? Number((spec.lng + deltaLng).toFixed(6)) : null;
+
     const report: Report = {
       id: reportId,
       incident_id: incidentId,
@@ -779,8 +789,8 @@ export function generateSeedDataset() {
       received_at: reportedAt,
       location_text: spec.loc,
       district: spec.dist,
-      latitude: spec.lat,
-      longitude: spec.lng,
+      latitude: finalLat,
+      longitude: finalLng,
       location_precision: spec.prec,
       people_at_risk_estimate: spec.risk,
       immediate_danger: spec.danger,
@@ -814,8 +824,8 @@ export function generateSeedDataset() {
       status: 'new',
       district: spec.dist,
       location_text: spec.loc,
-      latitude: spec.lat,
-      longitude: spec.lng,
+      latitude: finalLat,
+      longitude: finalLng,
       location_precision: spec.prec,
       people_at_risk_estimate: spec.risk,
       vulnerability_flags: [...spec.flags] as any,
@@ -847,15 +857,15 @@ export function generateSeedDataset() {
     { reportAIndex: 0, reportBIndex: 1, isDuplicate: true, notes: 'East River flood rooftop rescues (same event, 15m apart)' },
     { reportAIndex: 0, reportBIndex: 2, isDuplicate: true, notes: 'East River flood volunteer vs 911 call' },
     { reportAIndex: 4, reportBIndex: 5, isDuplicate: true, notes: 'Midtown warehouse transformer fire & collapse' },
-    { reportAIndex: 7, reportBIndex: 8, isDuplicate: true, notes: 'Northern Ridge Highway 101 mudslide' },
-    { reportAIndex: 10, reportBIndex: 11, isDuplicate: true, notes: 'Sunnyvale elder care ceiling collapse' },
-    { reportAIndex: 12, reportBIndex: 13, isDuplicate: true, notes: 'Civic Pavilion displaced persons shelter request' },
-    { reportAIndex: 14, reportBIndex: 15, isDuplicate: true, notes: 'Pier 39 gas storage leak & surge damage' },
-    { reportAIndex: 16, reportBIndex: 17, isDuplicate: true, notes: 'Sunset Blvd apartment power outage oxygen patients' },
+    { reportAIndex: 7, reportBIndex: 8, isDuplicate: true, notes: 'Northern Ridge Highway Bypass mudslide' },
+    { reportAIndex: 10, reportBIndex: 11, isDuplicate: true, notes: 'Shanti elder care ceiling collapse' },
+    { reportAIndex: 12, reportBIndex: 13, isDuplicate: true, notes: 'Relief Pavilion displaced persons shelter request' },
+    { reportAIndex: 14, reportBIndex: 15, isDuplicate: true, notes: 'Port Terminal 3 gas storage leak & surge damage' },
+    { reportAIndex: 16, reportBIndex: 17, isDuplicate: true, notes: 'Sunset Ring Road apartment power outage oxygen patients' },
     { reportAIndex: 19, reportBIndex: 20, isDuplicate: true, notes: 'Valley Creek bridge submerged motorists stranded' },
     { reportAIndex: 21, reportBIndex: 22, isDuplicate: true, notes: 'North Shore Marina timber boardwalk diesel fire' },
-    { reportAIndex: 23, reportBIndex: 24, isDuplicate: true, notes: 'Alpine Way clinic flooded basement dialysis patients' },
-    { reportAIndex: 25, reportBIndex: 26, isDuplicate: true, notes: 'East Side Elementary shelter station water shortage' },
+    { reportAIndex: 23, reportBIndex: 24, isDuplicate: true, notes: 'Hillside Road clinic flooded basement dialysis patients' },
+    { reportAIndex: 25, reportBIndex: 26, isDuplicate: true, notes: 'East Side Primary shelter station water shortage' },
     { reportAIndex: 27, reportBIndex: 28, isDuplicate: true, notes: 'Central Railway main concourse glass canopy collapse' },
     { reportAIndex: 29, reportBIndex: 30, isDuplicate: true, notes: 'Timber Ridge Trail canyon wildfire spot fires' },
     { reportAIndex: 31, reportBIndex: 32, isDuplicate: true, notes: 'South Bay Tidal Gate 3 actuator failure & inflow' },
@@ -869,7 +879,7 @@ export function generateSeedDataset() {
     { reportAIndex: 14, reportBIndex: 21, isDuplicate: false, notes: 'Near-miss: Both in Harbour District, but fuel tank leak vs boat fire' },
     { reportAIndex: 18, reportBIndex: 31, isDuplicate: false, notes: 'Near-miss: Culvert sensor flood vs tidal gate failure' },
     { reportAIndex: 23, reportBIndex: 11, isDuplicate: false, notes: 'Near-miss: Clinic evacuation vs nursing home collapse' },
-    { reportAIndex: 1, reportBIndex: 33, isDuplicate: false, notes: 'Near-miss: Flood on Riverside vs flooded intersection on Chestnut' },
+    { reportAIndex: 1, reportBIndex: 33, isDuplicate: false, notes: 'Near-miss: Flood on Riverside vs flooded intersection on Lake Road' },
     { reportAIndex: 5, reportBIndex: 41, isDuplicate: false, notes: 'Near-miss: Warehouse fire vs rooftop solar panel smoking' },
   ];
 

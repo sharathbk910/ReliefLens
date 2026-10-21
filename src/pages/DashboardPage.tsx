@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileSpreadsheet } from 'lucide-react';
+import { FileSpreadsheet, Crosshair, Loader2 } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
 import { IncidentFilters } from '../components/dashboard/IncidentFilters.tsx';
 import { IncidentTable } from '../components/dashboard/IncidentTable.tsx';
@@ -9,10 +9,14 @@ import { DashboardMapPreview } from '../components/dashboard/DashboardMapPreview
 import { DispatchExportModal } from '../components/dashboard/DispatchExportModal.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { useIncidents } from '../hooks/index.ts';
+import { useToast } from '../components/ui/Toast.tsx';
+import { dataService } from '../lib/dataService.ts';
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isSyncingLocation, setIsSyncingLocation] = useState(false);
+  const toast = useToast();
 
   const {
     incidents,
@@ -40,6 +44,40 @@ export function DashboardPage() {
     }
   };
 
+  const handleSyncToMyLocation = () => {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      toast.error('Geolocation Unavailable', 'Your browser does not support automatic geolocation.');
+      return;
+    }
+    setIsSyncingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        localStorage.setItem('relieflens_user_lat', latitude.toString());
+        localStorage.setItem('relieflens_user_lng', longitude.toString());
+        localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
+        dataService.anchorToUserLocation(latitude, longitude);
+        setIsSyncingLocation(false);
+        toast.success(
+          'Reports Synced to Your Area',
+          `Incidents have been anchored around your current position (${latitude.toFixed(4)}, ${longitude.toFixed(4)}).`
+        );
+      },
+      (err) => {
+        setIsSyncingLocation(false);
+        if (err.code === 1) {
+          toast.error(
+            'Location Access Denied',
+            'Please allow location permission in your browser address bar to sync reports to your area.'
+          );
+        } else {
+          toast.error('Location Error', err.message || 'Unable to retrieve your current location.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Operational Header - Immediate Live Data, No Marketing Hero */}
@@ -53,6 +91,23 @@ export function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSyncToMyLocation}
+            disabled={isSyncingLocation}
+            leftIcon={
+              isSyncingLocation ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-400" />
+              ) : (
+                <Crosshair className="w-3.5 h-3.5 text-teal-400" />
+              )
+            }
+            className="text-xs shrink-0 border-teal-500/40 text-teal-300 hover:bg-teal-950/30 hover:border-teal-400"
+            title="Relocate registered reports to your current area"
+          >
+            {isSyncingLocation ? 'Syncing...' : 'Sync to My Location'}
+          </Button>
           <Button
             variant="outline"
             size="sm"
