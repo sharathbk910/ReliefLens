@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/Button.tsx';
 import { Badge } from './ui/Badge.tsx';
+import { AudioWaveform } from './voice/AudioWaveform.tsx';
 import { dataService } from '../lib/dataService.ts';
 import type { VoiceExtractionResult } from '../shared/types.ts';
 
@@ -372,6 +373,13 @@ export function VoiceRecorder({
           <p className="text-xs text-[var(--text-muted)] tabular-nums">
             {formatTime(elapsedSeconds)} / {formatTime(MAX_RECORDING_SECONDS)} • Tap circle to stop
           </p>
+
+          <AudioWaveform
+            stream={streamRef.current}
+            isRecording={recorderState === 'recording'}
+            barColor="#f43f5e"
+            className="mt-4"
+          />
         </div>
       ) : recorderState === 'recording_stopped' ? (
         <div className="py-4 px-2">

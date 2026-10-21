@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FileSpreadsheet } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
 import { IncidentFilters } from '../components/dashboard/IncidentFilters.tsx';
 import { IncidentTable } from '../components/dashboard/IncidentTable.tsx';
 import { ScoringExplainer } from '../components/dashboard/ScoringExplainer.tsx';
 import { DashboardMapPreview } from '../components/dashboard/DashboardMapPreview.tsx';
+import { DispatchExportModal } from '../components/dashboard/DispatchExportModal.tsx';
+import { Button } from '../components/ui/Button.tsx';
 import { dataService } from '../lib/dataService.ts';
 import type {
   Incident,
@@ -20,6 +23,7 @@ export function DashboardPage() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(25);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   // Summary Metrics
   const [summary, setSummary] = useState({
@@ -124,7 +128,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-4 animate-spatial-enter">
       {/* Operational Header - Immediate Live Data, No Marketing Hero */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1">
         <div>
           <h1 className="text-xl md:text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight">
             Incident Coordination Dashboard
@@ -132,6 +136,17 @@ export function DashboardPage() {
           <p className="text-xs text-[var(--text-secondary)]">
             Continuous triage with deterministic multi-factor scoring and spatial cross-referencing.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsExportOpen(true)}
+            leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
+            className="text-xs shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
+          >
+            Export Manifest
+          </Button>
         </div>
       </div>
 
@@ -171,6 +186,13 @@ export function DashboardPage() {
           <DashboardMapPreview incidents={incidents} />
         </div>
       </div>
+
+      {/* Field Dispatch Manifest Export Modal */}
+      <DispatchExportModal
+        incidents={incidents}
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+      />
     </div>
   );
 }

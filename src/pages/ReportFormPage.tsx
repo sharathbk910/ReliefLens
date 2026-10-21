@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { reportIngestionSchema, type ReportIngestionInput } from '../shared/schemas.ts';
 import { dataService } from '../lib/dataService.ts';
+import { offlineSyncService } from '../lib/offlineSyncService.ts';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
 import { useToast } from '../components/ui/Toast.tsx';
@@ -34,6 +35,7 @@ type FormStep = 'input' | 'review' | 'location' | 'confirm';
 
 export function ReportFormPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
 
   const [activeStep, setActiveStep] = useState<FormStep>('input');
@@ -42,6 +44,16 @@ export function ReportFormPage() {
   const [detectedLocation, setDetectedLocation] = useState<DetectedLocation | null>(null);
   const [additionalOpen, setAdditionalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If navigated with prefilled voice extraction from EmergencyVoiceFAB
+  useEffect(() => {
+    const prefilled = (location.state as { prefilledVoiceExtraction?: VoiceExtractionResult })
+      ?.prefilledVoiceExtraction;
+    if (prefilled) {
+      setVoiceExtraction(prefilled);
+      setActiveStep('review');
+    }
+  }, [location.state]);
 
   const currentUser = dataService.getCurrentUser();
   if (currentUser.role === 'viewer') {
@@ -178,6 +190,19 @@ export function ReportFormPage() {
 
   const onSubmit = async (data: ReportIngestionInput) => {
     setIsSubmitting(true);
+
+    // If client is currently offline, queue report locally
+    if (!offlineSyncService.isOnline()) {
+      offlineSyncService.enqueueReport(data);
+      toast.warning(
+        'Report Saved in Offline Queue',
+        'Device is offline. Your report has been saved locally and will auto-sync when network returns.'
+      );
+      setIsSubmitting(false);
+      navigate('/dashboard');
+      return;
+    }
+
     try {
       const res = await dataService.ingestReport(data);
       toast.success(
@@ -194,7 +219,17 @@ export function ReportFormPage() {
 
       navigate(`/incidents/${res.incident_id}`);
     } catch (err: any) {
-      toast.error('Submission Failed', err.message || 'Validation error');
+      // Check if failure is network related
+      if (!navigator.onLine || err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
+        offlineSyncService.enqueueReport(data);
+        toast.warning(
+          'Network Error — Saved to Offline Queue',
+          'Failed to reach server. Report stored locally and will auto-sync once connection stabilizes.'
+        );
+        navigate('/dashboard');
+      } else {
+        toast.error('Submission Failed', err.message || 'Validation error');
+      }
     } finally {
       setIsSubmitting(false);
     }

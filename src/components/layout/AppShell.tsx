@@ -20,6 +20,8 @@ import {
 import { dataService } from '../../lib/dataService.ts';
 import { Button } from '../ui/Button.tsx';
 import { useToast } from '../ui/Toast.tsx';
+import { EmergencyVoiceFAB } from '../emergency/EmergencyVoiceFAB.tsx';
+import { OfflineBanner } from '../offline/OfflineBanner.tsx';
 import type { UserRole } from '../../shared/types.ts';
 
 export function AppShell() {
@@ -131,6 +133,9 @@ export function AppShell() {
           </div>
         </div>
       </header>
+
+      {/* Connectivity & Offline Sync Status Banner */}
+      <OfflineBanner />
 
       {/* Main Spatial Body */}
       <div className="flex-1 flex overflow-hidden relative">
@@ -321,6 +326,9 @@ export function AppShell() {
           </button>
         )}
       </nav>
+
+      {/* 5. Persistent Emergency Quick Voice Action Button */}
+      {currentUser.role !== 'viewer' && <EmergencyVoiceFAB />}
     </div>
   );
 }

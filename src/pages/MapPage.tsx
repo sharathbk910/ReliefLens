@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {
   MapPin,
@@ -14,6 +14,8 @@ import {
   Minimize2,
   Filter,
   X,
+  Layers,
+  Flame,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
 import type { Incident, PriorityTier } from '../shared/types.ts';
@@ -54,6 +56,16 @@ function createCustomMarkerIcon(tier: PriorityTier) {
   });
 }
 
+function getHeatCircleStyle(tier: PriorityTier) {
+  const configs: Record<PriorityTier, { color: string; fillColor: string; radius: number; fillOpacity: number }> = {
+    critical: { color: '#e11d48', fillColor: '#e11d48', radius: 1000, fillOpacity: 0.25 },
+    high: { color: '#f59e0b', fillColor: '#f59e0b', radius: 700, fillOpacity: 0.20 },
+    medium: { color: '#3b82f6', fillColor: '#3b82f6', radius: 500, fillOpacity: 0.15 },
+    low: { color: '#64748b', fillColor: '#64748b', radius: 350, fillOpacity: 0.10 },
+  };
+  return configs[tier] || configs.low;
+}
+
 // Map center controller
 function MapFlyTo({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
@@ -68,6 +80,7 @@ export function MapPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [tileError, setTileError] = useState(false);
   const [selectedTier, setSelectedTier] = useState<PriorityTier | 'all'>('all');
+  const [mapViewMode, setMapViewMode] = useState<'all' | 'pins' | 'heat'>('all');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   
   // Mobile sheet detents: 'peek' | 'half' | 'full'
@@ -162,39 +175,60 @@ export function MapPage() {
               <MapFlyTo lat={selectedIncident.latitude} lng={selectedIncident.longitude} />
             )}
 
-            {locatedIncidents.map((inc) => (
-              <Marker
-                key={inc.id}
-                position={[inc.latitude!, inc.longitude!]}
-                icon={createCustomMarkerIcon(inc.priority_tier)}
-                eventHandlers={{
-                  click: () => handleSelectIncident(inc),
-                }}
-              >
-                <Popup>
-                  <div className="p-1 space-y-1.5 text-xs max-w-xs">
-                    <div className="flex items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-1">
-                      <PriorityBadge tier={inc.priority_tier} score={inc.effective_score} />
-                      <StatusBadge status={inc.status} />
+            {/* Density Heat Radius Overlay */}
+            {mapViewMode !== 'pins' &&
+              locatedIncidents.map((inc) => {
+                const style = getHeatCircleStyle(inc.priority_tier);
+                return (
+                  <Circle
+                    key={`heat-${inc.id}`}
+                    center={[inc.latitude!, inc.longitude!]}
+                    radius={style.radius}
+                    pathOptions={{
+                      color: style.color,
+                      fillColor: style.fillColor,
+                      fillOpacity: style.fillOpacity,
+                      weight: 1,
+                    }}
+                  />
+                );
+              })}
+
+            {/* Pinpoint Markers */}
+            {mapViewMode !== 'heat' &&
+              locatedIncidents.map((inc) => (
+                <Marker
+                  key={inc.id}
+                  position={[inc.latitude!, inc.longitude!]}
+                  icon={createCustomMarkerIcon(inc.priority_tier)}
+                  eventHandlers={{
+                    click: () => handleSelectIncident(inc),
+                  }}
+                >
+                  <Popup>
+                    <div className="p-1 space-y-1.5 text-xs max-w-xs">
+                      <div className="flex items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-1">
+                        <PriorityBadge tier={inc.priority_tier} score={inc.effective_score} />
+                        <StatusBadge status={inc.status} />
+                      </div>
+                      <h4 className="font-semibold text-white leading-tight">{inc.title}</h4>
+                      <p className="text-[11px] text-slate-300">{inc.district || inc.location_text}</p>
+                      <p className="font-mono text-[10px] text-slate-400 tabular-nums">
+                        {inc.latitude?.toFixed(4)}, {inc.longitude?.toFixed(4)}
+                      </p>
+                      <div className="pt-1 border-t border-[var(--border-subtle)]">
+                        <Link
+                          to={`/incidents/${inc.id}`}
+                          className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 font-semibold"
+                        >
+                          <span>Open Details</span>
+                          <ArrowRight className="w-3 h-3" strokeWidth={1.5} />
+                        </Link>
+                      </div>
                     </div>
-                    <h4 className="font-semibold text-white leading-tight">{inc.title}</h4>
-                    <p className="text-[11px] text-slate-300">{inc.district || inc.location_text}</p>
-                    <p className="font-mono text-[10px] text-slate-400 tabular-nums">
-                      {inc.latitude?.toFixed(4)}, {inc.longitude?.toFixed(4)}
-                    </p>
-                    <div className="pt-1 border-t border-[var(--border-subtle)]">
-                      <Link
-                        to={`/incidents/${inc.id}`}
-                        className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 font-semibold"
-                      >
-                        <span>Open Details</span>
-                        <ArrowRight className="w-3 h-3" strokeWidth={1.5} />
-                      </Link>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+                  </Popup>
+                </Marker>
+              ))}
           </MapContainer>
         )}
       </div>
@@ -209,6 +243,43 @@ export function MapPage() {
           <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] tabular-nums">
             {locatedIncidents.length} Located
           </span>
+        </div>
+
+        {/* Layer Mode Segmented Switcher */}
+        <div className="bg-[var(--surface-1-solid)] p-1 rounded-lg border border-[var(--border-subtle)] flex items-center justify-between gap-1 text-[11px]">
+          <button
+            type="button"
+            onClick={() => setMapViewMode('all')}
+            className={`flex-1 py-1 rounded font-medium transition-colors ${
+              mapViewMode === 'all'
+                ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapViewMode('pins')}
+            className={`flex-1 py-1 rounded font-medium transition-colors ${
+              mapViewMode === 'pins'
+                ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Pins
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapViewMode('heat')}
+            className={`flex-1 py-1 rounded font-medium transition-colors ${
+              mapViewMode === 'heat'
+                ? 'bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Heat
+          </button>
         </div>
 
         {/* Priority Filter */}
