@@ -97,36 +97,37 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       {/* 1. Immediate Crisis Action Hero Banner */}
       <EmergencyHeroActionBanner
         onSyncLocation={handleSyncToMyLocation}
         isSyncingLocation={isSyncingLocation}
       />
 
-      {/* 2. Executive Command Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-[var(--border-subtle)]">
+      {/* 2. Unified Tactical Command & Dispatch Status Bar */}
+      <div className="surface-z1 px-3 sm:px-4 py-2 rounded-xl border border-[var(--border-subtle)] flex flex-col md:flex-row md:items-center justify-between gap-2.5">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square" />
-            <h2 className="text-base sm:text-lg font-bold font-heading text-white tracking-tight leading-none">
+            <h2 className="text-sm sm:text-base font-bold font-heading text-white tracking-tight leading-none">
               Emergency Rescue & Response Center
             </h2>
             <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EBFC72]/15 text-[#EBFC72] border border-[#EBFC72]/30 shrink-0">
-              Live Crisis Feed
+              Live Feed
             </span>
+            <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              <span className="font-semibold">ACTIVE DISPATCH (v1.0.0)</span>
+            </div>
           </div>
-          <p className="text-xs text-[var(--text-muted)] font-mono mt-1 leading-normal">
-            Prioritizing life-safety, trapped victims, and urgent medical needs
-          </p>
         </div>
 
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto shrink-0 self-start sm:self-center">
+        <div className="flex items-center gap-2 shrink-0 self-stretch sm:self-auto">
           <button
             type="button"
             onClick={handleSyncToMyLocation}
             disabled={isSyncingLocation}
-            className="flex-1 sm:flex-none justify-center px-3 py-1.5 h-9 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="flex-1 sm:flex-none justify-center px-3 py-1.5 h-8 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             title="Anchor simulated incidents around your current location"
           >
             {isSyncingLocation ? (
@@ -142,29 +143,10 @@ export function DashboardPage() {
             size="sm"
             onClick={() => setIsExportOpen(true)}
             leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
-            className="flex-1 sm:flex-none justify-center text-xs h-9 shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
+            className="flex-1 sm:flex-none justify-center text-xs h-8 shrink-0 border-[var(--border-strong)] hover:bg-[var(--border-subtle)]"
           >
             Export Manifest
           </Button>
-        </div>
-      </div>
-
-      {/* 3. Live Tactical Response Status Strip */}
-      <div className="surface-z1 px-3 sm:px-3.5 py-2 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs font-mono border border-[var(--border-subtle)] bg-[#12130f]/90">
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span className="font-bold">ACTIVE RESCUE DISPATCH</span>
-          </div>
-          <span className="text-[var(--text-muted)]">•</span>
-          <span className="text-[var(--text-secondary)]">24/7 HUMAN RESCUE COORDINATION</span>
-          <span className="text-[var(--text-muted)] hidden md:inline">•</span>
-          <span className="text-amber-300 font-semibold hidden md:inline">CRITICAL LIFE PROTECTION ACTIVE</span>
-        </div>
-        <div className="flex items-center gap-1.5 sm:gap-2 text-[var(--text-muted)]">
-          <span>RULESET: v1.0.0</span>
-          <span>•</span>
-          <span className="text-[#EBFC72] font-semibold">24/7 COORDINATION ACTIVE</span>
         </div>
       </div>
 

@@ -14,13 +14,13 @@ export function EmergencyHeroActionBanner({
   const navigate = useNavigate();
 
   return (
-    <div className="surface-z2 rounded-2xl p-4 sm:p-5 border-2 border-rose-500/40 bg-gradient-to-br from-rose-950/40 via-[#141611]/95 to-amber-950/30 shadow-xl shadow-rose-950/20 relative overflow-hidden select-none">
+    <div className="surface-z2 rounded-2xl p-3.5 sm:p-4 border-2 border-rose-500/40 bg-gradient-to-br from-rose-950/40 via-[#141611]/95 to-amber-950/30 shadow-xl shadow-rose-950/20 relative overflow-hidden select-none">
       {/* Background Subtle Emergency Glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 relative z-10">
         {/* Left Side: Human Friendly Emergency Message */}
-        <div className="space-y-1.5 max-w-xl">
+        <div className="space-y-1 max-w-xl">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />

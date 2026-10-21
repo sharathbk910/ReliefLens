@@ -74,7 +74,7 @@ export function DuplicatesPage() {
   };
 
   return (
-    <div className="space-y-5 animate-fade-in pb-12">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>

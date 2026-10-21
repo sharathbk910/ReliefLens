@@ -205,7 +205,7 @@ export function IncidentDetailPage() {
   const isViewer = currentUser.role === 'viewer';
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-4 sm:space-y-5 animate-fade-in">
       {/* Back button & top bar */}
       <div className="flex items-center justify-between">
         <Link

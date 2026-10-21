@@ -346,11 +346,11 @@ export function AppShell() {
           id="main-content"
           className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${
             location.pathname === '/reports/new' || location.pathname === '/map'
-              ? 'pb-4 md:pb-6'
-              : 'pb-36 md:pb-16'
+              ? 'pb-2 md:pb-4'
+              : 'pb-20 md:pb-8'
           }`}
         >
-          <div className="flex-1 p-3 md:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-page-enter">
+          <div className="flex-1 p-2.5 sm:p-3.5 md:p-5 max-w-7xl mx-auto w-full animate-page-enter">
             <Outlet />
           </div>
         </main>

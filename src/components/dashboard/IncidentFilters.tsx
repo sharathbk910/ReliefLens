@@ -39,7 +39,7 @@ export function IncidentFilters({
     (filters.maxDistanceKm !== undefined && filters.maxDistanceKm !== 'all');
 
   return (
-    <div className="surface-z1 border border-[var(--border-subtle)] rounded-2xl p-3 sm:p-3.5 mb-4 shadow-sm">
+    <div className="surface-z1 border border-[var(--border-subtle)] rounded-2xl p-3 sm:p-3.5 shadow-sm">
       {/* Compact Primary Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Search */}

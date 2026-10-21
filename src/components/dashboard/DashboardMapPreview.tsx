@@ -379,7 +379,7 @@ export function DashboardMapPreview({
       : (userLocation?.lng ?? defaultLng);
 
   return (
-    <div className="surface-z1 rounded-xl flex flex-col h-[280px] sm:h-[380px] xl:h-[520px] overflow-hidden border border-[var(--border-subtle)] shadow-sm relative corner-cross">
+    <div className="surface-z1 rounded-xl flex flex-col h-[260px] sm:h-[320px] xl:h-[380px] overflow-hidden border border-[var(--border-subtle)] shadow-sm relative corner-cross">
       <div className="corner-bracket cross-tl"></div>
       <div className="corner-bracket cross-tr"></div>
       <div className="corner-bracket cross-bl"></div>
