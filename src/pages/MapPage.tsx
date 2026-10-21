@@ -294,12 +294,12 @@ export function MapPage() {
             zoom={12}
             scrollWheelZoom={true}
             zoomControl={false}
+            attributionControl={false}
             className="w-full h-full"
           >
             <ZoomControl position="bottomleft" />
             <TileLayer
               url={tileUrl}
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               eventHandlers={{
                 tileerror: () => setTileError(true),
               }}

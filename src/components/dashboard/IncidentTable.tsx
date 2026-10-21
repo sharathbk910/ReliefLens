@@ -102,17 +102,17 @@ export function IncidentTable({
 
       {/* 2. Desktop & Tablet Table (>= 768px - Section G Table Scroll Container) */}
       <div className="hidden md:block table-scroll-container">
-        <table className="w-full text-left text-xs border-collapse">
+        <table className="w-full text-left text-xs border-collapse min-w-[880px]">
           <thead>
             <tr className="bg-[var(--surface-1)] border-b border-[var(--border-subtle)] text-[var(--text-secondary)] font-medium">
-              <th className="py-3 px-4">Priority & Score</th>
-              <th className="py-3 px-4 min-w-[200px]">Incident Details</th>
-              <th className="py-3 px-4">District / Location</th>
-              <th className="py-3 px-4 text-center">Reports</th>
-              <th className="py-3 px-4">Verification</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Uncertainty</th>
-              <th className="py-3 px-4 text-right">Action</th>
+              <th className="py-3 px-4 min-w-[150px] whitespace-nowrap">Priority & Score</th>
+              <th className="py-3 px-4 min-w-[220px]">Incident Details</th>
+              <th className="py-3 px-4 min-w-[160px]">District / Location</th>
+              <th className="py-3 px-4 min-w-[90px] text-center whitespace-nowrap">Reports</th>
+              <th className="py-3 px-4 min-w-[150px] whitespace-nowrap">Verification</th>
+              <th className="py-3 px-4 min-w-[100px] whitespace-nowrap">Status</th>
+              <th className="py-3 px-4 min-w-[140px] whitespace-nowrap">Uncertainty</th>
+              <th className="py-3 px-4 w-12 text-right whitespace-nowrap">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-primary)]">
@@ -127,19 +127,19 @@ export function IncidentTable({
                   className="hover:bg-[var(--surface-2-solid)] transition-colors cursor-pointer group"
                 >
                   {/* Priority & Score */}
-                  <td className="py-3.5 px-4 align-top">
-                    <div className="flex flex-col gap-1 items-start">
+                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                    <div className="flex flex-col gap-1 items-start whitespace-nowrap">
                       <PriorityBadge
                         tier={incident.priority_tier}
                         score={incident.effective_score}
                       />
                       {hasFloorApplied && (
-                        <span className="text-[10px] text-amber-400 font-mono">
+                        <span className="text-[10px] text-amber-400 font-mono whitespace-nowrap">
                           Floor Adjusted (45)
                         </span>
                       )}
                       {hasOverride && (
-                        <span className="text-[10px] text-teal-400 font-mono">
+                        <span className="text-[10px] text-teal-400 font-mono whitespace-nowrap">
                           Manual Override
                         </span>
                       )}
@@ -152,10 +152,10 @@ export function IncidentTable({
                       {incident.title}
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-[11px] text-[var(--text-secondary)]">
-                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-[10px]">
+                      <span className="capitalize font-mono px-1.5 py-0.5 rounded bg-[var(--surface-2-solid)] text-teal-300 border border-teal-500/20 text-[10px] whitespace-nowrap">
                         {incident.incident_type}
                       </span>
-                      <span className="flex items-center gap-1 tabular-nums text-[var(--text-muted)]">
+                      <span className="flex items-center gap-1 tabular-nums text-[var(--text-muted)] whitespace-nowrap">
                         <Clock className="w-3 h-3" strokeWidth={1.5} />
                         {formatTimeAgo(incident.last_reported_at)}
                       </span>
@@ -178,8 +178,8 @@ export function IncidentTable({
                   </td>
 
                   {/* Report Count */}
-                  <td className="py-3.5 px-4 align-top text-center">
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-medium tabular-nums">
+                  <td className="py-3.5 px-4 align-top text-center whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-medium tabular-nums whitespace-nowrap">
                       <span>{incident.report_count}</span>
                       <span className="text-[10px] text-[var(--text-muted)]">
                         ({incident.distinct_channel_count} ch)
@@ -188,24 +188,24 @@ export function IncidentTable({
                   </td>
 
                   {/* Verification Level */}
-                  <td className="py-3.5 px-4 align-top">
+                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
                     <VerificationBadge level={incident.verification_level} />
                   </td>
 
                   {/* Status */}
-                  <td className="py-3.5 px-4 align-top">
+                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
                     <StatusBadge status={incident.status} />
                   </td>
 
                   {/* Uncertainty Flags */}
-                  <td className="py-3.5 px-4 align-top">
+                  <td className="py-3.5 px-4 align-top whitespace-nowrap">
                     <div className="flex flex-wrap gap-1 max-w-[180px]">
                       {incident.uncertainty_flags && incident.uncertainty_flags.length > 0 ? (
                         incident.uncertainty_flags.map((flag) => (
                           <UncertaintyBadge key={flag} flag={flag} />
                         ))
                       ) : (
-                        <span className="text-[11px] text-emerald-500 flex items-center gap-1">
+                        <span className="text-[11px] text-emerald-500 flex items-center gap-1 whitespace-nowrap">
                           <ShieldCheck className="w-3.5 h-3.5" strokeWidth={1.5} />
                           Verified
                         </span>
@@ -214,7 +214,7 @@ export function IncidentTable({
                   </td>
 
                   {/* Action Link */}
-                  <td className="py-3.5 px-4 align-top text-right">
+                  <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
                     <span className="inline-flex items-center text-[var(--text-muted)] group-hover:text-teal-400 group-hover:translate-x-0.5 transition-all">
                       <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                     </span>

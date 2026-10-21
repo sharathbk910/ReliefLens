@@ -220,11 +220,11 @@ export function DashboardMapPreview({ incidents }: DashboardMapPreviewProps) {
           zoom={11}
           scrollWheelZoom={false}
           zoomControl={false}
+          attributionControl={false}
           className="w-full h-full"
         >
           <TileLayer
             url={tileUrl}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           />
 
           {/* Auto-fit bounds on load */}

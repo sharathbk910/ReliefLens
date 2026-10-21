@@ -98,10 +98,22 @@
     height: auto;
   }
 
-  /* Prevent text and element horizontal overflow */
-  p, span, h1, h2, h3, h4, h5, h6, a, label {
-    overflow-wrap: anywhere;
+  /* Prevent text and element horizontal overflow on paragraphs and headings */
+  p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
     word-break: break-word;
+  }
+
+  /* Badges, tabular numbers, buttons, tags must never wrap or break words */
+  .badge,
+  [class*="badge"],
+  [class*="Badge"],
+  .tabular-nums,
+  button,
+  th,
+  td {
+    overflow-wrap: normal !important;
+    word-break: normal !important;
   }
 
   /* Accessible focus indicators with WCAG compliance */
@@ -270,6 +282,18 @@
   height: 100%;
   background: var(--canvas) !important;
   border-radius: 0.875rem;
+}
+
+/* Hide Leaflet watermark and attribution box */
+.leaflet-control-attribution,
+.leaflet-control-attribution * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
 }
 
 .leaflet-popup-content-wrapper {

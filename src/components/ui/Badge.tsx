@@ -60,12 +60,12 @@ export function PriorityBadge({ tier, score }: { tier: PriorityTier; score?: num
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style.bg} ${style.text} ${style.border} tracking-wide transition-colors`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border} tracking-wide transition-colors`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
-      {style.label}
+      <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80 shrink-0" />
+      <span>{style.label}</span>
       {typeof score === 'number' && (
-        <span className="font-mono text-[11px] opacity-90 ml-0.5">({score})</span>
+        <span className="font-mono text-[11px] opacity-90 ml-0.5 tabular-nums">({score})</span>
       )}
     </span>
   );
@@ -115,7 +115,7 @@ export function StatusBadge({ status }: { status: IncidentStatus }) {
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium uppercase tracking-wider border ${style.bg} ${style.text} ${style.border}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border}`}
     >
       {style.label}
     </span>
@@ -154,7 +154,7 @@ export function VerificationBadge({ level }: { level: VerificationLevel }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${style.bg} ${style.text} ${style.border}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border whitespace-nowrap shrink-0 select-none ${style.bg} ${style.text} ${style.border}`}
     >
       {style.label}
     </span>
@@ -201,7 +201,7 @@ export function UncertaintyBadge({ flag }: { flag: UncertaintyFlag }) {
   return (
     <span
       title={info.tooltip}
-      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wide border ${
+      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wide border whitespace-nowrap shrink-0 select-none ${
         info.severe
           ? 'bg-rose-950/40 text-rose-300 border-rose-500/30'
           : 'bg-amber-950/30 text-amber-300 border-amber-500/30'
