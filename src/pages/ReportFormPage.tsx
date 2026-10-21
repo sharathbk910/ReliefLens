@@ -137,8 +137,19 @@ export function ReportFormPage() {
     setValue('location_accuracy', loc.accuracy);
     setValue('location_captured_at', loc.capturedAt);
     setValue('location_source', 'gps');
-    setValue('user_confirmed_incident_location', loc.isConfirmedIncidentLocation);
+    setValue('user_confirmed_incident_location', true); // Auto-confirm GPS position
     setValue('location_precision', loc.accuracy && loc.accuracy <= 40 ? 'exact' : 'approximate');
+
+    // Automatically pre-fill District / Zone and Landmark / Description
+    if (loc.district) {
+      setValue('district', loc.district);
+    }
+    if (loc.locationText) {
+      setValue('location_text', loc.locationText);
+    }
+    if (loc.placeName) {
+      toast.success('Location & District Auto-Detected', loc.placeName);
+    }
   };
 
   const handleLocationCleared = () => {

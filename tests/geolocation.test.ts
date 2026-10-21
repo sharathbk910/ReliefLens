@@ -180,4 +180,13 @@ describe('Automatic Geolocation & Location Safeguards', () => {
       })
     ).rejects.toThrow();
   });
+
+  it('provides structured reverse geocoded place name and district from coordinates', async () => {
+    const { reverseGeocodeCoordinates } = await import('../src/lib/reverseGeocode.ts');
+    const result = await reverseGeocodeCoordinates(12.97629, 74.818172);
+    expect(result).toBeDefined();
+    expect(result.district).toBeDefined();
+    expect(result.locationText).toBeDefined();
+    expect(result.displayName).toBeDefined();
+  });
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MapPin,
   Crosshair,
@@ -9,9 +9,11 @@ import {
   Clock,
   ShieldCheck,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from './ui/Button.tsx';
 import { Badge } from './ui/Badge.tsx';
+import { reverseGeocodeCoordinates } from '../lib/reverseGeocode.ts';
 
 export interface DetectedLocation {
   latitude: number;
@@ -19,6 +21,9 @@ export interface DetectedLocation {
   accuracy: number | null; // In meters
   capturedAt: string; // ISO string
   isConfirmedIncidentLocation: boolean;
+  placeName?: string | null;
+  district?: string | null;
+  locationText?: string | null;
 }
 
 interface CurrentLocationControlProps {
@@ -50,18 +55,36 @@ export function CurrentLocationControl({
     setIsLoading(true);
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setIsLoading(false);
+      async (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
         const capturedAt = new Date(pos.timestamp || Date.now()).toISOString();
+        const lat = parseFloat(latitude.toFixed(6));
+        const lon = parseFloat(longitude.toFixed(6));
 
-        onLocationDetected({
-          latitude: parseFloat(latitude.toFixed(6)),
-          longitude: parseFloat(longitude.toFixed(6)),
-          accuracy: accuracy ? Math.round(accuracy) : null,
-          capturedAt,
-          isConfirmedIncidentLocation: false, // Must be confirmed explicitly by user
-        });
+        try {
+          // Reverse-geocode place name, district, and landmark automatically
+          const geo = await reverseGeocodeCoordinates(lat, lon);
+          onLocationDetected({
+            latitude: lat,
+            longitude: lon,
+            accuracy: accuracy ? Math.round(accuracy) : null,
+            capturedAt,
+            isConfirmedIncidentLocation: true, // Auto-confirm GPS location
+            placeName: geo.displayName,
+            district: geo.district,
+            locationText: geo.locationText,
+          });
+        } catch {
+          onLocationDetected({
+            latitude: lat,
+            longitude: lon,
+            accuracy: accuracy ? Math.round(accuracy) : null,
+            capturedAt,
+            isConfirmedIncidentLocation: true, // Auto-confirm GPS location
+          });
+        } finally {
+          setIsLoading(false);
+        }
       },
       (err) => {
         setIsLoading(false);
@@ -88,6 +111,13 @@ export function CurrentLocationControl({
       }
     );
   };
+
+  // Automatically fetch location on mount if not already acquired
+  useEffect(() => {
+    if (!location && typeof window !== 'undefined' && navigator.geolocation) {
+      fetchCurrentLocation();
+    }
+  }, []);
 
   const formatTimestamp = (iso: string) => {
     try {
@@ -169,6 +199,17 @@ export function CurrentLocationControl({
               </button>
             </div>
           </div>
+
+          {/* Auto-Detected Place Name & District */}
+          {location.placeName && (
+            <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-600/40 text-xs animate-fade-in">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-semibold mb-0.5">
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>Auto-Detected Location & District</span>
+              </div>
+              <p className="text-slate-100 font-medium leading-relaxed">{location.placeName}</p>
+            </div>
+          )}
 
           {/* Coordinates Summary */}
           <div className="grid grid-cols-2 gap-2 text-xs">
