@@ -99,7 +99,7 @@ export function IncidentTable({
   }
 
   return (
-    <div className="surface-z1 rounded-2xl border border-[var(--border-subtle)] overflow-hidden flex flex-col shadow-sm">
+    <div className="surface-z1 rounded-2xl border border-[var(--border-subtle)] overflow-hidden flex flex-col shadow-sm flex-1 h-full">
       {/* 1. Mobile Stacked Cards (< 768px - Internal Scrollable List) */}
       <div className="md:hidden divide-y divide-[var(--border-subtle)] max-h-[460px] overflow-y-auto">
         {incidents.map((incident) => {
@@ -155,7 +155,7 @@ export function IncidentTable({
       </div>
 
       {/* 2. Desktop & Tablet Table (>= 768px - Internal Scroll Container with Sticky Headers) */}
-      <div className="hidden md:block w-full max-w-full table-body-scroll relative">
+      <div className="hidden md:flex flex-col flex-1 min-h-0 w-full max-w-full table-body-scroll relative">
         <table className="w-full text-left text-xs border-collapse table-fixed">
           <colgroup>
             <col style={{ width: '18%' }} className="w-[18%]" />
@@ -321,7 +321,7 @@ export function IncidentTable({
       </div>
 
       {/* Pagination Footer (Mobile-friendly stacked & touch targets) */}
-      <div className="p-3 sm:p-3.5 bg-[var(--surface-1)] border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
+      <div className="p-3 sm:p-3.5 bg-[var(--surface-1)] border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--text-secondary)] mt-auto shrink-0">
         <div className="tabular-nums text-center sm:text-left text-[11px] sm:text-xs">
           Showing{' '}
           <strong className="text-[var(--text-primary)]">

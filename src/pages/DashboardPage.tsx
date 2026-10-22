@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileSpreadsheet, Crosshair, Loader2, Mic } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
@@ -22,6 +22,35 @@ export function DashboardPage() {
   const [isSyncingLocation, setIsSyncingLocation] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const toast = useToast();
+
+  const rightColumnRef = useRef<HTMLDivElement | null>(null);
+  const [rightColumnHeight, setRightColumnHeight] = useState<number | undefined>(undefined);
+  const [isXl, setIsXl] = useState(() => (typeof window !== 'undefined' ? window.innerWidth >= 1280 : true));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsXl(window.innerWidth >= 1280);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const el = rightColumnRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const height = Math.round(entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height);
+        if (height > 0) {
+          setRightColumnHeight(height);
+        }
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const {
     incidents,
@@ -172,7 +201,10 @@ export function DashboardPage() {
 
       {/* 6. Incidents Table + Right Column (Map Preview + Emergency Helpline Widget) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-        <div className="xl:col-span-8 space-y-3 min-w-0 w-full">
+        <div
+          className="xl:col-span-8 flex flex-col min-w-0 w-full space-y-3"
+          style={isXl && rightColumnHeight ? { height: `${rightColumnHeight}px` } : undefined}
+        >
           {/* Tactical Dispatch Control HUD (appears when an incident is targeted) */}
           <TacticalDispatchControl
             selectedIncident={selectedIncident}
@@ -193,8 +225,8 @@ export function DashboardPage() {
           />
         </div>
 
-        {/* Right Column: Geographic Map + Emergency Helplines & Crisis Guide (Sticky docked, prevents dead vertical void) */}
-        <div className="xl:col-span-4 min-w-0 w-full space-y-4 xl:sticky xl:top-2 self-start">
+        {/* Right Column: Geographic Map + Emergency Helplines & Crisis Guide */}
+        <div ref={rightColumnRef} className="xl:col-span-4 min-w-0 w-full flex flex-col space-y-4">
           <DashboardMapPreview
             incidents={incidents}
             allIncidents={allIncidents}
