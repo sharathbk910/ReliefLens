@@ -28,6 +28,9 @@ const queryClient = new QueryClient({
 export function App() {
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const geminiKey = urlParams.get('gemini_key');

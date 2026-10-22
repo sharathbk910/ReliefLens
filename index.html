@@ -103,6 +103,14 @@
         } catch (e) {
           document.documentElement.classList.add('dark');
         }
+
+        // Prevent browser from restoring scrolled down position on refresh
+        try {
+          if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+          }
+          window.scrollTo(0, 0);
+        } catch (e) {}
       })();
     </script>
   </head>

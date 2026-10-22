@@ -392,8 +392,8 @@ export function DashboardMapPreview({
           <h3 className="text-xs font-semibold text-[var(--text-primary)] font-mono whitespace-nowrap shrink-0">
             Spatial Distribution
           </h3>
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums truncate">
-            {locatedIncidents.length} pinned ({clusteredNodes.length} zones)
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--border-subtle)] text-teal-300 font-semibold tabular-nums shrink-0 whitespace-nowrap">
+            {locatedIncidents.length} pins
           </span>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">

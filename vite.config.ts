@@ -16,7 +16,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true,
     open: false,
+    watch: {
+      ignored: ['**/.temp_edge_verify/**', '**/docs/screenshots/**'],
+    },
   },
   test: {
     testTimeout: 15000,

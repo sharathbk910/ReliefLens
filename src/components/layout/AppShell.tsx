@@ -49,6 +49,18 @@ export function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  // Automatically scroll main viewport canvas to top on page navigation and initial mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      mainRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -145,9 +157,9 @@ export function AppShell() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans relative selection:bg-rose-500/20">
-      {/* 1. Operational Topbar & Emergency Response Strip */}
-      <header className="sticky top-0 z-40 px-3 md:px-6 py-2 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-xs select-none shadow-xs">
+    <div className="h-screen max-h-screen overflow-hidden flex flex-col font-sans relative selection:bg-rose-500/20">
+      {/* 1. Operational Topbar & Emergency Response Strip - Always Pinned */}
+      <header className="shrink-0 z-40 px-3 md:px-6 py-2 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-xs select-none shadow-xs">
         <div className="flex items-center justify-between gap-2.5 max-w-7xl mx-auto w-full flex-nowrap min-w-0">
           <div className="md:hidden shrink-0">
             <AppLogo size="xs" showText={false} />
@@ -203,20 +215,20 @@ export function AppShell() {
       <OfflineBanner />
 
       {/* Main Spatial Body */}
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) - Sticky Viewport Docked */}
+      <div className="flex-1 flex min-h-0 overflow-hidden relative">
+        {/* 2. Floating Spatial Navigation Rail (Desktop & Tablet) - Always Pinned to Viewport, Never Scrolls Away */}
         <aside
           aria-label="Primary Navigation"
-          className="hidden md:flex flex-col m-3 md:m-4 w-16 lg:w-60 surface-z2 shrink-0 transition-all duration-300 z-30 select-none rounded-xl sticky top-14 h-[calc(100vh-4.5rem)] self-start shadow-sm"
+          className="hidden md:flex flex-col my-3 ml-3 md:my-4 md:ml-4 w-16 lg:w-60 surface-z2 shrink-0 self-stretch transition-all duration-300 z-30 select-none rounded-xl shadow-sm overflow-hidden"
         >
           {/* Logo & Operational Status */}
-          <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-center lg:justify-start">
+          <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-center lg:justify-start shrink-0">
             <AppLogo size="md" showText={false} className="lg:hidden" />
             <AppLogo size="md" showText={true} className="hidden lg:flex" />
           </div>
 
           {/* Navigation Links with Clean Modern Active Indicator */}
-          <nav className="flex-1 p-2 space-y-1.5 overflow-y-auto">
+          <nav className="flex-1 min-h-0 p-2 space-y-1.5 overflow-y-auto">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -237,7 +249,7 @@ export function AppShell() {
           </nav>
 
           {/* User Account & Login Session Controls in Sidebar Bottom */}
-          <div className="mt-auto p-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 rounded-b-xl relative" ref={userDropdownRef}>
+          <div className="mt-auto p-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 rounded-b-xl relative shrink-0" ref={userDropdownRef}>
             <div className="flex items-center justify-between gap-1.5 p-1.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 shadow-xs">
               <button
                 type="button"
@@ -319,8 +331,9 @@ export function AppShell() {
 
         {/* 3. Main Content Canvas */}
         <main
+          ref={mainRef}
           id="main-content"
-          className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${
+          className={`flex-1 flex flex-col min-w-0 h-full overflow-y-auto ${
             location.pathname === '/reports/new' || location.pathname === '/map'
               ? 'pb-2 md:pb-4'
               : 'pb-20 md:pb-8'

@@ -194,7 +194,7 @@ export function DashboardPage() {
         </div>
 
         {/* Right Column: Geographic Map + Emergency Helplines & Crisis Guide (Sticky docked, prevents dead vertical void) */}
-        <div className="xl:col-span-4 min-w-0 w-full space-y-4 xl:sticky xl:top-14 self-start">
+        <div className="xl:col-span-4 min-w-0 w-full space-y-4 xl:sticky xl:top-2 self-start">
           <DashboardMapPreview
             incidents={incidents}
             allIncidents={allIncidents}
