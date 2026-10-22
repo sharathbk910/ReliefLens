@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileSpreadsheet, Crosshair, Loader2, Mic } from 'lucide-react';
+import { FileSpreadsheet, Crosshair, Loader2 } from 'lucide-react';
 import { SummaryIndicators } from '../components/dashboard/SummaryIndicators.tsx';
 import { IncidentFilters } from '../components/dashboard/IncidentFilters.tsx';
 import { IncidentTable } from '../components/dashboard/IncidentTable.tsx';

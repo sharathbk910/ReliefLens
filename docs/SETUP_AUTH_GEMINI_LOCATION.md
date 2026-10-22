@@ -363,5 +363,5 @@ Use this checklist before declaring production readiness:
   - [ ] Audit log entry is recorded with actor ID and timestamp.
 - [ ] **Security & Code Quality**:
   - [ ] Zero secrets in `src/` or frontend build.
-  - [ ] `npm test` passes 29/29 tests.
-  - [ ] `npm run build` succeeds in under 2 seconds with zero TypeScript errors.
+  - [ ] `npm test` passes 36/36 tests across 7 test suites.
+  - [ ] `npm run build` succeeds in under 3 seconds with zero TypeScript errors.

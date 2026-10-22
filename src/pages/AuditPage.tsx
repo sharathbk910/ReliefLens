@@ -4,12 +4,10 @@ import {
   ShieldAlert,
   Clock,
   User,
-  Activity,
   RefreshCw,
   Search,
   Filter,
   CheckCircle2,
-  FileCode,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
 import { Button } from '../components/ui/Button.tsx';

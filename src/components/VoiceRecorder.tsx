@@ -53,7 +53,6 @@ export function VoiceRecorder({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [hasVoiceEngine] = useState(() => config.ai.hasClientKey);
   const [liveTranscript, setLiveTranscript] = useState<string>('');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -76,9 +75,13 @@ export function VoiceRecorder({
     }
 
     return () => {
-      // Clean up microphone tracks and timer on unmount
+      // Clean up microphone tracks, audio element, and timer on unmount
       stopAllTracks();
       clearTimer();
+      if (audioElementRef.current) {
+        audioElementRef.current.pause();
+        audioElementRef.current = null;
+      }
       if (speechRecognitionRef.current) {
         try {
           speechRecognitionRef.current.stop();
@@ -167,6 +170,11 @@ export function VoiceRecorder({
           return;
         }
 
+        if (audioElementRef.current) {
+          audioElementRef.current.pause();
+          audioElementRef.current = null;
+        }
+
         setAudioBlob(finalBlob);
         const url = URL.createObjectURL(finalBlob);
         setAudioUrl(url);
@@ -248,6 +256,10 @@ export function VoiceRecorder({
   };
 
   const handleRecordAgain = () => {
+    if (audioElementRef.current) {
+      audioElementRef.current.pause();
+      audioElementRef.current = null;
+    }
     if (speechRecognitionRef.current) {
       try {
         speechRecognitionRef.current.stop();

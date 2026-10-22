@@ -83,11 +83,16 @@ export function AudioWaveform({
         const x = startX + i * (barWidth + gap);
         const y = (canvas.height - barHeight) / 2;
 
-        // Rounded bar
+        // Rounded bar with fallback
         ctx.fillStyle = barColor;
         ctx.beginPath();
-        ctx.roundRect(x, y, barWidth, barHeight, 2);
-        ctx.fill();
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(x, y, barWidth, barHeight, 2);
+          ctx.fill();
+        } else {
+          ctx.rect(x, y, barWidth, barHeight);
+          ctx.fill();
+        }
       }
     };
 

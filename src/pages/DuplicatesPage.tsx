@@ -8,9 +8,7 @@ import {
   Clock,
   MapPin,
   ArrowRight,
-  ShieldAlert,
   GitMerge,
-  Filter,
 } from 'lucide-react';
 import { dataService } from '../lib/dataService.ts';
 import { Button } from '../components/ui/Button.tsx';
@@ -218,7 +216,7 @@ export function DuplicatesPage() {
                         <span className="font-mono font-semibold text-rose-500 dark:text-rose-400">
                           Report A ({repA?.channel.replace('_', ' ')})
                         </span>
-                        {repA?.incident && (
+                        {repA?.incident_id && (
                           <Link
                             to={`/incidents/${repA.incident_id}`}
                             className="text-xs text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
@@ -263,7 +261,7 @@ export function DuplicatesPage() {
                         <span className="font-mono font-semibold text-purple-600 dark:text-purple-400">
                           Report B ({repB?.channel.replace('_', ' ')})
                         </span>
-                        {repB?.incident && (
+                        {repB?.incident_id && (
                           <Link
                             to={`/incidents/${repB.incident_id}`}
                             className="text-xs text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"

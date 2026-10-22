@@ -3,15 +3,9 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodSafeResolver } from '../lib/zodResolver.ts';
 import {
-  ArrowLeft,
   AlertOctagon,
   MapPin,
-  Users,
   ShieldAlert,
-  ChevronDown,
-  Info,
-  Clock,
-  Phone,
   Mic,
   FileText,
   Sparkles,
