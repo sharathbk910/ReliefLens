@@ -113,6 +113,8 @@ function MapAutoInitializer({
 }) {
   const map = useMap();
   const containerRef = useRef<HTMLElement | null>(null);
+  const initialFitDoneRef = useRef(false);
+  const prevIncidentsLengthRef = useRef(0);
 
   // Invalidate map size so Leaflet renders tiles immediately on open without requiring a click
   useEffect(() => {
@@ -148,6 +150,12 @@ function MapAutoInitializer({
   }, [map]);
 
   useEffect(() => {
+    // If the map has already fitted bounds and the number of incidents hasn't changed,
+    // do not re-fit bounds when userLocation changes (which would reset the zoom level after clicking Locate Me)
+    if (initialFitDoneRef.current && incidents.length === prevIncidentsLengthRef.current) {
+      return;
+    }
+
     const valid = incidents.filter(
       (i) =>
         typeof i.latitude === 'number' &&
@@ -177,8 +185,12 @@ function MapAutoInitializer({
       } else {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
       }
+      initialFitDoneRef.current = true;
+      prevIncidentsLengthRef.current = incidents.length;
     } else if (userLocation) {
       map.setView([userLocation.lat, userLocation.lng], 13);
+      initialFitDoneRef.current = true;
+      prevIncidentsLengthRef.current = incidents.length;
     } else {
       const defaultCenter = config.map.defaultCenter || [12.9716, 77.5946];
       map.setView([defaultCenter[0], defaultCenter[1]], 12);
@@ -212,6 +224,17 @@ function LocateMeControl({
   const [isLocating, setIsLocating] = useState(false);
 
   const handleLocateMe = () => {
+    // If we already have a location (in state or localStorage), immediately zoom in to street level (zoom 16)
+    if (userLocation) {
+      map.flyTo([userLocation.lat, userLocation.lng], 16, { animate: true, duration: 1.2 });
+    } else {
+      const cachedLat = parseFloat(localStorage.getItem('relieflens_user_lat') || '');
+      const cachedLng = parseFloat(localStorage.getItem('relieflens_user_lng') || '');
+      if (!isNaN(cachedLat) && !isNaN(cachedLng)) {
+        map.flyTo([cachedLat, cachedLng], 16, { animate: true, duration: 1.2 });
+      }
+    }
+
     if (isLocating) return;
     if (typeof window === 'undefined' || !navigator.geolocation) {
       toast.error('Not Supported', 'Geolocation is not supported by your browser.');
@@ -228,10 +251,11 @@ function LocateMeControl({
         localStorage.setItem('relieflens_user_lng', longitude.toString());
         localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
         dataService.checkAndAnchorToNearby(latitude, longitude);
-        map.flyTo([latitude, longitude], 15, { duration: 1.2 });
+        // Zoom in close to user location (zoom 16)
+        map.flyTo([latitude, longitude], 16, { animate: true, duration: 1.2 });
         toast.success(
           'Location Detected',
-          `Recentered map to current GPS coordinates (±${loc.accuracy}m).`
+          `Zoomed in to your current GPS coordinates (±${loc.accuracy}m).`
         );
         setIsLocating(false);
       },
@@ -257,21 +281,13 @@ function LocateMeControl({
   }, [locateRequested]);
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: '24px',
-        right: '24px',
-        zIndex: 1000,
-        pointerEvents: 'auto',
-      }}
-    >
+    <div className="absolute bottom-6 right-4 md:right-[348px] z-[1000] pointer-events-auto">
       <button
         type="button"
         onClick={handleLocateMe}
         disabled={isLocating}
-        title="Locate My Current Position"
-        aria-label="Locate My Current Position"
+        title="Locate My Current Position and Zoom In"
+        aria-label="Locate My Current Position and Zoom In"
         className="h-11 px-4 rounded-full bg-[var(--surface-1-solid)] hover:bg-[var(--surface-2-solid)] border-2 border-teal-500/80 hover:border-teal-400 text-teal-400 shadow-2xl flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer"
       >
         {isLocating ? (
@@ -460,6 +476,14 @@ export function MapPage() {
                 <Marker
                   position={[userLocation.lat, userLocation.lng]}
                   icon={createUserLocationIcon()}
+                  eventHandlers={{
+                    click: (e) => {
+                      const targetMap = e.target?._map;
+                      if (targetMap) {
+                        targetMap.flyTo([userLocation.lat, userLocation.lng], 16, { animate: true, duration: 1.0 });
+                      }
+                    },
+                  }}
                 >
                   <Popup>
                     <div className="p-1 space-y-1 text-xs">

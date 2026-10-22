@@ -150,8 +150,17 @@ function MapAutoInitializer({
     };
   }, [map]);
 
+  const initialFitDoneRef = useRef(false);
+  const prevIncidentsLengthRef = useRef(0);
+
   // Fit bounds to include incident markers automatically without requiring clicks
   useEffect(() => {
+    // Only fit bounds on initial load or when filtered incidents count changes
+    // Do NOT re-fit bounds and zoom out when user clicks "My Location"!
+    if (initialFitDoneRef.current && incidents.length === prevIncidentsLengthRef.current) {
+      return;
+    }
+
     const valid = incidents.filter(
       (i) =>
         typeof i.latitude === 'number' &&
@@ -167,8 +176,8 @@ function MapAutoInitializer({
         valid.map((i) => [i.latitude!, i.longitude!] as [number, number])
       );
 
-      // Only extend bounds if user location is nearby (< 100km) to keep focus on incident cluster
-      if (userLocation) {
+      // Only extend bounds on initial load if user location is nearby (< 100km) to keep focus on incident cluster
+      if (userLocation && !initialFitDoneRef.current) {
         const center = bounds.getCenter();
         const distMeters = calculateHaversineMeters(userLocation.lat, userLocation.lng, center.lat, center.lng);
         if (distMeters < 100_000) {
@@ -181,21 +190,26 @@ function MapAutoInitializer({
       } else {
         map.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
       }
-    } else if (userLocation) {
+    } else if (userLocation && !initialFitDoneRef.current) {
       map.setView([userLocation.lat, userLocation.lng], 13);
-    } else {
+    } else if (!initialFitDoneRef.current) {
       const defaultCenter = config.map.defaultCenter || [12.9716, 77.5946];
       map.setView([defaultCenter[0], defaultCenter[1]], 12);
     }
-  }, [incidents, userLocation, map]);
+
+    initialFitDoneRef.current = true;
+    prevIncidentsLengthRef.current = incidents.length;
+  }, [incidents, map]);
 
   return null;
 }
 
 function MiniLocateMeControl({
+  userLocation,
   onLocated,
   locateRequested,
 }: {
+  userLocation: { lat: number; lng: number; accuracy: number } | null;
   onLocated: (loc: { lat: number; lng: number; accuracy: number }) => void;
   locateRequested: number;
 }) {
@@ -204,9 +218,19 @@ function MiniLocateMeControl({
   const [isLocating, setIsLocating] = useState(false);
 
   const handleLocate = () => {
+    // If we already have a user location (e.g. from state or localStorage), immediately zoom in!
+    const cachedLat = userLocation?.lat ?? (typeof window !== 'undefined' ? parseFloat(localStorage.getItem('relieflens_user_lat') || '') : null);
+    const cachedLng = userLocation?.lng ?? (typeof window !== 'undefined' ? parseFloat(localStorage.getItem('relieflens_user_lng') || '') : null);
+
+    if (cachedLat && cachedLng && !isNaN(cachedLat) && !isNaN(cachedLng)) {
+      map.flyTo([cachedLat, cachedLng], 16, { animate: true, duration: 1.2 });
+    }
+
     if (isLocating) return;
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      toast.error('Not Supported', 'Geolocation is not supported by your browser.');
+      if (!cachedLat) {
+        toast.error('Not Supported', 'Geolocation is not supported by your browser.');
+      }
       return;
     }
 
@@ -221,15 +245,16 @@ function MiniLocateMeControl({
           localStorage.setItem('relieflens_user_accuracy', Math.round(accuracy).toString());
         } catch (_) {}
         onLocated(loc);
-        map.flyTo([latitude, longitude], 14, { duration: 1.2 });
-        toast.success('Location Found', `Map centered to your current position (±${loc.accuracy}m).`);
+        // Zoom in to street level (zoom 16)
+        map.flyTo([latitude, longitude], 16, { animate: true, duration: 1.2 });
+        toast.success('Location Found', `Zoomed in to your current position (±${loc.accuracy}m).`);
         setIsLocating(false);
       },
       (err) => {
         setIsLocating(false);
         if (err.code === 1) {
           toast.error('Location Access Denied', 'Please allow location access in your browser address bar.');
-        } else {
+        } else if (!cachedLat) {
           toast.error('Location Unavailable', err.message || 'Unable to retrieve location.');
         }
       },
@@ -257,8 +282,8 @@ function MiniLocateMeControl({
         type="button"
         onClick={handleLocate}
         disabled={isLocating}
-        title="Locate My Current Position"
-        aria-label="Locate My Current Position"
+        title="Locate My Current Position and Zoom In"
+        aria-label="Locate My Current Position and Zoom In"
         className="h-9 px-3 rounded-full bg-[var(--surface-1-solid)] hover:bg-[var(--surface-2-solid)] border-2 border-teal-500/80 hover:border-teal-400 text-teal-400 shadow-2xl flex items-center gap-1.5 transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer"
       >
         {isLocating ? (
@@ -433,6 +458,7 @@ export function DashboardMapPreview({
 
           {/* Floating Target Button (Single authoritative location trigger - Issue #26) */}
           <MiniLocateMeControl
+            userLocation={userLocation}
             onLocated={(loc) => setUserLocation(loc)}
             locateRequested={locateRequested}
           />
@@ -443,6 +469,14 @@ export function DashboardMapPreview({
               <Marker
                 position={[userLocation.lat, userLocation.lng]}
                 icon={createUserLocationMiniIcon()}
+                eventHandlers={{
+                  click: (e) => {
+                    const targetMap = e.target?._map;
+                    if (targetMap) {
+                      targetMap.flyTo([userLocation.lat, userLocation.lng], 16, { animate: true, duration: 1.0 });
+                    }
+                  },
+                }}
               >
                 <Popup>
                   <div className="p-1 text-xs">
