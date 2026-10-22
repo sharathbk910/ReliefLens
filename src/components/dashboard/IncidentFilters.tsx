@@ -43,13 +43,13 @@ export function IncidentFilters({
       {/* Compact Primary Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Search */}
-        <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
+        <div className="relative w-full sm:flex-1 sm:min-w-[240px] md:min-w-[280px]">
           <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => onChange({ search: e.target.value })}
-            placeholder="Search incident title, district, or description..."
+            placeholder="Search title, district, or description..."
             className="w-full bg-[var(--surface-1-solid)] border border-[var(--border-strong)] rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-xs"
           />
           {filters.search && (

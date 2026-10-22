@@ -138,13 +138,13 @@ export function DashboardPage() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="blinker-square" />
-            <h2 className="text-sm sm:text-base font-bold font-heading text-white tracking-tight leading-none">
+            <h2 className="text-sm sm:text-base font-bold font-heading text-[var(--text-primary)] tracking-tight leading-none">
               Emergency Rescue & Response Center
             </h2>
-            <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EBFC72]/15 text-[#EBFC72] border border-[#EBFC72]/30 shrink-0">
+            <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 border-amber-300 dark:bg-[#EBFC72]/15 dark:text-[#EBFC72] dark:border-[#EBFC72]/30 shrink-0">
               Live Feed
             </span>
-            <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400">
+            <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-600 dark:text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               <span className="font-semibold">ACTIVE DISPATCH (v1.0.0)</span>
             </div>

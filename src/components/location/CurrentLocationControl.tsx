@@ -339,52 +339,52 @@ export function CurrentLocationControl({
 
           {/* Auto-Detected Place Name & District */}
           {location.placeName && (
-            <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-600/40 text-xs animate-fade-in">
-              <div className="flex items-center gap-1.5 text-emerald-400 font-semibold mb-0.5">
+            <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-600/40 text-xs animate-fade-in">
+              <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold mb-0.5">
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
                 <span>Auto-Detected Location & District</span>
               </div>
-              <p className="text-slate-100 font-medium leading-relaxed">{location.placeName}</p>
+              <p className="text-slate-900 dark:text-slate-100 font-medium leading-relaxed">{location.placeName}</p>
             </div>
           )}
 
           {/* Coordinates Summary */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2 rounded bg-slate-950/70 border border-slate-800/60 font-mono">
-              <span className="text-slate-400 block text-[10px]">LATITUDE</span>
-              <span className="text-white font-medium">{location.latitude}°</span>
+            <div className="p-2 rounded bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/60 font-mono">
+              <span className="text-slate-500 dark:text-slate-400 block text-[10px]">LATITUDE</span>
+              <span className="text-slate-900 dark:text-white font-medium">{location.latitude}°</span>
             </div>
-            <div className="p-2 rounded bg-slate-950/70 border border-slate-800/60 font-mono">
-              <span className="text-slate-400 block text-[10px]">LONGITUDE</span>
-              <span className="text-white font-medium">{location.longitude}°</span>
+            <div className="p-2 rounded bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/60 font-mono">
+              <span className="text-slate-500 dark:text-slate-400 block text-[10px]">LONGITUDE</span>
+              <span className="text-slate-900 dark:text-white font-medium">{location.longitude}°</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400">
+          <div className="flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-500" />
+              <Clock className="w-3 h-3 text-[var(--text-muted)]" />
               Captured at {formatTimestamp(location.capturedAt)}
             </span>
-            <span className="text-[10px] text-slate-500">Source: Browser Geolocation</span>
+            <span className="text-[10px] text-[var(--text-muted)]">Source: Browser Geolocation</span>
           </div>
 
           {/* Important Location-Safety Confirmation */}
-          <div className="pt-2 border-t border-slate-800/80 space-y-2">
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80 space-y-2">
             <label className="flex items-start gap-2.5 cursor-pointer text-xs group">
               <input
                 type="checkbox"
                 checked={location.isConfirmedIncidentLocation}
                 onChange={(e) => onLocationConfirmedChange(e.target.checked)}
-                className="mt-0.5 rounded border-slate-700 bg-slate-950 text-emerald-600 focus:ring-emerald-500 shrink-0"
+                className="mt-0.5 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-emerald-600 focus:ring-emerald-500 shrink-0 cursor-pointer"
               />
-              <span className="text-slate-300 leading-snug group-hover:text-white">
-                <strong className="text-emerald-400">Confirm Incident Location:</strong> I confirm that this device GPS
+              <span className="text-slate-700 dark:text-slate-300 leading-snug group-hover:text-slate-900 dark:group-hover:text-white">
+                <strong className="text-emerald-600 dark:text-emerald-400">Confirm Incident Location:</strong> I confirm that this device GPS
                 position represents the actual location of the emergency incident.
               </span>
             </label>
 
             {!location.isConfirmedIncidentLocation && (
-              <p className="text-[11px] text-amber-400/90 pl-6 flex items-center gap-1">
+              <p className="text-[11px] text-amber-600 dark:text-amber-400/90 pl-6 flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3 shrink-0" />
                 If you are reporting an incident away from your current position, please confirm or enter the incident
                 coordinates manually.
@@ -392,9 +392,9 @@ export function CurrentLocationControl({
             )}
 
             {spokenLocationText && (
-              <div className="p-2 rounded bg-slate-950/50 border border-slate-800 text-[11px] text-slate-400">
-                <span className="text-slate-300 font-medium">Spoken location mentioned: </span>
-                <span className="text-cyan-300">"{spokenLocationText}"</span>
+              <div className="p-2 rounded bg-slate-100 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-400">
+                <span className="text-slate-700 dark:text-slate-300 font-medium">Spoken location mentioned: </span>
+                <span className="text-cyan-700 dark:text-cyan-300 font-medium">"{spokenLocationText}"</span>
               </div>
             )}
           </div>

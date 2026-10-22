@@ -78,25 +78,25 @@ export function DuplicatesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold font-heading text-white tracking-tight flex items-center gap-2">
-            <CopyCheck className="w-6 h-6 text-purple-400" />
+          <h1 className="text-xl md:text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight flex items-center gap-2">
+            <CopyCheck className="w-6 h-6 text-purple-500 dark:text-purple-400" />
             Duplicate Incident Review Queue
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Human-in-the-loop review for potential duplicate emergency reports identified by deterministic matching.
           </p>
         </div>
 
         {/* Tab Filters */}
-        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 self-start">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1 self-start">
           {(['pending', 'confirmed', 'rejected'] as DuplicateDecision[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-3 py-1 rounded text-xs font-medium capitalize transition-colors ${
                 activeTab === tab
-                  ? 'bg-slate-800 text-white font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               {tab}
@@ -107,23 +107,23 @@ export function DuplicatesPage() {
 
       {/* Viewer Notice */}
       {isViewer && (
-        <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-400 flex items-center gap-2">
+        <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2">
           <span>🔒 You are viewing duplicate suggestions in read-only mode. Confirmation or rejection requires coordinator privileges.</span>
         </div>
       )}
 
       {/* Candidates List */}
       {isLoading ? (
-        <div className="p-12 text-center text-slate-400 bg-slate-900 border border-slate-800 rounded-xl animate-pulse">
+        <div className="p-12 text-center text-[var(--text-secondary)] surface-z1 border border-[var(--border-subtle)] rounded-xl animate-pulse">
           <p className="text-sm">Loading duplicate candidates...</p>
         </div>
       ) : candidates.length === 0 ? (
-        <div className="p-12 text-center text-slate-400 bg-slate-900/60 border border-slate-800 rounded-xl">
+        <div className="p-12 text-center text-[var(--text-secondary)] surface-z1 border border-[var(--border-subtle)] rounded-xl">
           <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-          <h3 className="text-sm font-semibold text-slate-200">
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">
             No {activeTab.toUpperCase()} Duplicate Suggestions
           </h3>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
             {activeTab === 'pending'
               ? 'All candidate reports have been reviewed. No pending duplicate pairs require human confirmation.'
               : `No duplicate suggestions have been marked as ${activeTab}.`}
@@ -197,11 +197,11 @@ export function DuplicatesPage() {
                 {/* Match Reasons List */}
                 {cand.match_reasons && cand.match_reasons.length > 0 && (
                   <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                    <span className="text-slate-400 font-medium">Matching Factors:</span>
+                    <span className="text-[var(--text-secondary)] font-medium">Matching Factors:</span>
                     {cand.match_reasons.map((reason, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300 font-mono"
+                        className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-mono"
                       >
                         ✓ {reason}
                       </span>
@@ -212,16 +212,16 @@ export function DuplicatesPage() {
                 {/* Side-by-Side Comparison of Both Reports */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                   {/* Report A */}
-                  <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+                  <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
                     <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 text-xs">
-                        <span className="font-mono font-semibold text-rose-400">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800/80 text-xs">
+                        <span className="font-mono font-semibold text-rose-500 dark:text-rose-400">
                           Report A ({repA?.channel.replace('_', ' ')})
                         </span>
                         {repA?.incident && (
                           <Link
                             to={`/incidents/${repA.incident_id}`}
-                            className="text-xs text-sky-400 hover:underline flex items-center gap-1"
+                            className="text-xs text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
                           >
                             <span>Incident #{repA.incident_id.slice(0, 6)}</span>
                             <ArrowRight className="w-3 h-3" />
@@ -229,17 +229,17 @@ export function DuplicatesPage() {
                         )}
                       </div>
 
-                      <p className="text-xs text-slate-200 mt-2.5 leading-relaxed">
+                      <p className="text-xs text-slate-700 dark:text-slate-200 mt-2.5 leading-relaxed">
                         {repA?.description || 'Report description unavailable.'}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-2 border-t border-slate-800/60 text-[11px] text-slate-400 space-y-1">
-                      <div className="flex items-center gap-1 text-slate-300">
-                        <MapPin className="w-3 h-3 text-slate-400" />
+                    <div className="mt-4 pt-2 border-t border-slate-200 dark:border-slate-800/60 text-[11px] text-[var(--text-secondary)] space-y-1">
+                      <div className="flex items-center gap-1 text-[var(--text-primary)]">
+                        <MapPin className="w-3 h-3 text-[var(--text-muted)]" />
                         <span>{repA?.location_text || repA?.district || 'No location text'}</span>
                         {repA?.latitude && (
-                          <span className="font-mono text-[10px]">
+                          <span className="font-mono text-[10px] text-[var(--text-muted)]">
                             ({repA.latitude.toFixed(4)}, {repA.longitude?.toFixed(4)})
                           </span>
                         )}
@@ -257,16 +257,16 @@ export function DuplicatesPage() {
                   </div>
 
                   {/* Report B */}
-                  <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+                  <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
                     <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 text-xs">
-                        <span className="font-mono font-semibold text-purple-400">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800/80 text-xs">
+                        <span className="font-mono font-semibold text-purple-600 dark:text-purple-400">
                           Report B ({repB?.channel.replace('_', ' ')})
                         </span>
                         {repB?.incident && (
                           <Link
                             to={`/incidents/${repB.incident_id}`}
-                            className="text-xs text-sky-400 hover:underline flex items-center gap-1"
+                            className="text-xs text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
                           >
                             <span>Incident #{repB.incident_id.slice(0, 6)}</span>
                             <ArrowRight className="w-3 h-3" />
@@ -274,17 +274,17 @@ export function DuplicatesPage() {
                         )}
                       </div>
 
-                      <p className="text-xs text-slate-200 mt-2.5 leading-relaxed">
+                      <p className="text-xs text-slate-700 dark:text-slate-200 mt-2.5 leading-relaxed">
                         {repB?.description || 'Report description unavailable.'}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-2 border-t border-slate-800/60 text-[11px] text-slate-400 space-y-1">
-                      <div className="flex items-center gap-1 text-slate-300">
-                        <MapPin className="w-3 h-3 text-slate-400" />
+                    <div className="mt-4 pt-2 border-t border-slate-200 dark:border-slate-800/60 text-[11px] text-[var(--text-secondary)] space-y-1">
+                      <div className="flex items-center gap-1 text-[var(--text-primary)]">
+                        <MapPin className="w-3 h-3 text-[var(--text-muted)]" />
                         <span>{repB?.location_text || repB?.district || 'No location text'}</span>
                         {repB?.latitude && (
-                          <span className="font-mono text-[10px]">
+                          <span className="font-mono text-[10px] text-[var(--text-muted)]">
                             ({repB.latitude.toFixed(4)}, {repB.longitude?.toFixed(4)})
                           </span>
                         )}

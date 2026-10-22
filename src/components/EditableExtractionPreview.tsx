@@ -148,10 +148,10 @@ export function EditableExtractionPreview({
               {copiedTranscript ? 'Copied' : 'Copy'}
             </button>
           </div>
-          <div className="w-full min-h-[110px] p-3 text-xs rounded-lg bg-slate-950/80 border border-slate-800 text-slate-200 font-sans leading-relaxed select-text overflow-y-auto max-h-48">
+          <div className="w-full min-h-[110px] p-3 text-xs rounded-lg bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-sans leading-relaxed select-text overflow-y-auto max-h-48">
             {formData.transcript || '(No speech detected)'}
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-[var(--text-muted)]">
             Faithful verbatim transcription preserved in its native script.
           </p>
         </div>
@@ -159,20 +159,20 @@ export function EditableExtractionPreview({
         {/* Editable Normalized English Description */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <label className="font-medium text-slate-300 flex items-center gap-1.5">
-              <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
+            <label className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <Edit3 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               Normalized English Description (Editable)
             </label>
-            <span className="text-[11px] text-slate-400">Required min 10 chars</span>
+            <span className="text-[11px] text-[var(--text-secondary)]">Required min 10 chars</span>
           </div>
           <textarea
             rows={4}
             value={formData.normalizedDescription}
             onChange={(e) => setFormData({ ...formData, normalizedDescription: e.target.value })}
-            className="w-full min-h-[110px] p-3 text-xs rounded-lg bg-slate-950 border border-slate-700 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-sans leading-relaxed resize-y"
+            className="w-full min-h-[110px] p-3 text-xs rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-sans leading-relaxed resize-y"
             placeholder="Editable English-normalized emergency description..."
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-[var(--text-muted)]">
             You can modify this translation or summary before confirming.
           </p>
         </div>
@@ -182,22 +182,22 @@ export function EditableExtractionPreview({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 pt-2">
         {/* Title */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-300">Suggested Title</label>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Suggested Title</label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
         </div>
 
         {/* Incident Type */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-300">Incident Type</label>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Incident Type</label>
           <select
             value={formData.incidentType}
             onChange={(e) => setFormData({ ...formData, incidentType: e.target.value as IncidentType })}
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
           >
             {INCIDENT_TYPES.map((t) => (
               <option key={t.value} value={t.value}>
@@ -209,20 +209,20 @@ export function EditableExtractionPreview({
 
         {/* District */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-300">District / Region</label>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">District / Region</label>
           <input
             type="text"
             value={formData.district || ''}
             onChange={(e) => setFormData({ ...formData, district: e.target.value || null })}
             placeholder="e.g. Udupi, Dakshina Kannada"
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
         </div>
 
         {/* Spoken Location Text */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-300 flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-slate-400" />
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-[var(--text-muted)]" />
             Spoken Location Landmark
           </label>
           <input
@@ -230,14 +230,14 @@ export function EditableExtractionPreview({
             value={formData.locationText || ''}
             onChange={(e) => setFormData({ ...formData, locationText: e.target.value || null })}
             placeholder="e.g. Near town bridge, 3rd cross"
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
         </div>
 
         {/* People at risk */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-300 flex items-center gap-1">
-            <Users className="w-3 h-3 text-slate-400" />
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+            <Users className="w-3 h-3 text-[var(--text-muted)]" />
             People at Risk (Estimated)
           </label>
           <input
@@ -251,24 +251,24 @@ export function EditableExtractionPreview({
               })
             }
             placeholder="Leave blank if unknown"
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
         </div>
 
         {/* Immediate Danger Assessment */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-300 flex items-center gap-1">
-            <ShieldAlert className="w-3 h-3 text-slate-400" />
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+            <ShieldAlert className="w-3 h-3 text-[var(--text-muted)]" />
             Immediate Danger
           </label>
           <div className="flex items-center gap-2 pt-1">
             <button
               type="button"
               onClick={() => setFormData({ ...formData, immediateDanger: true })}
-              className={`flex-1 py-1.5 px-2 text-xs rounded-md border font-medium transition-all ${
+              className={`flex-1 py-1.5 px-2 text-xs rounded-md border font-medium transition-all cursor-pointer ${
                 formData.immediateDanger === true
-                  ? 'bg-rose-500/20 border-rose-500 text-rose-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-rose-500/20 border-rose-500 text-rose-600 dark:text-rose-300'
+                  : 'bg-slate-100 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Yes (Active Danger)
@@ -276,17 +276,17 @@ export function EditableExtractionPreview({
             <button
               type="button"
               onClick={() => setFormData({ ...formData, immediateDanger: false })}
-              className={`flex-1 py-1.5 px-2 text-xs rounded-md border font-medium transition-all ${
+              className={`flex-1 py-1.5 px-2 text-xs rounded-md border font-medium transition-all cursor-pointer ${
                 formData.immediateDanger === false
-                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-300'
+                  : 'bg-slate-100 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               No / Stable
             </button>
           </div>
           {formData.immediateDanger === null && (
-            <p className="text-[11px] text-amber-400 flex items-center gap-1 pt-0.5">
+            <p className="text-[11px] text-amber-500 dark:text-amber-400 flex items-center gap-1 pt-0.5">
               <HelpCircle className="w-3 h-3 shrink-0" />
               Ambiguous in speech. Please select Yes or No.
             </p>
@@ -296,7 +296,7 @@ export function EditableExtractionPreview({
 
       {/* Vulnerability Flags */}
       <div className="space-y-1.5 pt-1">
-        <label className="text-xs font-medium text-slate-300">Vulnerability Flags Detected</label>
+        <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Vulnerability Flags Detected</label>
         <div className="flex flex-wrap gap-2">
           {VULNERABILITY_OPTIONS.map((opt) => {
             const isSelected = formData.vulnerabilityFlags.includes(opt.id);
@@ -305,10 +305,10 @@ export function EditableExtractionPreview({
                 key={opt.id}
                 type="button"
                 onClick={() => toggleVulnerability(opt.id)}
-                className={`text-xs px-2.5 py-1 rounded-md border transition-all ${
+                className={`text-xs px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-amber-500/20 border-amber-500/50 text-amber-200'
-                    : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                    ? 'bg-amber-500/20 border-amber-500/50 text-amber-700 dark:text-amber-200'
+                    : 'bg-slate-100 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 {isSelected ? '✓ ' : '+ '}
@@ -320,14 +320,14 @@ export function EditableExtractionPreview({
       </div>
 
       {/* Human Review Reminder & Actions */}
-      <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="text-[11px] text-slate-400 max-w-md">
-          <strong className="text-slate-300">Human confirmation required:</strong> AI extraction does not automatically
+      <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-[11px] text-[var(--text-secondary)] max-w-md">
+          <strong className="text-[var(--text-primary)]">Human confirmation required:</strong> AI extraction does not automatically
           verify or submit the report. Applying this draft will fill the report form for final review.
         </p>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
-          <Button variant="ghost" size="sm" onClick={onDiscard} className="text-slate-400 hover:text-slate-200 flex-1 sm:flex-initial">
+          <Button variant="ghost" size="sm" onClick={onDiscard} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex-1 sm:flex-initial">
             Discard AI Draft
           </Button>
 

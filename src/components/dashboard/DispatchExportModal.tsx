@@ -117,7 +117,7 @@ export function DispatchExportModal({
         </div>
 
         {/* Printable Manifest Preview */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-900/60 print:bg-white print:text-black print:p-0">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 dark:bg-slate-900/60 print:bg-white print:text-black print:p-0">
           <div className="mb-4 pb-4 border-b border-[var(--border-subtle)] print:border-black flex justify-between items-start">
             <div>
               <h2 className="text-base font-bold font-heading text-[var(--text-primary)] print:text-black">
@@ -147,13 +147,13 @@ export function DispatchExportModal({
               <tbody className="divide-y divide-[var(--border-subtle)] print:divide-gray-300">
                 {incidents.slice(0, 100).map((inc) => (
                   <tr key={inc.id} className="hover:bg-[var(--border-subtle)]/40 print:hover:bg-transparent">
-                    <td className="py-2.5 px-2 font-mono font-bold text-rose-400 print:text-black">
+                    <td className="py-2.5 px-2 font-mono font-bold text-rose-600 dark:text-rose-400 print:text-black">
                       {inc.priority_tier.toUpperCase()} ({inc.effective_score})
                     </td>
                     <td className="py-2.5 px-2 font-medium text-[var(--text-primary)] print:text-black">
                       {inc.title}
                       {(inc.score_breakdown?.factors?.immediate_danger?.points ?? 0) > 0 && (
-                        <span className="ml-1.5 px-1.5 py-0.2 rounded text-[10px] bg-rose-500/20 text-rose-400 print:border print:border-red-600 print:text-red-700">
+                        <span className="ml-1.5 px-1.5 py-0.2 rounded text-[10px] bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 print:border print:border-red-600 print:text-red-700">
                           IMMEDIATE DANGER
                         </span>
                       )}

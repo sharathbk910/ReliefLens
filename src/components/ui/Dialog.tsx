@@ -50,15 +50,15 @@ export function Dialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
-        className={`relative z-10 w-full ${maxWidths[maxWidth]} bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl p-6 text-slate-100 animate-slide-down overflow-hidden max-h-[90vh] flex flex-col`}
+        className={`relative z-10 w-full ${maxWidths[maxWidth]} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl shadow-2xl p-6 text-slate-800 dark:text-slate-100 animate-slide-down overflow-hidden max-h-[90vh] flex flex-col`}
       >
-        <div className="flex items-start justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-start justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h2 id="dialog-title" className="text-lg font-semibold text-white tracking-tight">
+            <h2 id="dialog-title" className="text-lg font-semibold text-slate-900 dark:text-white tracking-tight">
               {title}
             </h2>
             {description && (
-              <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
                 {description}
               </p>
             )}
@@ -66,7 +66,7 @@ export function Dialog({
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

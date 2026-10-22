@@ -226,7 +226,7 @@ export function IncidentDetailPage() {
       <div className="flex items-center justify-between">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
@@ -235,7 +235,7 @@ export function IncidentDetailPage() {
         {hasPendingDuplicates && (
           <Link
             to="/duplicates"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-950/80 border border-purple-500/50 text-purple-200 hover:bg-purple-900 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-950/80 border border-purple-300 dark:border-purple-500/50 text-purple-700 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-900 transition-colors"
           >
             <CopyCheck className="w-3.5 h-3.5" />
             <span>Duplicate Review Pending</span>
@@ -254,28 +254,28 @@ export function IncidentDetailPage() {
               />
               <StatusBadge status={incident.status} />
               <VerificationBadge level={incident.verification_level} />
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 uppercase">
                 {incident.incident_type}
               </span>
             </div>
 
-            <h1 className="text-xl md:text-2xl font-bold font-heading text-white tracking-tight">
+            <h1 className="text-xl md:text-2xl font-bold font-heading text-[var(--text-primary)] tracking-tight">
               {incident.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--text-secondary)] pt-1">
               <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                <strong>{incident.district || 'Unassigned'}</strong> (
+                <MapPin className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                <strong className="text-[var(--text-primary)]">{incident.district || 'Unassigned'}</strong> (
                 {incident.location_text || 'No location text'})
               </span>
               {incident.latitude !== null && incident.longitude !== null && (
-                <span className="font-mono text-[11px] text-slate-400">
+                <span className="font-mono text-[11px] text-[var(--text-muted)]">
                   📍 {incident.latitude.toFixed(4)}, {incident.longitude.toFixed(4)} ({incident.location_precision})
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <Clock className="w-3.5 h-3.5 text-[var(--text-muted)]" />
                 First reported {new Date(incident.first_reported_at).toLocaleString()}
               </span>
             </div>
@@ -307,14 +307,14 @@ export function IncidentDetailPage() {
 
       {/* Uncertainty Alerts Bar if any uncertainty flags active */}
       {incident.uncertainty_flags && incident.uncertainty_flags.length > 0 && (
-        <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-4">
+        <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4 shadow-2xs">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-xs font-semibold text-amber-200">
+              <h3 className="text-xs font-semibold text-amber-900 dark:text-amber-200">
                 Uncertainty & Verification Flags Active ({incident.uncertainty_flags.length})
               </h3>
-              <p className="text-[11px] text-amber-300/80 mt-0.5">
+              <p className="text-[11px] text-amber-800 dark:text-amber-300/80 mt-0.5">
                 Information regarding this incident has incomplete or conflicting factors. Inspect flags before dispatch:
               </p>
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -380,28 +380,28 @@ export function IncidentDetailPage() {
         {/* 5 Scoring Factors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
           {/* Factor 1: Immediate Danger */}
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-lg bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-slate-300">Immediate Danger</span>
-                <span className="font-mono text-xs font-bold text-rose-400">
+                <span className="text-xs font-semibold text-[var(--text-primary)]">Immediate Danger</span>
+                <span className="font-mono text-xs font-bold text-rose-500 dark:text-rose-400">
                   {breakdown?.factors?.immediate_danger?.points || 0}/30
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Source: <strong>{breakdown?.factors?.immediate_danger?.source || 'none'}</strong>
+              <p className="text-[11px] text-[var(--text-secondary)]">
+                Source: <strong className="text-[var(--text-primary)]">{breakdown?.factors?.immediate_danger?.source || 'none'}</strong>
               </p>
               {breakdown?.factors?.immediate_danger?.matched_keywords?.length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1">
                   {breakdown.factors.immediate_danger.matched_keywords.map((kw: string) => (
-                    <span key={kw} className="text-[10px] bg-rose-950/60 text-rose-300 border border-rose-800/40 px-1 rounded">
+                    <span key={kw} className="text-[10px] bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40 px-1 rounded">
                       "{kw}"
                     </span>
                   ))}
                 </div>
               )}
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
               <div
                 className="bg-rose-500 h-full rounded-full transition-all"
                 style={{
@@ -412,22 +412,22 @@ export function IncidentDetailPage() {
           </div>
 
           {/* Factor 2: People at Risk */}
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-lg bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-slate-300">People at Risk</span>
-                <span className="font-mono text-xs font-bold text-amber-400">
+                <span className="text-xs font-semibold text-[var(--text-primary)]">People at Risk</span>
+                <span className="font-mono text-xs font-bold text-amber-500 dark:text-amber-400">
                   {breakdown?.factors?.people_at_risk?.points || 0}/25
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Input: <strong>{breakdown?.factors?.people_at_risk?.input_value !== null ? `${breakdown?.factors?.people_at_risk?.input_value} people` : 'Unknown'}</strong>
+              <p className="text-[11px] text-[var(--text-secondary)]">
+                Input: <strong className="text-[var(--text-primary)]">{breakdown?.factors?.people_at_risk?.input_value !== null ? `${breakdown?.factors?.people_at_risk?.input_value} people` : 'Unknown'}</strong>
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">
+              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                 Highest estimate considered
               </p>
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
               <div
                 className="bg-amber-500 h-full rounded-full transition-all"
                 style={{
@@ -438,22 +438,22 @@ export function IncidentDetailPage() {
           </div>
 
           {/* Factor 3: Time Sensitivity */}
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-lg bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-slate-300">Time Sensitivity</span>
-                <span className="font-mono text-xs font-bold text-sky-400">
+                <span className="text-xs font-semibold text-[var(--text-primary)]">Time Sensitivity</span>
+                <span className="font-mono text-xs font-bold text-sky-500 dark:text-sky-400">
                   {breakdown?.factors?.time_sensitivity?.points || 0}/20
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Age: <strong>{breakdown?.factors?.time_sensitivity?.hours_since_last_report} hrs ago</strong>
+              <p className="text-[11px] text-[var(--text-secondary)]">
+                Age: <strong className="text-[var(--text-primary)]">{breakdown?.factors?.time_sensitivity?.hours_since_last_report} hrs ago</strong>
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">
+              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                 Fresher reports prioritize urgency
               </p>
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
               <div
                 className="bg-sky-500 h-full rounded-full transition-all"
                 style={{
@@ -464,28 +464,28 @@ export function IncidentDetailPage() {
           </div>
 
           {/* Factor 4: Vulnerability */}
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-lg bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-slate-300">Vulnerabilities</span>
-                <span className="font-mono text-xs font-bold text-purple-400">
+                <span className="text-xs font-semibold text-[var(--text-primary)]">Vulnerabilities</span>
+                <span className="font-mono text-xs font-bold text-purple-500 dark:text-purple-400">
                   {breakdown?.factors?.vulnerability?.points || 0}/15
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Flags: <strong>{breakdown?.factors?.vulnerability?.flags?.length || 0} active</strong>
+              <p className="text-[11px] text-[var(--text-secondary)]">
+                Flags: <strong className="text-[var(--text-primary)]">{breakdown?.factors?.vulnerability?.flags?.length || 0} active</strong>
               </p>
               {breakdown?.factors?.vulnerability?.flags?.length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1">
                   {breakdown.factors.vulnerability.flags.map((fl: string) => (
-                    <span key={fl} className="text-[10px] bg-purple-950/60 text-purple-300 border border-purple-800/40 px-1 rounded">
+                    <span key={fl} className="text-[10px] bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 px-1 rounded">
                       {fl.replace('_', ' ')}
                     </span>
                   ))}
                 </div>
               )}
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
               <div
                 className="bg-purple-500 h-full rounded-full transition-all"
                 style={{
@@ -496,22 +496,22 @@ export function IncidentDetailPage() {
           </div>
 
           {/* Factor 5: Confidence */}
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-between">
+          <div className="p-3 rounded-lg bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-slate-300">Confidence</span>
-                <span className="font-mono text-xs font-bold text-teal-400">
+                <span className="text-xs font-semibold text-[var(--text-primary)]">Confidence</span>
+                <span className="font-mono text-xs font-bold text-teal-500 dark:text-teal-400">
                   {breakdown?.factors?.information_confidence?.points || 0}/10
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Level: <strong>{breakdown?.factors?.information_confidence?.verification_level}</strong>
+              <p className="text-[11px] text-[var(--text-secondary)]">
+                Level: <strong className="text-[var(--text-primary)]">{breakdown?.factors?.information_confidence?.verification_level}</strong>
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">
+              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                 Corroboration bonus points
               </p>
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
               <div
                 className="bg-teal-500 h-full rounded-full transition-all"
                 style={{
@@ -524,18 +524,18 @@ export function IncidentDetailPage() {
       </div>
 
       {/* Associated Reports Timeline (Section 4.3) */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+      <div className="surface-z1 border border-[var(--border-subtle)] rounded-xl p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-semibold text-white tracking-tight flex items-center gap-2">
-              <FileText className="w-4 h-4 text-rose-400" />
+            <h2 className="text-base font-semibold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
+              <FileText className="w-4 h-4 text-rose-500 dark:text-rose-400" />
               Associated Incoming Reports ({reports.length})
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
               All raw observations and communication records are preserved after aggregation or merge.
             </p>
-          </div>
         </div>
+      </div>
 
         <div className="space-y-3">
           {reports.map((report, idx) => {
@@ -544,60 +544,60 @@ export function IncidentDetailPage() {
             return (
               <div
                 key={report.id}
-                className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition-colors"
+                className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-2xs"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800/80 text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200 dark:border-slate-800/80 text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-rose-400">
+                    <span className="font-mono font-bold text-rose-500 dark:text-rose-400">
                       Report #{idx + 1}
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[11px] uppercase">
+                    <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-[11px] uppercase">
                       Channel: {report.channel.replace('_', ' ')}
                     </span>
                     {report.immediate_danger && (
-                      <span className="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40 text-[10px] font-bold">
+                      <span className="px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-500/40 text-[10px] font-bold">
                         ⚠️ Immediate Danger
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+                  <div className="flex items-center gap-3 text-[var(--text-secondary)] text-[11px]">
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
+                      <Clock className="w-3 h-3 text-[var(--text-muted)]" />
                       Reported: {new Date(report.reported_at).toLocaleString()}
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-sans">
                     {report.description}
                   </p>
                 </div>
 
                 {/* Metadata & restricted contact */}
-                <div className="mt-3 pt-2.5 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                <div className="mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-800/60 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-secondary)]">
                   <div className="flex flex-wrap items-center gap-3 text-[11px]">
                     {report.location_text && (
-                      <span className="flex items-center gap-1 text-slate-300">
-                        <MapPin className="w-3 h-3 text-slate-400" />
+                      <span className="flex items-center gap-1 text-[var(--text-primary)]">
+                        <MapPin className="w-3 h-3 text-[var(--text-muted)]" />
                         {report.location_text}
                       </span>
                     )}
                     {typeof report.people_at_risk_estimate === 'number' && (
                       <span>
-                        Impact Estimate: <strong>{report.people_at_risk_estimate} people</strong>
+                        Impact Estimate: <strong className="text-[var(--text-primary)]">{report.people_at_risk_estimate} people</strong>
                       </span>
                     )}
                     {report.vulnerability_flags?.length > 0 && (
-                      <span className="text-purple-300">
+                      <span className="text-purple-600 dark:text-purple-300">
                         Flags: {report.vulnerability_flags.join(', ')}
                       </span>
                     )}
                   </div>
 
                   {contact && (contact.name || contact.phone) && (
-                    <div className="flex items-center gap-2 text-[11px] bg-slate-900 border border-slate-700/80 px-2 py-0.5 rounded text-amber-200">
-                      <Phone className="w-3 h-3 text-amber-400" />
+                    <div className="flex items-center gap-2 text-[11px] bg-amber-500/10 dark:bg-slate-900 border border-amber-500/30 dark:border-slate-700/80 px-2 py-0.5 rounded text-amber-700 dark:text-amber-200">
+                      <Phone className="w-3 h-3 text-amber-500 dark:text-amber-400" />
                       <span>Contact (Restricted):</span>
                       <strong>{contact.name || 'Anonymous'}</strong>
                       {contact.phone && <span>({contact.phone})</span>}
@@ -618,29 +618,29 @@ export function IncidentDetailPage() {
         description="Authorized coordinators and admins can set an explicit priority score. The original computed score remains preserved."
       >
         <div className="space-y-4 text-xs">
-          <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between">
+          <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <div>
-              <span className="text-slate-400 block text-[11px]">Original System Score</span>
-              <span className="text-lg font-bold text-slate-200 font-mono">
+              <span className="text-[var(--text-secondary)] block text-[11px]">Original System Score</span>
+              <span className="text-lg font-bold text-[var(--text-primary)] font-mono">
                 {incident.computed_score}/100
               </span>
             </div>
             <div>
-              <span className="text-slate-400 block text-[11px]">Safety Floor Score</span>
-              <span className="text-lg font-bold text-amber-300 font-mono">
+              <span className="text-[var(--text-secondary)] block text-[11px]">Safety Floor Score</span>
+              <span className="text-lg font-bold text-amber-500 dark:text-amber-300 font-mono">
                 {breakdown?.floor_score || incident.computed_score}/100
               </span>
             </div>
             <div>
-              <span className="text-slate-400 block text-[11px]">Current Effective</span>
-              <span className="text-lg font-bold text-rose-300 font-mono">
+              <span className="text-[var(--text-secondary)] block text-[11px]">Current Effective</span>
+              <span className="text-lg font-bold text-rose-500 dark:text-rose-300 font-mono">
                 {incident.effective_score}/100
               </span>
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">
+            <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
               New Manual Score (0 to 100):
             </label>
             <div className="flex items-center gap-3">
@@ -658,7 +658,7 @@ export function IncidentDetailPage() {
                 max="100"
                 value={overrideScore}
                 onChange={(e) => setOverrideScore(Math.min(100, Math.max(0, parseInt(e.target.value, 10) || 0)))}
-                className="w-16 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-center font-mono font-bold text-white"
+                className="w-16 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2 py-1 text-center font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-rose-500"
               />
             </div>
           </div>
@@ -666,8 +666,8 @@ export function IncidentDetailPage() {
           {/* Safety floor override warning if lowering below 45 */}
           {breakdown?.uncertainty_flags?.includes('unverified_high_danger') &&
             overrideScore < 45 && (
-              <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-500/40 text-rose-200 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-500/40 text-rose-700 dark:text-rose-200 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500 dark:text-rose-400" />
                 <div className="text-[11px]">
                   <strong>High Danger Warning:</strong> This incident reports immediate danger and is unverified. Lowering below the 45 safety floor requires explicit written justification in your reason.
                 </div>
@@ -675,7 +675,7 @@ export function IncidentDetailPage() {
             )}
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">
+            <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
               Documented Justification / Reason (Required, 10–500 characters):
             </label>
             <textarea
@@ -683,14 +683,14 @@ export function IncidentDetailPage() {
               value={overrideReason}
               onChange={(e) => setOverrideReason(e.target.value)}
               placeholder="Explain the specific field ground assessment or operational decision..."
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-rose-500"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
             />
-            <span className="text-[10px] text-slate-400">
+            <span className="text-[10px] text-[var(--text-secondary)]">
               {overrideReason.length}/500 characters (minimum 10 required)
             </span>
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
             {incident.score_override !== null ? (
               <Button
                 variant="danger"
@@ -733,13 +733,13 @@ export function IncidentDetailPage() {
       >
         <div className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">
+            <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
               Operational Status:
             </label>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as any)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
             >
               <option value="new">New (Awaiting Initial Action)</option>
               <option value="under_review">Under Review (Team Assessing)</option>
@@ -750,13 +750,13 @@ export function IncidentDetailPage() {
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">
+            <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
               Verification Level:
             </label>
             <select
               value={selectedVerification}
               onChange={(e) => setSelectedVerification(e.target.value as VerificationLevel)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
             >
               <option value="unverified">Unverified</option>
               <option value="partially_corroborated">Partially Corroborated</option>
@@ -767,7 +767,7 @@ export function IncidentDetailPage() {
 
           {selectedVerification === 'coordinator_verified' && (
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
                 Coordinator Verification Reason (Required for coordinator level):
               </label>
               <textarea
@@ -775,12 +775,12 @@ export function IncidentDetailPage() {
                 value={verificationReason}
                 onChange={(e) => setVerificationReason(e.target.value)}
                 placeholder="Confirmed directly via callback with shift supervisor or ground volunteer..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-400"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
               />
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
             <Button
               variant="ghost"
               size="sm"

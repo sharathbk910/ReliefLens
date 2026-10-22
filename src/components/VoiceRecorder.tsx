@@ -437,12 +437,12 @@ export function VoiceRecorder({
           />
 
           {liveTranscript && (
-            <div className="mt-3 p-2.5 rounded-lg bg-slate-950/70 border border-emerald-500/30 text-left max-h-24 overflow-y-auto">
-              <div className="text-[10px] font-mono uppercase text-emerald-400 flex items-center gap-1.5 mb-1 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <div className="mt-3 p-2.5 rounded-lg bg-slate-100 dark:bg-slate-950/70 border border-emerald-500/30 text-left max-h-24 overflow-y-auto">
+              <div className="text-[10px] font-mono uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 mb-1 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                 Real-Time Voice Detection:
               </div>
-              <p className="text-xs text-slate-200 italic leading-relaxed">
+              <p className="text-xs text-slate-800 dark:text-slate-200 italic leading-relaxed">
                 "{liveTranscript}"
               </p>
             </div>
@@ -450,13 +450,13 @@ export function VoiceRecorder({
         </div>
       ) : recorderState === 'recording_stopped' ? (
         <div className="py-4 px-2">
-          <div className="p-4 rounded-lg bg-slate-800/60 border border-slate-700/60 mb-4">
+          <div className="p-4 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 mb-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Volume2 className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <Volume2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Audio Recording Captured ({formatTime(elapsedSeconds)})
               </span>
-              <span className="text-[11px] text-slate-400 font-mono">
+              <span className="text-[11px] text-[var(--text-secondary)] font-mono">
                 {audioBlob ? `${(audioBlob.size / 1024).toFixed(1)} KB` : ''}
               </span>
             </div>
@@ -467,7 +467,7 @@ export function VoiceRecorder({
                 variant="outline"
                 size="sm"
                 onClick={togglePlayback}
-                className="gap-2 text-slate-200 border-slate-600 hover:bg-slate-700"
+                className="gap-2 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
               >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
                 {isPlaying ? 'Pause Playback' : 'Listen to Recording'}
@@ -477,7 +477,7 @@ export function VoiceRecorder({
                 variant="ghost"
                 size="sm"
                 onClick={handleRecordAgain}
-                className="gap-1.5 text-slate-400 hover:text-slate-200"
+                className="gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Record Again
@@ -485,12 +485,12 @@ export function VoiceRecorder({
             </div>
 
             {liveTranscript && (
-              <div className="mt-3 pt-3 border-t border-slate-700/60 text-left">
-                <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5 mb-1">
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700/60 text-left">
+                <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 mb-1">
                   <Sparkles className="w-3.5 h-3.5" />
                   Spoken Words Detected
                 </div>
-                <p className="text-xs text-slate-200 italic leading-relaxed">
+                <p className="text-xs text-slate-800 dark:text-slate-200 italic leading-relaxed">
                   "{liveTranscript}"
                 </p>
               </div>
